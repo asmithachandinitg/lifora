@@ -1,0 +1,182 @@
+<div class="tasks-container">
+
+  <div class="header">
+    <h2>Tasks</h2>
+    <button (click)="openModal()">+ Add Task</button>
+  </div>
+
+  <div *ngIf="tasks.length === 0" class="empty">
+    No tasks yet 
+  </div>
+
+<div class="task-card"
+     *ngFor="let task of tasks; let i = index"
+     [class.completed-card]="task.status === 'completed'"
+     [class.overdue-card]="isOverdue(task)">
+
+  <div class="left-strip priority-{{task.priority}}"></div>
+
+  <div class="task-content">
+
+    <div class="task-top-row">
+
+      <div class="left-section">
+
+        <label class="checkbox-wrapper">
+          <input type="checkbox"
+                 [checked]="task.status === 'completed'"
+                 (click)="$event.preventDefault(); confirmComplete(task, i)">
+          <span></span>
+        </label>
+
+        <h3 class="task-title">
+          {{ task.title }}
+        </h3>
+
+      </div>
+
+      <button class="delete-btn" (click)="confirmDelete(task, i)">×</button>
+
+    </div>
+
+    <div class="task-description"
+         [innerHTML]="task.description">
+    </div>
+
+    <div class="task-meta">
+
+      <div class="meta-item" *ngIf="task.dueDate">
+        📅 {{ task.dueDate | date:'mediumDate' }}
+      </div>
+
+      <div class="meta-item" *ngIf="task.reminderTime">
+        🔔 {{ task.reminderTime | date:'short' }}
+      </div>
+
+      <div class="tags" *ngIf="task.tags.length">
+        <span class="tag" *ngFor="let tag of task.tags">
+          {{ tag }}
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+</div>
+
+
+<!-- MODAL -->
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+
+    <h3>Add Task</h3>
+
+    <!-- Title -->
+    <div class="form-group">
+      <div class="error" *ngIf="errors.title">{{ errors.title }}</div>
+      <input placeholder="Title"
+             [(ngModel)]="newTask.title"
+             [class.invalid]="errors.title">
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <div class="error" *ngIf="errors.description">{{ errors.description }}</div>
+      <quill-editor
+        [(ngModel)]="newTask.description"
+        [modules]="quillConfig"
+        class="quill-editor"
+        [class.invalid]="errors.description">
+      </quill-editor>
+    </div>
+
+    <!-- Due Date -->
+    <input type="date" [(ngModel)]="newTask.dueDate">
+
+    <!-- Priority -->
+    <div class="form-group">
+      <div class="error" *ngIf="errors.priority">{{ errors.priority }}</div>
+      <select [(ngModel)]="newTask.priority"
+              [class.invalid]="errors.priority">
+        <option [value]="0">Select Priority</option>
+        <option [value]="1">⚪ Normal</option>
+        <option [value]="2">🟢 Low</option>
+        <option [value]="3">🟡 Medium</option>
+        <option [value]="4">🔴 High</option>
+      </select>
+    </div>
+
+ <div class="tag-input-row">
+  <input
+    type="text"
+    placeholder="Add tag"
+    [(ngModel)]="tagInput"
+    (keyup.enter)="addTag()"
+  />
+
+  <button type="button" (click)="addTag()">
+    Add
+  </button>
+</div>
+
+<select (change)="selectExistingTag($any($event.target).value)">
+  <option value="">Select existing tag</option>
+  <option *ngFor="let tag of existingTags" [value]="tag">
+    {{ tag }}
+  </option>
+</select>
+
+    <!-- Selected Tags -->
+    <div class="tags">
+      <span class="tag" *ngFor="let tag of newTask.tags">
+        {{ tag }}
+        <span class="remove" (click)="removeTag(tag)">×</span>
+      </span>
+    </div>
+
+    <!-- Reminder -->
+    <label class="beautiful-checkbox">
+      <input type="checkbox" [(ngModel)]="newTask.reminderEnabled">
+      <span></span>
+      Enable Reminder
+    </label>
+
+    <input *ngIf="newTask.reminderEnabled"
+           type="datetime-local"
+           [(ngModel)]="newTask.reminderTime">
+
+    <div class="modal-actions">
+      <button (click)="addTask()">Save</button>
+      <button (click)="closeModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" *ngIf="confirmModal">
+  <div class="confirm-modal">
+
+    <h3>
+      {{ confirmType === 'complete'
+        ? 'Mark this task as completed?'
+        : 'Are you sure you want to delete this task?' }}
+    </h3>
+
+    <div class="confirm-actions">
+      <button class="yes-btn"
+              (click)="confirmAction()">
+        Yes
+      </button>
+
+      <button class="no-btn"
+              (click)="closeConfirm()">
+        Cancel
+      </button>
+    </div>
+
+  </div>
+</div>

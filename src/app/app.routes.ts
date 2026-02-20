@@ -11,6 +11,7 @@ import { AuthGuard }
     from '../core/auth/auth.guard';
 import { LayoutComponent } from '../layout/layout/layout.component';
 import { ForgotPasswordComponent } from '../modules/auth/forgot-password/forgot-password.component';
+import { TasksComponent } from '../modules/tasks/tasks.component';
 
 
 export const routes: Routes = [
@@ -42,6 +43,10 @@ export const routes: Routes = [
             {
                 path: 'diary',
                 component: DiaryComponent
+            },
+            {
+                path: 'tasks',
+                component: TasksComponent
             }
         ]
     },
