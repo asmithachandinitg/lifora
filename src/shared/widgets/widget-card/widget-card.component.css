@@ -1,0 +1,63 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.widget-card {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: 0.2s ease;
+  height: 100%;
+    margin-top: 10px; 
+    min-height: 120px;
+}
+
+.widget-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Header */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* Left */
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Icon */
+
+.icon {
+  font-size: 20px;
+  color: #7C3AED;
+}
+
+/* Title */
+
+.title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* Content */
+
+.content {
+  font-size: 13px;
+  color: #6B7280;
+}
+
+:host {
+  display: block;
+}

@@ -1,0 +1,90 @@
+<div class="diary-page"> <!-- HEADER -->
+    <div class="header">
+        <h2> <span class="material-icons">menu_book</span> My Diary </h2> <button class="add-entry-btn"
+            (click)="openForm()"> <span class="material-icons">add</span> Add Entry </button>
+    </div>
+    <div class="entry-form" *ngIf="showForm" [ngClass]="mood"> <!-- TITLE -->
+        <div class="field"> <label>Title <span class="required">*</span></label> <input class="title-input"
+                placeholder="Entry Title" [(ngModel)]="title" [ngClass]="{ 'invalid': submitted && !title }" />
+            <div class="error" *ngIf="submitted && !title"> Title is required </div>
+        </div>
+        <div class="field"> <label>Date <span class="required">*</span></label> <input type="date"
+                [(ngModel)]="entryDate" [ngClass]="{ 'invalid': submitted && !entryDate }" />
+            <div class="error" *ngIf="submitted && !entryDate"> Date is required </div>
+        </div>
+        <div class="field"> <label>Mood <span class="required">*</span></label>
+            <div class="mood-row" [ngClass]="{ 'invalid-border': submitted && !mood }"> <!-- HAPPY -->
+                <div class="mood-item" [ngClass]="{ 'active happy': mood === 'happy' }" (click)="selectMood('happy')">
+                    <span class="material-icons"> sentiment_very_satisfied </span> <small>Happy</small>
+                </div>
+                <div class="mood-item" [ngClass]="{ 'active sad': mood === 'sad' }" (click)="selectMood('sad')"> <span
+                        class="material-icons"> sentiment_dissatisfied </span> <small>Sad</small> </div> <!-- ANGRY -->
+                <div class="mood-item" [ngClass]="{ 'active angry': mood === 'angry' }" (click)="selectMood('angry')">
+                    <span class="material-icons"> sentiment_very_dissatisfied </span> <small>Angry</small>
+                </div>
+                <div class="mood-item" [ngClass]="{ 'active excited': mood === 'excited' }"
+                    (click)="selectMood('excited')"> <span class="material-icons"> mood </span> <small>Excited</small>
+                </div>
+                <div class="mood-item" [ngClass]="{ 'active neutral': mood === 'neutral' }"
+                    (click)="selectMood('neutral')"> <span class="material-icons"> sentiment_neutral </span>
+                    <small>Neutral</small>
+                </div>
+            </div>
+            <div class="error" *ngIf="submitted && !mood"> Please select a mood </div>
+        </div>
+        <div class="field"> <label>Content <span class="required">*</span></label> <quill-editor [(ngModel)]="content"
+                [modules]="quillModules" class="editor" [ngClass]="{ 'invalid': submitted && isContentEmpty() }"
+                (onContentChanged)="onContentChange()"> </quill-editor>
+            <div class="error" *ngIf="submitted && isContentEmpty()"> Content is required </div>
+        </div>
+        <div class="form-actions"> <button (click)="saveEntry()"> Save Entry </button> <button class="cancel"
+                (click)="closeForm()"> Cancel </button> </div>
+    </div>
+    <div class="entries" *ngIf="!showForm">
+    <div class="entry-card"
+     *ngFor="let entry of entries"
+     [ngClass]="entry.mood"
+     (click)="editEntry(entry)">
+
+  <div class="delete-wrapper">
+    <button class="delete-btn"
+            (click)="openDeleteModal(entry._id); $event.stopPropagation()">
+      <span class="material-icons">delete</span>
+    </button>
+  </div>
+
+  <div class="card-header">
+    <h3>{{ entry.title }}</h3>
+    <span class="material-icons mood-icon">
+      {{ getMoodIcon(entry.mood) }}
+    </span>
+  </div>
+
+  <small>{{ entry.entryDate | date }}</small>
+
+  <div class="preview" [innerHTML]="entry.content"></div>
+</div>
+    </div>
+
+<div class="modal-overlay"
+     *ngIf="showDeleteModal"
+     (click)="closeDeleteModal()">
+
+  <div class="modal"
+       (click)="$event.stopPropagation()">
+
+    <h3>Delete Entry?</h3>
+    <p>This action cannot be undone.</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn"
+              (click)="closeDeleteModal()">Cancel</button>
+
+      <button class="confirm-btn"
+              (click)="confirmDelete()">Delete</button>
+    </div>
+
+  </div>
+</div>
+
+</div>

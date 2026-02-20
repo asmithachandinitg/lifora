@@ -1,0 +1,28 @@
+<div class="sidebar">
+
+  <!-- Logo -->
+  <div class="logo">
+    💜 Lifora
+  </div>
+
+  <!-- Menu -->
+  <nav class="menu">
+
+    <a
+      *ngFor="let item of menu"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="menu-item"
+    >
+      <span class="material-icons icon">
+        {{ item.icon }}
+      </span>
+
+      <span class="label">
+        {{ item.name }}
+      </span>
+    </a>
+
+  </nav>
+
+</div>

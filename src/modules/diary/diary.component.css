@@ -1,0 +1,939 @@
+/* ========================= */
+/* PAGE LAYOUT */
+/* ========================= */
+.diary-page {
+    /* max-width: 880px; */
+    margin: auto;
+    padding: 25px;
+}
+
+/* ========================= */
+/* HEADER */
+/* ========================= */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.header h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #2d2d2d;
+}
+
+/* ========================= */
+/* ADD ENTRY BUTTON */
+/* ========================= */
+.add-entry-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-entry-btn:hover {
+    opacity: 0.9;
+}
+
+.add-entry-btn:active {
+    transform: scale(0.96);
+}
+
+/* ========================= */
+/* FORM PANEL */
+/* ========================= */
+.entry-form {
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    margin-bottom: 26px;
+    transition: 0.2s;
+}
+
+/* ========================= */
+/* MOOD TINT BORDER */
+/* ========================= */
+.entry-form.happy {
+    border-left: 6px solid #22c55e;
+}
+
+.entry-form.sad {
+    border-left: 6px solid #3b82f6;
+}
+
+.entry-form.angry {
+    border-left: 6px solid #ef4444;
+}
+
+.entry-form.excited {
+    border-left: 6px solid #f59e0b;
+}
+
+.entry-form.neutral {
+    border-left: 6px solid #9ca3af;
+}
+
+/* ========================= */
+/* TITLE FIELD */
+/* ========================= */
+.title-input {
+    width: 98%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #e3e3e3;
+    font-size: 15px;
+    margin-bottom: 18px;
+    transition: 0.2s;
+}
+
+.title-input:focus {
+    border-color: #6c63ff;
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.15);
+    outline: none;
+}
+
+/* ========================= */
+/* DATE + MOOD ROW */
+/* ========================= */
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+/* DATE FIELD */
+.date-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f7f7fb;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.date-field .material-icons {
+    font-size: 18px;
+    color: #6c63ff;
+}
+
+.date-field input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    outline: none;
+}
+
+/* ========================= */
+/* MOOD ICON ROW */
+/* ========================= */
+.mood-row {
+    display: flex;
+    gap: 10px;
+}
+
+.mood-row .material-icons {
+    font-size: 26px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mood-row .material-icons:hover {
+    color: #6c63ff;
+    transform: scale(1.2);
+}
+
+/* ========================= */
+/* QUILL EDITOR */
+/* ========================= */
+.editor {
+    margin-top: 12px;
+}
+
+/* Toolbar theme */
+.ql-toolbar {
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #e3e3e3;
+    background: #fafafe;
+}
+
+/* Editor body */
+.ql-container {
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #e3e3e3;
+    font-size: 14px;
+    min-height: 460px;
+}
+
+/* Focus glow */
+.ql-container.ql-snow:focus-within {
+    border-color: #6c63ff;
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.12);
+}
+
+/* ========================= */
+/* FORM ACTIONS */
+/* ========================= */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.form-actions button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.form-actions button:first-child {
+    background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+    color: #fff;
+}
+
+.form-actions button:first-child:hover {
+    opacity: 0.9;
+}
+
+.form-actions .cancel {
+    background: #f1f1f5;
+}
+
+.form-actions .cancel:hover {
+    opacity: 0.9;
+}
+
+.ql-container {
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #e3e3e3;
+    min-height: 300px;
+}
+
+.ql-editor {
+    min-height: 300px;
+    overflow-y: hidden;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.word-count {
+    text-align: right;
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+}
+
+/* ========================= */
+/* VALIDATION */
+/* ========================= */
+.error {
+    color: #ef4444;
+    font-size: 12px;
+}
+
+.entry-form.happy {
+    background: linear-gradient(0deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.08)), #fff;
+}
+
+.entry-form.sad {
+    background: linear-gradient(0deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.08)), #fff;
+}
+
+.entry-form.angry {
+    background: linear-gradient(0deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.08)), #fff;
+}
+
+.entry-form.excited {
+    background: linear-gradient(0deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.08)), #fff;
+}
+
+/* FORM BOX */
+.entry-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* FIELD */
+.field {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* LABEL */
+.field label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: black;
+}
+
+/* INPUT */
+input,
+.editor {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px;
+    transition: 0.2s;
+}
+
+/* INVALID */
+.invalid {
+    border: 1px solid #ff4d4f !important;
+    background: #fff5f5;
+}
+
+/* MOOD ROW */
+.mood-row {
+    display: flex;
+    gap: 10px;
+    padding: 6px;
+}
+
+.mood-row span {
+    cursor: pointer;
+    font-size: 26px;
+}
+
+/* MOOD INVALID BORDER */
+.invalid-border {
+    border: 1px solid #ff4d4f;
+    border-radius: 8px;
+}
+
+/* ERROR */
+.error {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+/* WORD COUNT */
+.word-count {
+    font-size: 12px;
+    color: #666;
+    margin-top: 6px;
+}
+
+/* BUTTONS */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+/* BASE ICON */
+.mood-row span {
+    cursor: pointer;
+    font-size: 28px;
+    padding: 6px;
+    border-radius: 50%;
+    transition: 0.2s;
+    color: #aaa;
+}
+
+/* HOVER */
+.mood-row span:hover {
+    background: #f3f4f6;
+    transform: scale(1.1);
+}
+
+/* ACTIVE BASE */
+.mood-row span.active {
+    transform: scale(1.25);
+    background: #eef2ff;
+    color: #4f46e5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* MOOD COLORS */
+.mood-row span.happy.active {
+    color: #22c55e;
+    background: #ecfdf5;
+}
+
+.mood-row span.sad.active {
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+.mood-row span.angry.active {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.mood-row span.excited.active {
+    color: #f59e0b;
+    background: #fffbeb;
+}
+
+.mood-row span.neutral.active {
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+/* TOOLTIP WRAPPER */
+.tooltip {
+    position: relative;
+}
+
+/* TOOLTIP TEXT */
+.tooltip-text {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.2s;
+}
+
+/* SHOW ON HOVER */
+.tooltip:hover .tooltip-text {
+    opacity: 1;
+}
+
+/* MOOD ROW GRID */
+.mood-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* MOOD ITEM BOX */
+.mood-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 80px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid #e5e7eb;
+    transition: 0.2s;
+    background: #fafafa;
+}
+
+/* ICON */
+.mood-item span {
+    font-size: 30px;
+    margin-bottom: 4px;
+    color: #6b7280;
+}
+
+/* LABEL */
+.mood-item small {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+}
+
+/* HOVER */
+.mood-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* ACTIVE BASE */
+.mood-item.happy.active {
+    border: 2px solid #22c55e;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+.mood-item.sad.active {
+    border: 2px solid #3b82f6;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+.mood-item.angry.active {
+    border: 2px solid #ef4444;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+.mood-item.excited.active {
+    border: 2px solid #f59e0b;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+.mood-item.neutral.active {
+    border: 2px solid #6b7280;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+/* MOOD COLORS */
+.mood-item.happy.active span {
+    color: #22c55e;
+}
+
+.mood-item.sad.active span {
+    color: #3b82f6;
+}
+
+.mood-item.angry.active span {
+    color: #ef4444;
+}
+
+.mood-item.excited.active span {
+    color: #f59e0b;
+}
+
+.mood-item.neutral.active span {
+    color: #6b7280;
+}
+
+/* INVALID BORDER */
+.invalid-border {
+    border: 1px solid #ff4d4f;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.required {
+    color: #ff4d4f;
+    margin-left: 2px;
+    font-weight: 900;
+    font-size: 16px;
+}
+
+/* Mood Background for Cards */
+
+.entry-card.happy {
+    background: linear-gradient(0deg, rgba(34,197,94,0.08), rgba(34,197,94,0.08)), #fff;
+    border-left: 5px solid #22c55e;
+}
+
+.entry-card.sad {
+    background: linear-gradient(0deg, rgba(59,130,246,0.08), rgba(59,130,246,0.08)), #fff;
+    border-left: 5px solid #3b82f6;
+}
+
+.entry-card.angry {
+    background: linear-gradient(0deg, rgba(239,68,68,0.08), rgba(239,68,68,0.08)), #fff;
+    border-left: 5px solid #ef4444;
+}
+
+.entry-card.excited {
+    background: linear-gradient(0deg, rgba(245,158,11,0.08), rgba(245,158,11,0.08)), #fff;
+    border-left: 5px solid #f59e0b;
+}
+
+.entry-card.neutral {
+    background: linear-gradient(0deg, rgba(156,163,175,0.08), rgba(156,163,175,0.08)), #fff;
+    border-left: 5px solid #9ca3af;
+}
+
+/* ========================= */
+/* ENTRY GRID LAYOUT */
+/* ========================= */
+
+.entries {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+/* ========================= */
+/* ENTRY CARD */
+/* ========================= */
+
+.entry-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: 0.2s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    height: 240px;
+    overflow: hidden;
+}
+
+.entry-card:hover {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+/* HEADER */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* DATE */
+.entry-card small {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+}
+
+/* PREVIEW CONTENT */
+.preview {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #444;
+
+    overflow-y: auto;
+    /* Scroll inside card */
+    flex-grow: 1;
+}
+
+/* Smooth Scroll */
+.preview::-webkit-scrollbar {
+    width: 4px;
+}
+
+.preview::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+.preview .ql-size-large {
+    font-size: 20px;
+}
+
+.preview .ql-size-huge {
+    font-size: 26px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #8B5CF6;
+    color: white;
+}
+
+.pagination button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #ef4444;
+}
+
+.delete-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Position delete button */
+.entry-card {
+    position: relative;
+}
+
+/* Wrapper */
+.delete-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: 0.2s;
+}
+
+/* Show only on hover */
+.entry-card:hover .delete-wrapper {
+    opacity: 1;
+}
+
+/* Delete button style */
+.delete-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ef4444;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: 0.2s;
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
+}
+
+/* Overlay */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Modal box */
+.modal {
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    width: 320px;
+    text-align: center;
+    animation: fadeIn 0.2s ease;
+}
+
+/* Actions */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.cancel-btn {
+    flex: 1;
+    background: #f3f4f6;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.confirm-btn {
+    flex: 1;
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background: #dc2626;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* Left section */
+.title-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.title-section h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.title-section small {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+}
+
+/* Right section */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Mood icon */
+.mood-icon {
+    font-size: 22px;
+}
+
+/* Delete */
+.delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: 0.2s;
+    opacity: 0;
+}
+
+/* Show delete only on hover */
+.entry-card:hover .delete-btn {
+    opacity: 1;
+}
+
+/* Hover effect */
+.delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.entry-card {
+    transition: 0.25s ease;
+}
+
+.entry-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(6px);
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    padding: 28px;
+    border-radius: 20px;
+    width: 340px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    animation: scaleIn 0.25s ease;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Mood icon */
+.mood-icon {
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Delete button */
+.delete-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.2s;
+    opacity: 0;
+}
+
+/* Delete icon inside */
+.delete-btn .material-icons {
+    font-size: 18px;
+}
+
+/* Show on hover */
+.entry-card:hover .delete-btn {
+    opacity: 1;
+}
+
+/* Hover effect */
+.delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.actions {
+    margin-top: 5px;
+}
+
+.entries {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Smooth Scroll */
+.entries {
+    scroll-behavior: smooth;
+}
+
+/* Clean Scrollbar */
+.entries::-webkit-scrollbar {
+    width: 6px;
+}
+
+.entries::-webkit-scrollbar-thumb {
+    background: #d4d4d8;
+    border-radius: 10px;
+}
