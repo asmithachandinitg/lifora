@@ -1,59 +1,142 @@
-# Lifora
+# 🌸 Lifora – Personal Life Management App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.20.
+Lifora is a modular full-stack personal life management application built with Angular.  
+It brings multiple life trackers into one unified platform to help manage productivity, health, finances, and personal growth.
 
-## Development server
+---
 
-To start a local development server, run:
+## ✨ Modules
+
+Lifora currently includes:
+
+### 📊 Productivity
+- Dashboard
+- Tasks
+- Habits
+- Goals
+
+### 🏥 Health
+- Food Tracker
+- Fitness Tracker
+- Sleep Tracker
+- Mood Tracker
+- Period Tracker
+- Medicine Tracker
+
+### 💰 Finance
+- Expenses Tracker
+
+### 📚 Growth & Lifestyle
+- Diary / Journal
+- Reading Tracker
+- Knowledge Tracker
+- Vision Board
+- Travel
+- Relationships
+
+More modules will be added as the product evolves.
+
+---
+
+## 🚀 Features
+
+- Modular feature-based architecture
+- Rich text journaling with Quill editor
+- Mood-based dynamic UI styling
+- Custom confirmation modals
+- Date-based sorting
+- Responsive grid layout
+- Local draft auto-save
+- REST API integration
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- Angular (Standalone Components)
+- TypeScript
+- Angular Forms
+- ngx-quill
+- Responsive CSS
+
+### Backend (Separate Repository)
+- Node.js
+- Express.js
+- MongoDB
+- REST API Architecture
+
+---
+
+## 📂 Project Structure
+
+```
+lifora/
+│
+├── src/
+│   ├── app/
+│   │   ├── diary/
+│   │   ├── tasks/
+│   │   ├── habits/
+│   │   ├── goals/
+│   │   ├── expenses/
+│   │   └── ...
+│   │
+│   └── services/
+│
+├── angular.json
+├── package.json
+└── README.md
+```
+
+---
+
+## ⚙️ Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/asmithachandinitg/lifora.git
+cd lifora
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open in browser:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🔮 Future Enhancements
 
-## Building
+- Authentication & User Profiles
+- Analytics Dashboard
+- Dark Mode
+- Cloud Deployment
+- PWA Support
+- Data Visualization
 
-To build the project run:
+---
 
-```bash
-ng build
-```
+## 👩‍💻 Author
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Asmitha Chandini T G  
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 📌 Purpose
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project is being developed as a scalable personal life management system and portfolio application.
