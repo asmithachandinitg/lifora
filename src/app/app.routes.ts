@@ -12,6 +12,9 @@ import { AuthGuard }
 import { LayoutComponent } from '../layout/layout/layout.component';
 import { ForgotPasswordComponent } from '../modules/auth/forgot-password/forgot-password.component';
 import { TasksComponent } from '../modules/tasks/tasks.component';
+import { ExpensesComponent } from '../modules/expenses/expenses.component';
+import { MoodService } from '../modules/mood/mood.service';
+import { MoodComponent } from '../modules/mood/mood.component';
 
 
 export const routes: Routes = [
@@ -47,6 +50,14 @@ export const routes: Routes = [
             {
                 path: 'tasks',
                 component: TasksComponent
+            },
+             {
+                path: 'expenses',
+                component: ExpensesComponent
+            },
+            {
+                path: 'mood',
+                component: MoodComponent
             }
         ]
     },
