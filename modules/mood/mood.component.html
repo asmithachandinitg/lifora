@@ -1,0 +1,212 @@
+<div class="mood-wrapper" [class]="'theme-' + currentTheme">
+
+  <!-- HEADER -->
+  <div class="mood-header">
+    <div class="header-left">
+      <h2>Mood Tracker</h2>
+      <span class="mood-subtitle">How are you feeling?</span>
+    </div>
+    <button class="log-mood-btn" (click)="openModal()">+ Log Mood</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'today'" (click)="activeTab = 'today'">Today</button>
+    <button [class.active]="activeTab === 'calendar'" (click)="activeTab = 'calendar'">Calendar</button>
+    <button [class.active]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">Analytics</button>
+  </div>
+
+  <!-- ===================== TODAY TAB ===================== -->
+  <div *ngIf="activeTab === 'today'">
+
+    <div *ngIf="todayMoods.length === 0" class="empty">
+      <span class="empty-emoji">🌤️</span>
+      <p>No moods logged today. How are you feeling?</p>
+    </div>
+
+    <div class="today-list">
+      <div class="mood-card" *ngFor="let mood of todayMoods"
+           [class]="'mood-card-' + mood.mood">
+        <div class="mood-card-left">
+          <div class="big-emoji">{{ getMoodEmoji(mood.mood) }}</div>
+          <div class="mood-info">
+            <span class="mood-label">{{ getMoodLabel(mood.mood) }}</span>
+            <span class="mood-time">{{ mood.datetime | date:'shortTime' }}</span>
+            <span class="mood-note" *ngIf="mood.note">{{ mood.note }}</span>
+          </div>
+        </div>
+        <div class="mood-card-right">
+          <div class="mood-scale-display">
+            <span class="scale-number">{{ mood.scale }}</span>
+            <span class="scale-label">/10</span>
+          </div>
+          <button class="delete-mood-btn" (click)="confirmDelete(mood)">×</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== CALENDAR TAB ===================== -->
+  <div *ngIf="activeTab === 'calendar'" class="calendar-tab">
+
+    <div class="month-nav">
+      <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+      <span class="month-label">{{ currentMonthLabel }}</span>
+      <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth" [class.disabled]="isCurrentMonth">&#8250;</button>
+    </div>
+
+    <div class="calendar-grid">
+      <div class="cal-day-name" *ngFor="let d of dayNames">{{ d }}</div>
+
+      <div *ngFor="let cell of calendarCells"
+           class="cal-cell"
+           [class.empty-cell]="!cell.day"
+           [class.today-cell]="cell.isToday"
+           [style.background]="cell.color || ''">
+        <span class="cal-day-num" *ngIf="cell.day">{{ cell.day }}</span>
+        <span class="cal-emoji" *ngIf="cell.emoji">{{ cell.emoji }}</span>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="cal-legend">
+      <div class="legend-item" *ngFor="let m of moods">
+        <span class="legend-dot" [style.background]="m.color"></span>
+        <span>{{ m.emoji }} {{ m.label }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== ANALYTICS TAB ===================== -->
+  <div *ngIf="activeTab === 'analytics'" class="analytics-tab">
+
+    <div *ngIf="allMoods.length === 0" class="empty">
+      <span class="empty-emoji">📊</span>
+      <p>Log some moods to see analytics</p>
+    </div>
+
+    <div *ngIf="allMoods.length > 0">
+
+      <!-- Average score card -->
+      <div class="avg-card" [class]="'avg-' + dominantMood">
+        <div class="avg-emoji">{{ getDominantEmoji() }}</div>
+        <div class="avg-info">
+          <span class="avg-label">Average Mood Score</span>
+          <span class="avg-score">{{ averageScale | number:'1.1-1' }} / 10</span>
+          <span class="avg-desc">{{ getMoodLabel(dominantMood) }} overall</span>
+        </div>
+      </div>
+
+      <!-- Mood frequency bars -->
+      <div class="frequency-section">
+        <h3>Mood Frequency</h3>
+        <div class="freq-bars">
+          <div class="freq-item" *ngFor="let m of moodFrequency">
+            <div class="freq-left">
+              <span class="freq-emoji">{{ m.emoji }}</span>
+              <span class="freq-label">{{ m.label }}</span>
+            </div>
+            <div class="freq-bar-track">
+              <div class="freq-bar-fill"
+                   [style.width.%]="m.percentage"
+                   [style.background]="m.color">
+              </div>
+            </div>
+            <span class="freq-count">{{ m.count }}x</span>
+            <span class="freq-pct">{{ m.percentage }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly mood trend -->
+      <div class="trend-section">
+        <h3>Last 7 Days</h3>
+        <div class="trend-bars">
+          <div class="trend-item" *ngFor="let day of weekTrend">
+            <div class="trend-bar-wrap">
+              <div class="trend-bar"
+                   [style.height.%]="day.scale * 10"
+                   [style.background]="day.color"
+                   [title]="day.label">
+              </div>
+            </div>
+            <span class="trend-day">{{ day.dayLabel }}</span>
+            <span class="trend-emoji">{{ day.emoji }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== LOG MOOD MODAL ===================== -->
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content mood-modal">
+    <h3>How are you feeling?</h3>
+
+    <!-- Emoji selector -->
+    <div class="emoji-selector">
+      <div *ngFor="let m of moods"
+           class="emoji-option"
+           [class.selected-mood]="moodForm.mood === m.value"
+           [style.border-color]="moodForm.mood === m.value ? m.color : 'transparent'"
+           [style.background]="moodForm.mood === m.value ? m.color + '22' : ''"
+           (click)="selectMood(m.value)">
+        <span class="option-emoji">{{ m.emoji }}</span>
+        <span class="option-label">{{ m.label }}</span>
+      </div>
+    </div>
+
+    <div class="error" *ngIf="formErrors.mood">{{ formErrors.mood }}</div>
+
+    <!-- Scale slider -->
+    <div class="scale-section">
+      <div class="scale-header">
+        <span>Mood Intensity</span>
+        <span class="scale-val">{{ moodForm.scale }} / 10</span>
+      </div>
+      <input type="range" min="1" max="10" step="1"
+             [(ngModel)]="moodForm.scale"
+             class="mood-slider"
+             [style.accent-color]="getSelectedColor()">
+      <div class="scale-labels">
+        <span>Low</span>
+        <span>High</span>
+      </div>
+    </div>
+
+    <!-- Note -->
+    <textarea placeholder="What's on your mind? (optional)"
+              [(ngModel)]="moodForm.note"
+              rows="3">
+    </textarea>
+
+    <!-- Date & Time -->
+    <div class="datetime-row">
+      <input type="date" [(ngModel)]="moodForm.date" [max]="todayStr">
+      <input type="time" [(ngModel)]="moodForm.time">
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn"
+              [style.background]="getSelectedColor() ? 'linear-gradient(90deg,' + getSelectedColor() + ', ' + getSelectedColor() + 'cc)' : ''"
+              (click)="saveMood()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="modal" *ngIf="confirmModal">
+  <div class="confirm-modal">
+    <h3>Delete this mood entry?</h3>
+    <div class="confirm-actions">
+      <button class="yes-btn" (click)="confirmAction()">Yes</button>
+      <button class="no-btn" (click)="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>

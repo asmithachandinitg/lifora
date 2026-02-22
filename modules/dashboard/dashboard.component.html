@@ -1,0 +1,39 @@
+<!-- Welcome -->
+<div class="welcome-card">
+  <h2>Welcome back 💜</h2>
+  <p>{{ user?.firstName | titlecase }} {{ user?.lastName | titlecase }} life dashboard is ready.</p>
+</div>
+
+<!-- ROW 1 -->
+<div class="widget-flex-row">
+
+  <app-widget-card title="Mood" icon="mood">
+    😊 Feeling Happy
+  </app-widget-card>
+
+  <app-widget-card title="Tasks" icon="check_circle">
+    3 pending today
+  </app-widget-card>
+
+  <app-widget-card title="Habits" icon="repeat">
+    🔥 5 day streak
+  </app-widget-card>
+
+</div>
+
+<!-- ROW 2 -->
+<div class="widget-flex-row">
+
+  <app-widget-card title="Sleep" icon="bedtime">
+    7h 20m average
+  </app-widget-card>
+
+  <app-widget-card title="Expenses" icon="payments">
+    ₹2,450 this week
+  </app-widget-card>
+
+  <app-widget-card title="Reading" icon="auto_stories">
+    12 pages today
+  </app-widget-card>
+
+</div>

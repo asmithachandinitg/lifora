@@ -1,0 +1,372 @@
+<div class="expenses-wrapper">
+
+  <!-- TOP TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'records'" (click)="activeTab = 'records'">Records</button>
+    <button [class.active]="activeTab === 'analysis'" (click)="activeTab = 'analysis'">Analysis</button>
+    <button [class.active]="activeTab === 'budgets'" (click)="activeTab = 'budgets'">Budgets</button>
+    <button [class.active]="activeTab === 'categories'" (click)="activeTab = 'categories'">Categories</button>
+    <button [class.active]="activeTab === 'accounts'" (click)="activeTab = 'accounts'">Accounts</button>
+  </div>
+
+  <!-- ===================== RECORDS TAB ===================== -->
+  <div *ngIf="activeTab === 'records'">
+
+    <div class="month-nav">
+      <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+      <span class="month-label">{{ currentMonthLabel }}</span>
+      <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth"
+        [class.disabled]="isCurrentMonth">&#8250;</button>
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-item expense-sum">
+        <span class="s-label">Expense</span>
+        <span class="s-value red">{{ monthExpense | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item income-sum">
+        <span class="s-label">Income</span>
+        <span class="s-value green">{{ monthIncome | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item total-sum">
+        <span class="s-label">Total</span>
+        <span class="s-value" [class.red]="monthTotal < 0" [class.green]="monthTotal >= 0">{{ monthTotal |
+          number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="records-action-row">
+      <button class="add-record-btn" (click)="openAddRecord()">+ Add Record</button>
+    </div>
+
+    <div *ngIf="groupedRecords.length === 0" class="empty">No records for this month</div>
+
+    <div *ngFor="let group of groupedRecords" class="day-group">
+      <div class="day-header">
+        <span class="day-date">{{ group.dateLabel }}</span>
+        <span class="day-total" [class.red]="group.dayTotal < 0" [class.green]="group.dayTotal > 0">
+          {{ group.dayTotal | number:'1.2-2' }}
+        </span>
+      </div>
+
+      <div class="record-item" *ngFor="let record of group.records">
+        <div class="record-left">
+          <div class="record-icon-circle">{{ getCategoryIcon(record.category) }}</div>
+          <div class="record-info">
+            <span class="record-category">{{ getCategoryName(record.category) }}</span>
+            <span class="record-note" *ngIf="record.note">{{ record.note }}</span>
+            <span class="record-time">{{ record.datetime | date:'shortTime' }}</span>
+          </div>
+        </div>
+        <div class="record-right">
+          <span class="record-amount" [class.income-amount]="record.type === 'income'"
+            [class.expense-amount]="record.type === 'expense'">
+            {{ record.type === 'income' ? '+' : '-' }}{{ record.amount | number:'1.2-2' }}
+          </span>
+          <button class="record-delete-btn" (click)="confirmDeleteRecord(record)">×</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== ANALYSIS TAB ===================== -->
+  <div *ngIf="activeTab === 'analysis'" class="analysis-tab">
+
+    <div class="month-nav">
+      <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+      <span class="month-label">{{ currentMonthLabel }}</span>
+      <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth"
+        [class.disabled]="isCurrentMonth">&#8250;</button>
+    </div>
+
+    <div *ngIf="monthRecords.length === 0" class="empty">No data for this month</div>
+
+    <div *ngIf="categoryStats.length > 0">
+      <div class="pie-section">
+        <div class="pie-chart" [ngStyle]="getPieGradient()">
+          <div class="pie-center">
+            <span class="pie-total-label">Total</span>
+            <span class="pie-total-val">{{ monthExpense | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div class="pie-legend">
+          <div class="legend-item" *ngFor="let cat of categoryStats">
+            <span class="legend-dot" [style.background]="cat.color"></span>
+            <span class="legend-name">{{ cat.icon }} {{ cat.name }}</span>
+            <span class="legend-pct">{{ cat.percentage }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-breakdown">
+        <div class="breakdown-item" *ngFor="let cat of categoryStats">
+          <div class="breakdown-left">
+            <span class="breakdown-icon">{{ cat.icon }}</span>
+            <span class="breakdown-name">{{ cat.name }}</span>
+          </div>
+          <div class="breakdown-right">
+            <div class="breakdown-bar-track">
+              <div class="breakdown-bar-fill" [style.width.%]="getBudgetUsedPercent(cat)"
+                [style.background]="cat.color">
+              </div>
+            </div>
+            <span class="breakdown-amount">{{ cat.total | number:'1.2-2' }}</span>
+            <span class="breakdown-pct">{{ getBudgetUsedPercent(cat) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== BUDGETS TAB ===================== -->
+  <div *ngIf="activeTab === 'budgets'" class="budgets-tab">
+    <h3 class="tab-title">Monthly Budgets</h3>
+
+    <div class="budget-list">
+      <div class="budget-row" *ngFor="let cat of allCategories">
+        <div class="budget-left">
+          <span class="budget-icon">{{ cat.icon }}</span>
+          <span class="budget-cat-name">{{ cat.name }}</span>
+        </div>
+        <div class="budget-right">
+          <div class="budget-progress-info" *ngIf="cat.budget > 0">
+            <span class="budget-used-text">{{ getCategorySpent(cat.id) | number:'1.0-0' }} / {{ cat.budget |
+              number:'1.0-0' }}</span>
+            <div class="mini-bar-track">
+              <div class="mini-bar-fill" [style.width.%]="getBudgetPercent(cat)"
+                [class.danger]="getBudgetPercent(cat) >= 90"
+                [class.warning]="getBudgetPercent(cat) >= 70 && getBudgetPercent(cat) < 90">
+              </div>
+            </div>
+          </div>
+          <button class="set-budget-btn" (click)="openBudgetModal(cat)">
+            {{ cat.budget > 0 ? 'Edit' : 'Set Budget' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CATEGORIES TAB ===================== -->
+  <div *ngIf="activeTab === 'categories'" class="categories-tab">
+    <div class="tab-header">
+      <h3 class="tab-title">Categories</h3>
+      <button class="add-cat-btn" (click)="openAddCategory()">+ Add</button>
+    </div>
+
+    <div class="cat-list">
+      <div class="cat-row" *ngFor="let cat of allCategories">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        <span class="cat-name">{{ cat.name }}</span>
+        <span class="cat-type-badge" [class.income-badge]="cat.type === 'income'">{{ cat.type }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== ADD RECORD MODAL ===================== -->
+<div class="modal" *ngIf="showAddRecord">
+  <div class="modal-content add-record-modal">
+
+    <div class="type-toggle">
+      <button [class.active-expense]="recordForm.type === 'expense'"
+        (click)="recordForm.type = 'expense'; calcClear()">Expense</button>
+      <button [class.active-income]="recordForm.type === 'income'"
+        (click)="recordForm.type = 'income'; calcClear()">Income</button>
+    </div>
+
+    <div class="calc-display" [class.income-display]="recordForm.type === 'income'">
+      <span class="calc-expression">{{ calcExpression }}</span>
+      <span class="calc-result">{{ calcDisplay }}</span>
+    </div>
+
+    <div class="calculator">
+      <button class="calc-btn op" (click)="calcClear()">C</button>
+      <button class="calc-btn op" (click)="calcBackspace()">⌫</button>
+      <button class="calc-btn op" (click)="calcPercent()">%</button>
+      <button class="calc-btn op accent" (click)="calcOperator('÷')">÷</button>
+
+      <button class="calc-btn" (click)="calcNumber('7')">7</button>
+      <button class="calc-btn" (click)="calcNumber('8')">8</button>
+      <button class="calc-btn" (click)="calcNumber('9')">9</button>
+      <button class="calc-btn op accent" (click)="calcOperator('×')">×</button>
+
+      <button class="calc-btn" (click)="calcNumber('4')">4</button>
+      <button class="calc-btn" (click)="calcNumber('5')">5</button>
+      <button class="calc-btn" (click)="calcNumber('6')">6</button>
+      <button class="calc-btn op accent" (click)="calcOperator('-')">−</button>
+
+      <button class="calc-btn" (click)="calcNumber('1')">1</button>
+      <button class="calc-btn" (click)="calcNumber('2')">2</button>
+      <button class="calc-btn" (click)="calcNumber('3')">3</button>
+      <button class="calc-btn op accent" (click)="calcOperator('+')">+</button>
+
+      <button class="calc-btn wide" (click)="calcNumber('0')">0</button>
+      <button class="calc-btn" (click)="calcDecimal()">.</button>
+      <button class="calc-btn op accent" (click)="calcEquals()">=</button>
+    </div>
+
+    <div class="record-form">
+      <div class="form-group">
+        <div class="error" *ngIf="recordErrors.category">{{ recordErrors.category }}</div>
+        <select [(ngModel)]="recordForm.category" [class.invalid]="recordErrors.category">
+          <option value="">Select Category</option>
+          <option *ngFor="let cat of filteredCategories" [value]="cat.id">
+            {{ cat.icon }} {{ cat.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="error" *ngIf="recordErrors.account">{{ recordErrors.account }}</div>
+        <select [(ngModel)]="recordForm.account" [class.invalid]="recordErrors.account">
+          <option value="">Select Account</option>
+          <option *ngFor="let acc of allAccounts" [value]="acc._id || acc.id">
+            {{ acc.icon }} {{ acc.name }} ({{ acc.balance | number:'1.2-2' }})
+          </option>
+        </select>
+      </div>
+
+      <input placeholder="Note (optional)" [(ngModel)]="recordForm.note">
+
+      <div class="datetime-row">
+        <input type="date" [(ngModel)]="recordForm.date" [max]="todayStr">
+        <input type="time" [(ngModel)]="recordForm.time">
+      </div>
+
+      <div class="error" *ngIf="recordErrors.amount">{{ recordErrors.amount }}</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeAddRecord()">Cancel</button>
+      <button class="save-btn" (click)="saveRecord()">Save</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== SET BUDGET MODAL ===================== -->
+<div class="modal" *ngIf="showBudgetModal">
+  <div class="modal-content budget-modal">
+    <div class="budget-modal-header">
+      <span class="bm-icon">{{ selectedBudgetCat?.icon }}</span>
+      <span class="bm-name">{{ selectedBudgetCat?.name }}</span>
+    </div>
+    <input type="number" placeholder="Enter limit" [(ngModel)]="budgetLimit" min="0">
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeBudgetModal()">Cancel</button>
+      <button class="save-btn" (click)="saveBudget()">Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADD CATEGORY MODAL ===================== -->
+<div class="modal" *ngIf="showAddCategory">
+  <div class="modal-content cat-modal">
+    <h3>New Category</h3>
+
+    <div class="icon-picker">
+      <span *ngFor="let icon of availableIcons" class="icon-option" [class.selected-icon]="newCategory.icon === icon"
+        (click)="newCategory.icon = icon">
+        {{ icon }}
+      </span>
+    </div>
+
+    <div class="form-group">
+      <div class="error" *ngIf="catErrors.name">{{ catErrors.name }}</div>
+      <input placeholder="Category name" [(ngModel)]="newCategory.name" [class.invalid]="catErrors.name">
+    </div>
+
+    <select [(ngModel)]="newCategory.type">
+      <option value="expense">Expense</option>
+      <option value="income">Income</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeAddCategory()">Cancel</button>
+      <button class="save-btn" (click)="saveCategory()">Add</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================== ACCOUNTS TAB ===================== -->
+<div *ngIf="activeTab === 'accounts'" class="accounts-tab">
+  <div class="tab-header">
+    <h3 class="tab-title">Accounts</h3>
+    <button class="add-cat-btn" (click)="openAddAccount()">+ Add Account</button>
+  </div>
+
+  <div *ngIf="allAccounts.length === 0" class="empty">No accounts yet</div>
+
+  <div class="account-list">
+    <div class="account-row" *ngFor="let acc of allAccounts; let i = index">
+      <div class="account-left">
+        <div class="account-icon-circle">{{ acc.icon }}</div>
+        <div class="account-info">
+          <span class="account-name">{{ acc.name }}</span>
+          <span class="account-balance" [class.red]="acc.balance < 0">Balance: {{ acc.balance | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="account-actions">
+        <button class="edit-btn" (click)="openEditAccount(acc, i)">✏️</button>
+        <button class="record-delete-btn" (click)="confirmDeleteAccount(acc, i)">×</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================== ADD / EDIT ACCOUNT MODAL ===================== -->
+<div class="modal" *ngIf="showAccountModal">
+  <div class="modal-content cat-modal">
+    <h3>{{ editAccountMode ? 'Edit Account' : 'New Account' }}</h3>
+
+    <div class="icon-picker">
+      <span *ngFor="let icon of accountIcons" class="icon-option" [class.selected-icon]="accountForm.icon === icon"
+        (click)="accountForm.icon = icon">
+        {{ icon }}
+      </span>
+    </div>
+
+    <div class="form-group">
+      <div class="error" *ngIf="accountErrors.name">{{ accountErrors.name }}</div>
+      <input placeholder="Account name (e.g. Cash, HDFC Bank)" [(ngModel)]="accountForm.name"
+        [class.invalid]="accountErrors.name">
+    </div>
+
+    <div class="form-group">
+      <div class="error" *ngIf="accountErrors.balance">{{ accountErrors.balance }}</div>
+      <input type="number" placeholder="Initial amount" [(ngModel)]="accountForm.balance"
+        [class.invalid]="accountErrors.balance">
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeAccountModal()">Cancel</button>
+      <button class="save-btn" (click)="saveAccount()">{{ editAccountMode ? 'Update' : 'Save' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CONFIRM DELETE ===================== -->
+<div class="modal" *ngIf="confirmModal">
+  <div class="confirm-modal">
+    <h3>Delete this record?</h3>
+    <div class="confirm-actions">
+      <button class="yes-btn" (click)="confirmAction()">Yes</button>
+      <button class="no-btn" (click)="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SNACKBAR -->
+<div class="snackbar" *ngIf="snackbar.show" [class.snack-danger]="snackbar.type === 'danger'"
+  [class.snack-warning]="snackbar.type === 'warning'" [class.snack-info]="snackbar.type === 'info'">
+  {{ snackbar.message }}
+</div>

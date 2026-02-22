@@ -1,0 +1,364 @@
+<div class="auth-page">
+
+  <div class="auth-card">
+
+    <h2>Create Your Lifora Account 💜</h2>
+    <p>Start your personal life journey.</p>
+
+
+
+    <!-- ===================== -->
+    <!-- FIRST NAME -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="!firstName && submitted"
+      >
+        Enter first name
+      </small>
+
+      <input
+        placeholder="First Name *"
+        [(ngModel)]="firstName"
+        [class.error]="
+          !firstName && submitted
+        "
+      />
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- LAST NAME -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="!lastName && submitted"
+      >
+        Enter last name
+      </small>
+
+      <input
+        placeholder="Last Name *"
+        [(ngModel)]="lastName"
+        [class.error]="
+          !lastName && submitted
+        "
+      />
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- EMAIL -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="!email && submitted"
+      >
+        Enter email
+      </small>
+
+      <small
+        class="error-text"
+        *ngIf="
+          email &&
+          !emailPattern.test(email)
+        "
+      >
+        Invalid email format
+      </small>
+
+      <input
+        placeholder="Email Address *"
+        [(ngModel)]="email"
+        type="email"
+        [class.error]="
+          (!email && submitted) ||
+          (email &&
+           !emailPattern.test(email))
+        "
+      />
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- GENDER -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="!gender && submitted"
+      >
+        Select gender
+      </small>
+
+      <select
+        [(ngModel)]="gender"
+        [class.error]="
+          !gender && submitted
+        "
+      >
+        <option value="" disabled selected>
+          Select Gender *
+        </option>
+        <option>Female</option>
+        <option>Male</option>
+        <option>Non-binary</option>
+        <option>Prefer not to say</option>
+      </select>
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- PASSWORD -->
+    <!-- ===================== -->
+
+    <div class="field password-row">
+
+      <small
+        class="error-text"
+        *ngIf="!password && submitted"
+      >
+        Enter password
+      </small>
+
+      <div class="input-wrapper">
+
+        <input
+          [type]="
+            showPassword
+              ? 'text'
+              : 'password'
+          "
+          placeholder="Password *"
+          [(ngModel)]="password"
+          (input)="checkStrength()"
+          [class.error]="
+            !password && submitted
+          "
+        />
+
+        <span
+          class="material-icons eye"
+          (click)="
+            showPassword =
+            !showPassword
+          "
+        >
+          {{ showPassword
+             ? 'visibility'
+             : 'visibility_off' }}
+        </span>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- CONFIRM PASSWORD -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="
+          !confirmPassword &&
+          submitted
+        "
+      >
+        Enter confirm password
+      </small>
+
+      <small
+        class="error-text"
+        *ngIf="
+          confirmPassword &&
+          password !== confirmPassword
+        "
+      >
+        Passwords do not match
+      </small>
+
+      <div class="input-wrapper">
+
+        <input
+          [type]="
+            showConfirmPassword
+              ? 'text'
+              : 'password'
+          "
+          placeholder="Confirm Password *"
+          [(ngModel)]="confirmPassword"
+          [class.error]="
+            (!confirmPassword &&
+             submitted) ||
+            (confirmPassword &&
+             password !== confirmPassword)
+          "
+        />
+
+        <span
+          class="material-icons eye"
+          (click)="
+            showConfirmPassword =
+            !showConfirmPassword
+          "
+        >
+          {{ showConfirmPassword
+             ? 'visibility'
+             : 'visibility_off' }}
+        </span>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- PASSWORD PANEL -->
+    <!-- ===================== -->
+
+    <div
+      class="password-panel"
+      *ngIf="password"
+    >
+
+      <!-- STRENGTH -->
+      <div class="strength">
+
+        <div
+          class="bar"
+          [ngClass]="{
+            weak:
+              passwordStrength <= 1,
+            medium:
+              passwordStrength == 2,
+            strong:
+              passwordStrength >= 3
+          }"
+          [style.width.%]="
+            passwordStrength * 25
+          "
+        ></div>
+
+      </div>
+
+
+
+      <!-- RULES -->
+      <div class="rules">
+
+        <div
+          [class.valid]="
+            passwordRules.length
+          "
+        >
+          <span class="material-icons">
+            {{
+              passwordRules.length
+              ? 'check_circle'
+              : 'radio_button_unchecked'
+            }}
+          </span>
+          8 characters
+        </div>
+
+
+
+        <div
+          [class.valid]="
+            passwordRules.capital
+          "
+        >
+          <span class="material-icons">
+            {{
+              passwordRules.capital
+              ? 'check_circle'
+              : 'radio_button_unchecked'
+            }}
+          </span>
+          Capital letter
+        </div>
+
+
+
+        <div
+          [class.valid]="
+            passwordRules.number
+          "
+        >
+          <span class="material-icons">
+            {{
+              passwordRules.number
+              ? 'check_circle'
+              : 'radio_button_unchecked'
+            }}
+          </span>
+          Number
+        </div>
+
+
+
+        <div
+          [class.valid]="
+            passwordRules.special
+          "
+        >
+          <span class="material-icons">
+            {{
+              passwordRules.special
+              ? 'check_circle'
+              : 'radio_button_unchecked'
+            }}
+          </span>
+          Special character
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- REGISTER -->
+    <!-- ===================== -->
+
+    <button (click)="registerUser()">
+      Register
+    </button>
+
+
+
+    <small>
+      Already have an account?
+      <a routerLink="/login">
+        Login
+      </a>
+    </small>
+
+  </div>
+
+</div>

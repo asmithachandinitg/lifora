@@ -1,0 +1,62 @@
+.sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+  background: linear-gradient(
+    180deg,
+    #A78BFA 0%,
+    #C4B5FD 100%
+  );
+}
+
+/* Logo */
+
+.logo {
+  font-size: 22px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 30px;
+  padding-left: 10px;
+}
+
+/* Menu */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Menu item */
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: white;
+  transition: 0.2s ease;
+}
+
+/* Icon */
+
+.icon {
+  font-size: 20px;
+}
+
+/* Hover */
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Active route */
+
+.active {
+  background: white;
+  color: #7C3AED;
+  font-weight: 500;
+}

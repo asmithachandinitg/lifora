@@ -1,0 +1,88 @@
+<div class="topbar">
+
+  <!-- Left -->
+  <div class="left">
+
+    <div class="greeting">
+      {{ getGreeting() }} {{ user?.firstName | titlecase }} {{ user?.lastName | titlecase }}
+    </div>
+
+    <div class="date">
+      {{ today | date:'EEEE, MMMM d' }}
+    </div>
+
+  </div>
+
+  <!-- Right -->
+  <div class="right">
+
+    <!-- Future search -->
+    <span class="material-icons icon">
+      search
+    </span>
+
+    <!-- Future notifications -->
+    <span class="material-icons icon">
+      notifications
+    </span>
+
+    <!-- Avatar -->
+    <!-- <div class="avatar">
+      {{ user?.firstName?.charAt(0).toUpperCase() }}
+    </div>
+
+    <button (click)="logout()" class="logout-btn">
+  Logout
+</button> -->
+
+
+<div class="avatar-wrapper" (click)="toggleMenu()">
+
+  <!-- Avatar Icon Circle -->
+  <div class="avatar">
+
+    <span class="material-icons">
+      account_circle
+    </span>
+
+  </div>
+
+  <!-- Online Status Icon -->
+  <span class="status-icon material-icons">
+    circle
+  </span>
+
+  <!-- Dropdown -->
+  <div
+    class="dropdown"
+    *ngIf="menuOpen"
+  >
+
+    <div class="dropdown-item" (click)="goProfile()">
+
+      <span class="material-icons item-icon">
+        person
+      </span>
+
+      Profile
+
+    </div>
+
+    <div class="dropdown-item" (click)="logout()">
+
+      <span class="material-icons item-icon">
+        logout
+      </span>
+
+      Logout
+
+    </div>
+
+  </div>
+
+</div>
+
+
+  </div>
+
+</div>

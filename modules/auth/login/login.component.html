@@ -1,0 +1,131 @@
+<div class="auth-page">
+
+  <div class="auth-card">
+
+    <h2>Login 💜</h2>
+
+<div
+  class="form-error"
+  *ngIf="loginError"
+>
+  {{ loginError }} ❌
+</div>
+
+
+    <!-- ===================== -->
+    <!-- EMAIL -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="!email && submitted"
+      >
+        Enter email
+      </small>
+
+      <small
+        class="error-text"
+        *ngIf="
+          email &&
+          !emailPattern.test(email)
+        "
+      >
+        Invalid email format
+      </small>
+
+      <input
+        placeholder="Email Address *"
+        [(ngModel)]="email"
+        type="email"
+        [class.error]="
+          (!email && submitted) ||
+          (email &&
+           !emailPattern.test(email))
+        "
+        (ngModelChange)="clearError()"
+      />
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- PASSWORD -->
+    <!-- ===================== -->
+
+    <div class="field">
+
+      <small
+        class="error-text"
+        *ngIf="!password && submitted"
+      >
+        Enter password
+      </small>
+
+      <div class="input-wrapper">
+
+        <input
+          [type]="
+            showPassword
+              ? 'text'
+              : 'password'
+          "
+          placeholder="Password *"
+          [(ngModel)]="password"
+          [class.error]="
+            !password && submitted
+          "
+          (ngModelChange)="clearError()"
+        />
+
+        <span
+          class="material-icons eye"
+          (click)="
+            showPassword =
+            !showPassword
+          "
+        >
+          {{ showPassword
+             ? 'visibility'
+             : 'visibility_off' }}
+        </span>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================== -->
+    <!-- LOGIN BUTTON -->
+    <!-- ===================== -->
+
+    <button (click)="loginUser()">
+      Login
+    </button>
+
+
+
+    <!-- ===================== -->
+    <!-- REGISTER LINK -->
+    <!-- ===================== -->
+
+    <small>
+      Don’t have an account?
+      <a routerLink="/register">
+        Register
+      </a>
+    </small>
+
+    <small class="forgot-link">
+  <a routerLink="/forgot-password">
+    Forgot Password?
+  </a>
+</small>
+
+  </div>
+
+
+</div>
