@@ -33,7 +33,7 @@ select {
     margin-bottom: 14px;
     border-radius: 10px;
     border: 1px solid red;
-    font-family: inherit;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 button {

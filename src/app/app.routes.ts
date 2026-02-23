@@ -13,8 +13,9 @@ import { LayoutComponent } from '../layout/layout/layout.component';
 import { ForgotPasswordComponent } from '../modules/auth/forgot-password/forgot-password.component';
 import { TasksComponent } from '../modules/tasks/tasks.component';
 import { ExpensesComponent } from '../modules/expenses/expenses.component';
-import { MoodService } from '../modules/mood/mood.service';
 import { MoodComponent } from '../modules/mood/mood.component';
+import { GoalsComponent } from '../modules/goals/goals.component';
+import { SleepComponent } from '../modules/sleep/sleep.component';
 
 
 export const routes: Routes = [
@@ -58,6 +59,14 @@ export const routes: Routes = [
             {
                 path: 'mood',
                 component: MoodComponent
+            },
+             {
+                path: 'goals',
+                component: GoalsComponent
+            },
+             {
+                path: 'sleep',
+                component: SleepComponent
             }
         ]
     },

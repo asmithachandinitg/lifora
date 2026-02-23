@@ -1,0 +1,299 @@
+<div class="sleep-wrapper">
+
+  <!-- HEADER -->
+  <div class="sleep-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">bedtime</span> Sleep Tracker</h2>
+      <span class="sleep-subtitle">Track your rest, improve your life</span>
+    </div>
+    <button class="add-sleep-btn" (click)="openModal()">
+      <span class="material-icons">add</span> Log Sleep
+    </button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'">Dashboard</button>
+    <button [class.active]="activeTab === 'history'" (click)="activeTab = 'history'">History</button>
+  </div>
+
+  <!-- ===================== DASHBOARD TAB ===================== -->
+  <div *ngIf="activeTab === 'dashboard'">
+
+    <!-- Empty state -->
+    <div *ngIf="entries.length === 0" class="empty">
+      <span class="material-icons empty-icon">bedtime</span>
+      <p>No sleep logged yet. Start tracking your rest!</p>
+    </div>
+
+    <div *ngIf="entries.length > 0">
+
+      <!-- STATS ROW -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#A78BFA">schedule</span>
+          <span class="stat-number">{{ formatDuration(avgDuration) }}</span>
+          <span class="stat-label">Avg Duration</span>
+        </div>
+        <div class="stat-card">
+          <span class="material-icons stat-icon" [style.color]="getQualityColor(avgQuality)">{{ getQualityIcon(avgQuality) }}</span>
+          <span class="stat-number">{{ avgQuality }}<span class="stat-unit">/5</span></span>
+          <span class="stat-label">Avg Quality</span>
+        </div>
+        <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#22c55e">star</span>
+          <span class="stat-number">{{ bestSleep ? formatDuration(bestSleep!.duration) : '-' }}</span>
+          <span class="stat-label">Best Sleep</span>
+        </div>
+        <div class="stat-card" [style.border-top-color]="getSleepGoalStatus().color">
+          <span class="material-icons stat-icon" [style.color]="getSleepGoalStatus().color">{{ getSleepGoalStatus().icon }}</span>
+          <span class="stat-number goal-text" [style.color]="getSleepGoalStatus().color">{{ getSleepGoalStatus().label }}</span>
+          <span class="stat-label">vs 8h Goal</span>
+        </div>
+      </div>
+
+      <!-- WEEKLY CHART -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3><span class="material-icons">bar_chart</span> Last 7 Nights</h3>
+          <span class="chart-legend">
+            <span class="legend-dot" style="background:#A78BFA"></span> Duration
+          </span>
+        </div>
+        <div class="bar-chart">
+          <div class="bar-col" *ngFor="let entry of last7">
+            <div class="bar-wrap">
+              <span class="bar-val">{{ formatDuration(entry.duration) }}</span>
+              <div class="bar"
+                [style.height.%]="getBarHeight(entry)"
+                [style.background]="getQualityColor(entry.quality)">
+              </div>
+              <!-- 8h goal line indicator -->
+            </div>
+            <span class="bar-label">{{ entry.sleepTime | date:'EEE' }}</span>
+            <span class="bar-quality-dot" [style.background]="getQualityColor(entry.quality)"></span>
+          </div>
+        </div>
+        <!-- Quality legend below chart -->
+        <div class="quality-legend">
+          <span *ngFor="let q of [1,2,3,4,5]" class="ql-item">
+            <span class="ql-dot" [style.background]="getQualityColor(q)"></span>
+            {{ qualityLabels[q] }}
+          </span>
+        </div>
+      </div>
+
+      <!-- LATEST ENTRY DETAIL -->
+      <div class="latest-card" *ngIf="sortedEntries[0] as latest">
+        <div class="latest-header">
+          <div>
+            <h3>Last Night</h3>
+            <span class="latest-date">{{ latest.sleepTime | date:'EEE, dd MMM' }}</span>
+          </div>
+          <div class="latest-quality">
+            <span class="material-icons quality-face" [style.color]="getQualityColor(latest.quality)">
+              {{ getQualityIcon(latest.quality) }}
+            </span>
+            <span class="quality-label-text" [style.color]="getQualityColor(latest.quality)">
+              {{ getQualityLabel(latest.quality) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="latest-times">
+          <div class="time-block">
+            <span class="material-icons time-icon">bedtime</span>
+            <span class="time-label">Slept</span>
+            <span class="time-val">{{ formatTime(latest.sleepTime) }}</span>
+          </div>
+          <div class="time-arrow">
+            <span class="material-icons">arrow_forward</span>
+            <span class="duration-pill">{{ formatDuration(latest.duration) }}</span>
+          </div>
+          <div class="time-block">
+            <span class="material-icons time-icon">wb_sunny</span>
+            <span class="time-label">Woke</span>
+            <span class="time-val">{{ formatTime(latest.wakeTime) }}</span>
+          </div>
+        </div>
+
+        <!-- Sleep stages -->
+        <div class="stages-section" *ngIf="latest.stages">
+          <h4>Sleep Stages</h4>
+          <div class="stages-bar">
+            <div class="stage-seg deep-seg"
+              [style.width.%]="getStagePercent(latest.stages.deep, latest.duration)"
+              [title]="'Deep: ' + latest.stages.deep + 'min'">
+            </div>
+            <div class="stage-seg rem-seg"
+              [style.width.%]="getStagePercent(latest.stages.rem, latest.duration)"
+              [title]="'REM: ' + latest.stages.rem + 'min'">
+            </div>
+            <div class="stage-seg light-seg"
+              [style.width.%]="getStagePercent(latest.stages.light, latest.duration)"
+              [title]="'Light: ' + latest.stages.light + 'min'">
+            </div>
+          </div>
+          <div class="stages-legend">
+            <span class="stage-item">
+              <span class="stage-dot deep-dot"></span> Deep · {{ latest.stages.deep }}min
+            </span>
+            <span class="stage-item">
+              <span class="stage-dot rem-dot"></span> REM · {{ latest.stages.rem }}min
+            </span>
+            <span class="stage-item">
+              <span class="stage-dot light-dot"></span> Light · {{ latest.stages.light }}min
+            </span>
+          </div>
+        </div>
+
+        <p class="latest-notes" *ngIf="latest.notes">
+          <span class="material-icons notes-icon">notes</span> {{ latest.notes }}
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== HISTORY TAB ===================== -->
+  <div *ngIf="activeTab === 'history'">
+
+    <div *ngIf="entries.length === 0" class="empty">
+      <span class="material-icons empty-icon">history</span>
+      <p>No sleep entries yet.</p>
+    </div>
+
+    <div class="history-list">
+      <div class="history-card" *ngFor="let entry of sortedEntries; trackBy: trackByEntry">
+
+        <div class="hc-left">
+          <div class="hc-date-block">
+            <span class="hc-day">{{ entry.sleepTime | date:'EEE' }}</span>
+            <span class="hc-date">{{ entry.sleepTime | date:'dd MMM' }}</span>
+          </div>
+          <div class="hc-times">
+            <span class="material-icons hc-icon">bedtime</span>
+            {{ formatTime(entry.sleepTime) }}
+            <span class="material-icons hc-arrow">arrow_forward</span>
+            <span class="material-icons hc-icon">wb_sunny</span>
+            {{ formatTime(entry.wakeTime) }}
+          </div>
+          <p class="hc-notes" *ngIf="entry.notes">{{ entry.notes }}</p>
+        </div>
+
+        <div class="hc-right">
+          <div class="hc-duration">{{ formatDuration(entry.duration) }}</div>
+          <div class="hc-quality" [style.color]="getQualityColor(entry.quality)">
+            <span class="material-icons hc-quality-icon">{{ getQualityIcon(entry.quality) }}</span>
+            <span class="hc-quality-label">{{ getQualityLabel(entry.quality) }}</span>
+          </div>
+          <!-- Mini stages bar -->
+          <div class="mini-stages-bar">
+            <div class="stage-seg deep-seg" [style.width.%]="getStagePercent(entry.stages.deep, entry.duration)"></div>
+            <div class="stage-seg rem-seg" [style.width.%]="getStagePercent(entry.stages.rem, entry.duration)"></div>
+            <div class="stage-seg light-seg" [style.width.%]="getStagePercent(entry.stages.light, entry.duration)"></div>
+          </div>
+          <button class="delete-btn" (click)="confirmDelete(entry._id!)">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== LOG SLEEP MODAL ===================== -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+  <div class="sleep-modal" (click)="$event.stopPropagation()">
+
+    <h3><span class="material-icons modal-title-icon">bedtime</span> Log Sleep</h3>
+
+    <!-- Sleep time -->
+    <div class="form-section-label">
+      <span class="material-icons">bedtime</span> Sleep Time
+    </div>
+    <div class="datetime-row">
+      <input type="date" [(ngModel)]="form.sleepDate" />
+      <input type="time" [(ngModel)]="form.sleepTime" />
+    </div>
+
+    <!-- Wake time -->
+    <div class="form-section-label">
+      <span class="material-icons">wb_sunny</span> Wake Time
+    </div>
+    <div class="datetime-row">
+      <input type="date" [(ngModel)]="form.wakeDate" />
+      <input type="time" [(ngModel)]="form.wakeTime" />
+    </div>
+
+    <!-- Quality -->
+    <div class="form-section-label">
+      <span class="material-icons">star</span> Sleep Quality
+    </div>
+    <div class="quality-selector">
+      <div
+        *ngFor="let q of [1,2,3,4,5]"
+        class="quality-option"
+        [class.selected-quality]="form.quality === q"
+        [style.border-color]="form.quality === q ? getQualityColor(q) : 'transparent'"
+        [style.background]="form.quality === q ? getQualityColor(q) + '18' : ''"
+        (click)="form.quality = q">
+        <span class="material-icons quality-option-icon" [style.color]="form.quality === q ? getQualityColor(q) : '#9ca3af'">
+          {{ getQualityIcon(q) }}
+        </span>
+        <span class="quality-option-label">{{ qualityLabels[q] }}</span>
+      </div>
+    </div>
+
+    <!-- Sleep Stages -->
+    <div class="form-section-label">
+      <span class="material-icons">layers</span> Sleep Stages (minutes)
+    </div>
+    <div class="stages-inputs">
+      <div class="stage-input-group">
+        <label class="stage-label deep-label">Deep</label>
+        <input type="number" [(ngModel)]="form.deepMinutes" min="0" max="300" />
+      </div>
+      <div class="stage-input-group">
+        <label class="stage-label rem-label">REM</label>
+        <input type="number" [(ngModel)]="form.remMinutes" min="0" max="300" />
+      </div>
+      <div class="stage-input-group">
+        <label class="stage-label light-label">Light</label>
+        <input type="number" [(ngModel)]="form.lightMinutes" min="0" max="300" />
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-section-label">
+      <span class="material-icons">notes</span> Notes
+    </div>
+    <textarea [(ngModel)]="form.notes" placeholder="How did you feel? Any dreams?" rows="3"></textarea>
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn" (click)="saveEntry()">
+        <span class="material-icons">save</span> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Delete this sleep entry?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="deleteEntry()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

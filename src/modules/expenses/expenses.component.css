@@ -253,15 +253,27 @@
 .income-amount { color: #22c55e; }
 .expense-amount { color: #ef4444; }
 
+/* Material Icons base */
+.material-icons {
+  font-family: 'Material Icons';
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.confirm-del-icon { font-size: 44px; color: #ef4444; display: block; margin-bottom: 10px; }
+
 .record-delete-btn {
   border: none;
   background: transparent;
-  font-size: 20px;
   color: #d1d5db;
   cursor: pointer;
-  line-height: 1;
   transition: 0.2s;
-  padding: 0 4px;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
 }
 
 .record-delete-btn:hover { color: #ef4444; }
@@ -512,6 +524,9 @@
   background: linear-gradient(90deg, #A78BFA, #8B5CF6);
   color: white;
   border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 500;

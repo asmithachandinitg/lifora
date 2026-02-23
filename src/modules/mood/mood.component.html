@@ -6,7 +6,9 @@
       <h2>Mood Tracker</h2>
       <span class="mood-subtitle">How are you feeling?</span>
     </div>
-    <button class="log-mood-btn" (click)="openModal()">+ Log Mood</button>
+    <button class="log-mood-btn" (click)="openModal()">
+      <span class="material-icons">add</span> Log Mood
+    </button>
   </div>
 
   <!-- TABS -->
@@ -20,7 +22,7 @@
   <div *ngIf="activeTab === 'today'">
 
     <div *ngIf="todayMoods.length === 0" class="empty">
-      <span class="empty-emoji">🌤️</span>
+      <span class="material-icons empty-icon">wb_sunny</span>
       <p>No moods logged today. How are you feeling?</p>
     </div>
 
@@ -40,7 +42,9 @@
             <span class="scale-number">{{ mood.scale }}</span>
             <span class="scale-label">/10</span>
           </div>
-          <button class="delete-mood-btn" (click)="confirmDelete(mood)">×</button>
+          <button class="delete-mood-btn" (click)="confirmDelete(mood)">
+            <span class="material-icons">delete</span>
+          </button>
         </div>
       </div>
     </div>
@@ -51,9 +55,13 @@
   <div *ngIf="activeTab === 'calendar'" class="calendar-tab">
 
     <div class="month-nav">
-      <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+      <button class="nav-btn" (click)="prevMonth()">
+        <span class="material-icons">chevron_left</span>
+      </button>
       <span class="month-label">{{ currentMonthLabel }}</span>
-      <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth" [class.disabled]="isCurrentMonth">&#8250;</button>
+      <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth" [class.disabled]="isCurrentMonth">
+        <span class="material-icons">chevron_right</span>
+      </button>
     </div>
 
     <div class="calendar-grid">
@@ -83,7 +91,7 @@
   <div *ngIf="activeTab === 'analytics'" class="analytics-tab">
 
     <div *ngIf="allMoods.length === 0" class="empty">
-      <span class="empty-emoji">📊</span>
+      <span class="material-icons empty-icon">bar_chart</span>
       <p>Log some moods to see analytics</p>
     </div>
 
@@ -195,7 +203,9 @@
       <button class="cancel-btn" (click)="closeModal()">Cancel</button>
       <button class="save-btn"
               [style.background]="getSelectedColor() ? 'linear-gradient(90deg,' + getSelectedColor() + ', ' + getSelectedColor() + 'cc)' : ''"
-              (click)="saveMood()">Save</button>
+              (click)="saveMood()">
+        <span class="material-icons">save</span> Save
+      </button>
     </div>
   </div>
 </div>
@@ -203,9 +213,12 @@
 <!-- CONFIRM DELETE -->
 <div class="modal" *ngIf="confirmModal">
   <div class="confirm-modal">
+    <span class="material-icons confirm-del-icon">delete_forever</span>
     <h3>Delete this mood entry?</h3>
     <div class="confirm-actions">
-      <button class="yes-btn" (click)="confirmAction()">Yes</button>
+      <button class="yes-btn" (click)="confirmAction()">
+        <span class="material-icons">delete</span> Yes
+      </button>
       <button class="no-btn" (click)="closeConfirm()">Cancel</button>
     </div>
   </div>

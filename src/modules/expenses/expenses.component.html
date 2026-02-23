@@ -13,10 +13,10 @@
   <div *ngIf="activeTab === 'records'">
 
     <div class="month-nav">
-      <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+      <button class="nav-btn" (click)="prevMonth()"><span class="material-icons">chevron_left</span></button>
       <span class="month-label">{{ currentMonthLabel }}</span>
       <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth"
-        [class.disabled]="isCurrentMonth">&#8250;</button>
+        [class.disabled]="isCurrentMonth"><span class="material-icons">chevron_right</span></button>
     </div>
 
     <div class="summary-row">
@@ -38,7 +38,7 @@
     </div>
 
     <div class="records-action-row">
-      <button class="add-record-btn" (click)="openAddRecord()">+ Add Record</button>
+      <button class="add-record-btn" (click)="openAddRecord()"><span class="material-icons">add</span> Add Record</button>
     </div>
 
     <div *ngIf="groupedRecords.length === 0" class="empty">No records for this month</div>
@@ -65,7 +65,7 @@
             [class.expense-amount]="record.type === 'expense'">
             {{ record.type === 'income' ? '+' : '-' }}{{ record.amount | number:'1.2-2' }}
           </span>
-          <button class="record-delete-btn" (click)="confirmDeleteRecord(record)">×</button>
+          <button class="record-delete-btn" (click)="confirmDeleteRecord(record)"><span class="material-icons">delete</span></button>
         </div>
       </div>
     </div>
@@ -76,10 +76,10 @@
   <div *ngIf="activeTab === 'analysis'" class="analysis-tab">
 
     <div class="month-nav">
-      <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+      <button class="nav-btn" (click)="prevMonth()"><span class="material-icons">chevron_left</span></button>
       <span class="month-label">{{ currentMonthLabel }}</span>
       <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth"
-        [class.disabled]="isCurrentMonth">&#8250;</button>
+        [class.disabled]="isCurrentMonth"><span class="material-icons">chevron_right</span></button>
     </div>
 
     <div *ngIf="monthRecords.length === 0" class="empty">No data for this month</div>
@@ -156,7 +156,7 @@
   <div *ngIf="activeTab === 'categories'" class="categories-tab">
     <div class="tab-header">
       <h3 class="tab-title">Categories</h3>
-      <button class="add-cat-btn" (click)="openAddCategory()">+ Add</button>
+      <button class="add-cat-btn" (click)="openAddCategory()"><span class="material-icons">add</span> Add</button>
     </div>
 
     <div class="cat-list">
@@ -188,7 +188,7 @@
 
     <div class="calculator">
       <button class="calc-btn op" (click)="calcClear()">C</button>
-      <button class="calc-btn op" (click)="calcBackspace()">⌫</button>
+      <button class="calc-btn op" (click)="calcBackspace()"><span class="material-icons" style="font-size:18px">backspace</span></button>
       <button class="calc-btn op" (click)="calcPercent()">%</button>
       <button class="calc-btn op accent" (click)="calcOperator('÷')">÷</button>
 
@@ -300,7 +300,7 @@
 <div *ngIf="activeTab === 'accounts'" class="accounts-tab">
   <div class="tab-header">
     <h3 class="tab-title">Accounts</h3>
-    <button class="add-cat-btn" (click)="openAddAccount()">+ Add Account</button>
+    <button class="add-cat-btn" (click)="openAddAccount()"><span class="material-icons">add</span> Add Account</button>
   </div>
 
   <div *ngIf="allAccounts.length === 0" class="empty">No accounts yet</div>
@@ -315,8 +315,8 @@
         </div>
       </div>
       <div class="account-actions">
-        <button class="edit-btn" (click)="openEditAccount(acc, i)">✏️</button>
-        <button class="record-delete-btn" (click)="confirmDeleteAccount(acc, i)">×</button>
+        <button class="edit-btn" (click)="openEditAccount(acc, i)"><span class="material-icons">edit</span></button>
+        <button class="record-delete-btn" (click)="confirmDeleteAccount(acc, i)"><span class="material-icons">delete</span></button>
       </div>
     </div>
   </div>

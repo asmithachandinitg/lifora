@@ -45,6 +45,10 @@
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .log-mood-btn:hover {
@@ -170,14 +174,29 @@
 .delete-mood-btn {
   border: none;
   background: transparent;
-  font-size: 22px;
   color: #d1d5db;
   cursor: pointer;
   transition: 0.2s;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 8px;
 }
 
-.delete-mood-btn:hover { color: #ef4444; }
+.delete-mood-btn:hover { color: #ef4444; background: #fef2f2; }
+
+/* Material Icons */
+.material-icons {
+  font-family: 'Material Icons';
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.empty-icon { font-size: 52px; color: #d1d5db; display: block; margin-bottom: 12px; }
+.confirm-del-icon { font-size: 44px; color: #ef4444; display: block; margin-bottom: 10px; }
 
 /* CALENDAR */
 .month-nav {
@@ -194,13 +213,13 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  font-size: 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: 0.2s;
   color: #374151;
+  padding: 0;
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -589,6 +608,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .save-btn:hover {
@@ -605,6 +629,9 @@
   text-align: center;
   box-shadow: 0 20px 50px rgba(0,0,0,0.15);
   animation: fadeIn 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .confirm-modal h3 {
@@ -616,13 +643,17 @@
 .confirm-actions { display: flex; justify-content: center; gap: 14px; }
 
 .yes-btn {
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: linear-gradient(90deg, #ef4444, #dc2626);
   color: white;
   border: none;
   padding: 10px 24px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .no-btn {
@@ -631,6 +662,7 @@
   padding: 10px 24px;
   border-radius: 10px;
   cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 @keyframes fadeIn {

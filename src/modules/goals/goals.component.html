@@ -1,0 +1,283 @@
+<div class="goals-wrapper">
+
+  <!-- HEADER -->
+  <div class="goals-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">track_changes</span> Goals</h2>
+      <span class="goals-subtitle">Track your ambitions, one milestone at a time</span>
+    </div>
+    <button class="add-goal-btn" (click)="openAddModal()">
+      <span class="material-icons">add</span> Add Goal
+    </button>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="material-icons stat-icon" style="color:#6b7280">flag</span>
+      <span class="stat-number">{{ getTotalStats().total }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card stat-inprogress">
+      <span class="material-icons stat-icon" style="color:#A78BFA">pending</span>
+      <span class="stat-number">{{ getTotalStats().inProgress }}</span>
+      <span class="stat-label">In Progress</span>
+    </div>
+    <div class="stat-card stat-completed">
+      <span class="material-icons stat-icon" style="color:#22c55e">check_circle</span>
+      <span class="stat-number">{{ getTotalStats().completed }}</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-card stat-avg">
+      <span class="material-icons stat-icon" style="color:#f59e0b">insights</span>
+      <span class="stat-number">{{ getTotalStats().avgProgress }}%</span>
+      <span class="stat-label">Avg Progress</span>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <div class="status-tabs">
+      <button [class.active]="activeFilter === 'all'" (click)="setFilter('all')">All</button>
+      <button [class.active]="activeFilter === 'not-started'" (click)="setFilter('not-started')">Not Started</button>
+      <button [class.active]="activeFilter === 'in-progress'" (click)="setFilter('in-progress')">In Progress</button>
+      <button [class.active]="activeFilter === 'completed'" (click)="setFilter('completed')">Completed</button>
+    </div>
+    <div class="category-filter">
+      <select [(ngModel)]="activeCategory" (ngModelChange)="setCategoryFilter($event)">
+        <option value="all">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="filteredGoals.length === 0" class="empty">
+    <span class="material-icons empty-icon">track_changes</span>
+    <p>No goals found. Set your first goal!</p>
+  </div>
+
+  <!-- TIMELINE -->
+  <div *ngIf="filteredGoals.length > 0" class="timeline">
+    <div
+      *ngFor="let goal of filteredGoals; trackBy: trackByGoal; let i = index"
+      class="timeline-item"
+      [class.expanded]="isExpanded(goal._id!)"
+    >
+      <!-- Timeline dot -->
+      <div class="timeline-dot-wrap">
+        <div class="timeline-dot" [style.background]="statusColors[goal.status]">
+          <span class="material-icons dot-icon">{{ categoryMIcons[goal.category] }}</span>
+        </div>
+        <div class="timeline-line" *ngIf="i < filteredGoals.length - 1"></div>
+      </div>
+
+      <!-- Goal Card -->
+      <div class="goal-card" [class.card-completed]="goal.status === 'completed'"
+      [class.card-overdue]="getDaysLeft(goal.deadline) < 0 && goal.status !== 'completed'">
+
+        <!-- Card Top -->
+        <div class="card-top">
+          <div class="card-meta">
+            <span class="priority-badge" [style.background]="priorityColors[goal.priority] + '20'" [style.color]="priorityColors[goal.priority]">
+              <span class="material-icons badge-icon">{{ priorityMIcons[goal.priority] }}</span>
+              {{ goal.priority | titlecase }}
+            </span>
+            <span class="category-badge">
+              <span class="material-icons badge-icon">{{ categoryMIcons[goal.category] }}</span>
+              {{ goal.category | titlecase }}
+            </span>
+            <span class="status-badge" [style.background]="statusColors[goal.status] + '20'" [style.color]="statusColors[goal.status]">
+              {{ statusLabels[goal.status] }}
+            </span>
+          </div>
+          <div class="card-actions">
+            <span class="days-left" [class]="getDaysLeftClass(goal.deadline, goal.status)">
+              <span class="material-icons days-icon">{{ goal.status === 'completed' ? 'check_circle' : 'schedule' }}</span>
+              {{ goal.status === 'completed' ? 'Done' : getDaysLeftLabel(goal.deadline) }}
+            </span>
+            <button class="icon-btn edit-btn" (click)="openEditModal(goal)" title="Edit">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="icon-btn delete-btn" (click)="confirmDelete(goal._id!)" title="Delete">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Title & Description -->
+        <h3 class="goal-title" [class.strike]="goal.status === 'completed'">{{ goal.title }}</h3>
+        <p class="goal-desc">{{ goal.description }}</p>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">Progress</span>
+            <span class="progress-pct" [style.color]="getProgressColor(goal.progress)">{{ goal.progress }}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill"
+              [style.width.%]="goal.progress"
+              [style.background]="getProgressColor(goal.progress)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Deadline -->
+        <div class="deadline-row">
+          <span class="material-icons deadline-icon">calendar_today</span>
+          <span class="deadline-label">Deadline:</span>
+          <span class="deadline-val">{{ goal.deadline | date: 'dd MMM yyyy' }}</span>
+        </div>
+
+        <!-- Milestones toggle -->
+        <button class="expand-btn" (click)="toggleExpand(goal._id!)">
+          <span class="material-icons expand-icon">{{ isExpanded(goal._id!) ? 'expand_less' : 'expand_more' }}</span>
+          {{ isExpanded(goal._id!) ? 'Hide Milestones' : 'Show Milestones' }}
+          <span class="milestone-count">({{ goal.milestones.length }})</span>
+        </button>
+
+        <!-- Milestones -->
+        <div class="milestones" *ngIf="isExpanded(goal._id!)">
+          <div *ngIf="goal.milestones.length === 0" class="no-milestones">No milestones added yet.</div>
+          <div
+            *ngFor="let m of goal.milestones"
+            class="milestone-item"
+            [class.milestone-done]="m.completed"
+            (click)="toggleMilestone(goal, m._id!)"
+          >
+            <span class="material-icons milestone-check">{{ m.completed ? 'check_box' : 'check_box_outline_blank' }}</span>
+            <span class="milestone-title">{{ m.title }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+  <div class="goal-modal" (click)="$event.stopPropagation()">
+    <h3>
+      <span class="material-icons modal-title-icon">{{ editingGoal ? 'edit' : 'add_circle' }}</span>
+      {{ editingGoal ? 'Edit Goal' : 'New Goal' }}
+    </h3>
+
+    <div class="form-group">
+      <label>Title *</label>
+      <input type="text" [(ngModel)]="form.title" placeholder="What do you want to achieve?" />
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea [(ngModel)]="form.description" placeholder="Describe your goal..." rows="3"></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="form.category">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select [(ngModel)]="form.priority">
+          <option *ngFor="let p of priorities" [value]="p">{{ p | titlecase }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="form.status" (ngModelChange)="syncStatusAndProgress()">
+          <option *ngFor="let s of statuses" [value]="s">{{ statusLabels[s] }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Deadline *</label>
+        <input type="date" [(ngModel)]="form.deadline" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Progress: {{ form.progress }}%</label>
+      <input type="range" min="0" max="100" [(ngModel)]="form.progress" (ngModelChange)="syncStatusAndProgress()" [disabled]="form.status === 'completed'" class="progress-slider" />
+      </div>
+
+    <!-- Milestones -->
+    <div class="form-group">
+      <div class="milestones-header">
+        <label>Milestones</label>
+        <button class="add-milestone-btn" type="button" (click)="addMilestone()">
+          <span class="material-icons">add</span> Add
+        </button>
+      </div>
+      <div *ngFor="let m of form.milestones; let mi = index" class="milestone-input-row">
+        <input type="text" [(ngModel)]="m.title" [placeholder]="'Milestone ' + (mi + 1)" />
+        <button class="remove-milestone-btn" type="button" (click)="removeMilestone(mi)" *ngIf="form.milestones.length > 1">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn" (click)="saveGoal()">
+        <span class="material-icons">save</span>
+        {{ editingGoal ? 'Update' : 'Save Goal' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Delete this goal?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="deleteGoal()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" *ngIf="showCompletionModal" (click)="closeCompletionModal()">
+  <div class="confirm-modal celebration-modal" (click)="$event.stopPropagation()">
+    <span class="material-icons celebration-icon">emoji_events</span>
+    <h3>Goal Completed 🎉</h3>
+    <p>"{{ completedGoalTitle }}" has been successfully completed!</p>
+
+    <div class="confirm-actions">
+      <button class="save-btn" (click)="closeCompletionModal()">
+        <span class="material-icons">check_circle</span>
+        Awesome!
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" *ngIf="showReopenConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">refresh</span>
+    <h3>Reopen this goal?</h3>
+    <p>This goal is completed. Do you want to reopen it for editing?</p>
+
+    <div class="confirm-actions">
+      <button class="no-btn" (click)="cancelReopen()">Cancel</button>
+      <button class="save-btn" (click)="confirmReopen()">
+        <span class="material-icons">edit</span>
+        Reopen
+      </button>
+    </div>
+  </div>
+</div>
