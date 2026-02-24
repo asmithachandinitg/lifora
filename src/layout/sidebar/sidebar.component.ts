@@ -28,7 +28,8 @@ export class SidebarComponent {
     { name: 'Relationships', icon: 'groups', route: '/relationships' },
     { name: 'Knowledge', icon: 'psychology', route: '/knowledge' },
     { name: 'Reading', icon: 'auto_stories', route: '/reading' },
-    { name: 'Vision Board', icon: 'visibility', route: '/vision-board' }
+    { name: 'Vision Board', icon: 'visibility', route: '/vision-board' },
+    { name: 'Pregnancy', icon: 'favorite', route: '/pregnancy' },
   ];
 
 }

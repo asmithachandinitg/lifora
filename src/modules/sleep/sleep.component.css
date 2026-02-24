@@ -837,3 +837,23 @@
   .time-arrow { flex-direction: row; }
   .stages-inputs { flex-direction: column; }
 }
+
+.hc-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.edit-btn {
+  background: transparent;
+  border: none;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 4px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.edit-btn:hover { color: #A78BFA; background: #f5f3ff; }

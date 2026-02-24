@@ -193,9 +193,14 @@
             <div class="stage-seg rem-seg" [style.width.%]="getStagePercent(entry.stages.rem, entry.duration)"></div>
             <div class="stage-seg light-seg" [style.width.%]="getStagePercent(entry.stages.light, entry.duration)"></div>
           </div>
-          <button class="delete-btn" (click)="confirmDelete(entry._id!)">
-            <span class="material-icons">delete</span>
-          </button>
+            <div class="hc-actions">
+            <button class="edit-btn" (click)="openEditModal(entry)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="delete-btn" (click)="confirmDelete(entry._id!)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
         </div>
 
       </div>

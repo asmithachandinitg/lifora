@@ -1,0 +1,507 @@
+<div class="travel-wrapper">
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <div *ngIf="view === 'dashboard'">
+
+    <div class="travel-header">
+      <div class="header-left">
+        <h2><span class="material-icons header-icon">travel_explore</span> Travel</h2>
+        <span class="travel-subtitle">Plan, pack, explore</span>
+      </div>
+      <button class="add-btn" (click)="openAddTrip()">
+        <span class="material-icons">add</span> New Trip
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" *ngIf="trips.length > 0">
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#8B5CF6">luggage</span>
+        <span class="stat-number">{{ trips.length }}</span>
+        <span class="stat-label">Total Trips</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#22c55e">flight_takeoff</span>
+        <span class="stat-number">{{ ongoingTrips.length }}</span>
+        <span class="stat-label">Ongoing</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#8B5CF6">event</span>
+        <span class="stat-number">{{ upcomingTrips.length }}</span>
+        <span class="stat-label">Upcoming</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#9ca3af">check_circle</span>
+        <span class="stat-number">{{ completedTrips.length }}</span>
+        <span class="stat-label">Completed</span>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="trips.length === 0" class="empty">
+      <span class="material-icons empty-icon">travel_explore</span>
+      <p>No trips yet. Start planning your next adventure!</p>
+    </div>
+
+    <!-- Ongoing -->
+    <div *ngIf="ongoingTrips.length > 0">
+      <div class="section-title"><span class="material-icons">flight_takeoff</span> Ongoing</div>
+      <div class="trips-grid">
+        <div class="trip-card ongoing-card" *ngFor="let trip of ongoingTrips; trackBy: trackById"
+          (click)="openTrip(trip)">
+          <div class="trip-card-top" [style.background]="trip.coverColor">
+            <span class="trip-status-badge">
+              <span class="material-icons">flight_takeoff</span> Ongoing
+            </span>
+            <div class="trip-card-actions" (click)="$event.stopPropagation()">
+              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span class="material-icons">edit</span></button>
+              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span class="material-icons">delete</span></button>
+            </div>
+          </div>
+          <div class="trip-card-body">
+            <h3>{{ trip.name }}</h3>
+            <div class="trip-dest"><span class="material-icons">place</span> {{ trip.destination }}</div>
+            <div class="trip-dates">
+              <span class="material-icons">calendar_today</span>
+              {{ formatDate(trip.startDate) }} → {{ formatDate(trip.endDate) }}
+            </div>
+            <div class="trip-duration">{{ getTripDuration(trip) }} days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming -->
+    <div *ngIf="upcomingTrips.length > 0">
+      <div class="section-title"><span class="material-icons">event</span> Upcoming</div>
+      <div class="trips-grid">
+        <div class="trip-card" *ngFor="let trip of upcomingTrips; trackBy: trackById"
+          (click)="openTrip(trip)">
+          <div class="trip-card-top" [style.background]="trip.coverColor">
+            <span class="trip-countdown" *ngIf="getDaysUntil(trip.startDate) > 0">
+              {{ getDaysUntil(trip.startDate) }} days away
+            </span>
+            <span class="trip-countdown" *ngIf="getDaysUntil(trip.startDate) <= 0">Today!</span>
+            <div class="trip-card-actions" (click)="$event.stopPropagation()">
+              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span class="material-icons">edit</span></button>
+              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span class="material-icons">delete</span></button>
+            </div>
+          </div>
+          <div class="trip-card-body">
+            <h3>{{ trip.name }}</h3>
+            <div class="trip-dest"><span class="material-icons">place</span> {{ trip.destination }}</div>
+            <div class="trip-dates">
+              <span class="material-icons">calendar_today</span>
+              {{ formatDate(trip.startDate) }} → {{ formatDate(trip.endDate) }}
+            </div>
+            <!-- Packing progress -->
+            <div class="packing-progress" *ngIf="(trip.packingList?.length ?? 0) > 0">
+              <div class="pp-bar-track">
+                <div class="pp-bar-fill" [style.width.%]="getPackingProgress(trip)"></div>
+              </div>
+              <span class="pp-label">{{ getPackingProgress(trip) }}% packed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed -->
+    <div *ngIf="completedTrips.length > 0">
+      <div class="section-title"><span class="material-icons">check_circle</span> Completed</div>
+      <div class="trips-grid">
+        <div class="trip-card completed-card" *ngFor="let trip of completedTrips; trackBy: trackById"
+          (click)="openTrip(trip)">
+          <div class="trip-card-top" [style.background]="trip.coverColor + 'aa'">
+            <span class="trip-status-badge completed-badge">
+              <span class="material-icons">check_circle</span> Completed
+            </span>
+            <div class="trip-card-actions" (click)="$event.stopPropagation()">
+              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span class="material-icons">edit</span></button>
+              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span class="material-icons">delete</span></button>
+            </div>
+          </div>
+          <div class="trip-card-body">
+            <h3>{{ trip.name }}</h3>
+            <div class="trip-dest"><span class="material-icons">place</span> {{ trip.destination }}</div>
+            <div class="trip-dates">
+              <span class="material-icons">calendar_today</span>
+              {{ formatDate(trip.startDate) }} → {{ formatDate(trip.endDate) }}
+            </div>
+            <div class="trip-duration">{{ getTripDuration(trip) }} days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== DETAIL VIEW ===================== -->
+  <div *ngIf="view === 'detail' && selectedTrip">
+
+    <!-- Detail Header -->
+    <div class="detail-header" [style.background]="selectedTrip.coverColor">
+      <button class="back-btn" (click)="backToDashboard()">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <div class="detail-header-info">
+        <h2>{{ selectedTrip.name }}</h2>
+        <div class="detail-dest"><span class="material-icons">place</span> {{ selectedTrip.destination }}</div>
+        <div class="detail-dates">
+          {{ formatDate(selectedTrip.startDate) }}
+          <span *ngIf="selectedTrip.endDate"> → {{ formatDate(selectedTrip.endDate) }}</span>
+          · {{ getTripDuration(selectedTrip) }} days
+        </div>
+      </div>
+      <div class="detail-header-actions">
+        <button class="icon-btn-light" (click)="openEditTrip(selectedTrip)">
+          <span class="material-icons">edit</span>
+        </button>
+        <span class="status-pill">{{ statusConfig[selectedTrip.status].label }}</span>
+      </div>
+    </div>
+
+    <!-- Detail Tabs -->
+    <div class="tabs">
+      <button [class.active]="detailTab === 'overview'"   (click)="detailTab = 'overview'">Overview</button>
+      <button [class.active]="detailTab === 'packing'"    (click)="detailTab = 'packing'">
+        Packing <span class="tab-badge" *ngIf="totalPacking > 0">{{ packedCount }}/{{ totalPacking }}</span>
+      </button>
+      <button [class.active]="detailTab === 'itinerary'"  (click)="detailTab = 'itinerary'">Itinerary</button>
+      <button [class.active]="detailTab === 'budget'"     (click)="detailTab = 'budget'">Budget</button>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div *ngIf="detailTab === 'overview'" class="overview-section">
+      <div class="overview-grid">
+        <div class="ov-card">
+          <span class="material-icons ov-icon" style="color:#8B5CF6">inventory_2</span>
+          <span class="ov-val">{{ packedCount }}/{{ totalPacking }}</span>
+          <span class="ov-label">Items Packed</span>
+        </div>
+        <div class="ov-card">
+          <span class="material-icons ov-icon" style="color:#f59e0b">account_balance_wallet</span>
+          <span class="ov-val">₹{{ totalSpent | number }}</span>
+          <span class="ov-label">Spent of ₹{{ selectedTrip.budget | number }}</span>
+        </div>
+        <div class="ov-card">
+          <span class="material-icons ov-icon" style="color:#06b6d4">map</span>
+          <span class="ov-val">{{ selectedTrip.itinerary.length }}</span>
+          <span class="ov-label">Days Planned</span>
+        </div>
+        <div class="ov-card">
+          <span class="material-icons ov-icon" style="color:#22c55e">schedule</span>
+          <span class="ov-val">{{ getTripDuration(selectedTrip) }}</span>
+          <span class="ov-label">Total Days</span>
+        </div>
+      </div>
+      <div class="notes-card" *ngIf="selectedTrip.notes">
+        <div class="notes-title"><span class="material-icons">notes</span> Notes & Memories</div>
+        <p>{{ selectedTrip.notes }}</p>
+      </div>
+      <div class="notes-card" *ngIf="!selectedTrip.notes">
+        <div class="notes-title"><span class="material-icons">notes</span> Notes & Memories</div>
+        <textarea [(ngModel)]="selectedTrip.notes" placeholder="Write your notes, memories, tips..."
+          rows="4" (blur)="saveTrip$()"></textarea>
+      </div>
+    </div>
+
+    <!-- PACKING TAB -->
+    <div *ngIf="detailTab === 'packing'" class="packing-section">
+
+      <!-- Progress -->
+      <div class="pack-progress-card">
+        <div class="pack-progress-info">
+          <span class="pack-progress-label">{{ packedCount }} of {{ totalPacking }} items packed</span>
+          <span class="pack-progress-pct">{{ totalPacking > 0 ? (packedCount / totalPacking * 100 | number:'1.0-0') : 0 }}%</span>
+        </div>
+        <div class="pack-bar-track">
+          <div class="pack-bar-fill" [style.width.%]="totalPacking > 0 ? (packedCount / totalPacking * 100) : 0"></div>
+        </div>
+      </div>
+
+      <!-- Add item -->
+      <div class="add-packing-row">
+        <input class="pack-input" placeholder="Add item..." [(ngModel)]="newPackingItem.name"
+          (keyup.enter)="addPackingItem()" />
+        <select class="pack-select" [(ngModel)]="newPackingItem.category">
+          <option *ngFor="let cat of packingCategories" [value]="cat">{{ cat | titlecase }}</option>
+        </select>
+        <button class="add-pack-btn" (click)="addPackingItem()">
+          <span class="material-icons">add</span>
+        </button>
+      </div>
+
+      <!-- Items by category -->
+      <div *ngFor="let cat of packingCategories">
+        <div *ngIf="(packingByCategory[cat]?.length ?? 0) > 0" class="pack-category">
+          <div class="pack-cat-label">{{ cat | titlecase }}</div>
+          <div class="pack-items">
+            <div class="pack-item" *ngFor="let item of packingByCategory[cat]; trackBy: trackById"
+              [class.packed-item]="item.packed">
+              <div class="pack-item-left" (click)="togglePacked(item)">
+                <span class="material-icons pack-check">{{ item.packed ? 'check_box' : 'check_box_outline_blank' }}</span>
+                <span class="pack-item-name" [class.packed-text]="item.packed">{{ item.name }}</span>
+              </div>
+              <button class="remove-pack-btn" (click)="removePackingItem(item)">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ITINERARY TAB -->
+    <div *ngIf="detailTab === 'itinerary'" class="itinerary-section">
+
+      <!-- Add day -->
+      <div class="add-day-row">
+        <input type="date" [(ngModel)]="newItineraryDay.date" class="day-date-input" />
+        <input placeholder="Day title (optional)" [(ngModel)]="newItineraryDay.title" class="day-title-input" />
+        <button class="add-day-btn" (click)="addItineraryDay()">
+          <span class="material-icons">add</span> Add Day
+        </button>
+      </div>
+
+      <div *ngIf="selectedTrip.itinerary.length === 0" class="empty-inline">
+        <span class="material-icons">map</span> No days planned yet.
+      </div>
+
+      <div class="itinerary-list">
+        <div class="itin-day-card" *ngFor="let day of selectedTrip.itinerary; trackBy: trackById">
+          <div class="itin-day-header">
+            <div class="itin-day-left">
+              <span class="itin-date-badge">{{ day.date | date:'EEE, dd MMM' }}</span>
+              <span class="itin-day-title">{{ day.title }}</span>
+            </div>
+            <button class="remove-day-btn" (click)="removeItineraryDay(day)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+
+          <div class="activities-list">
+            <div class="activity-item" *ngFor="let act of day.activities; let i = index">
+              <span class="material-icons act-dot">circle</span>
+              <span class="act-text">{{ act }}</span>
+              <button class="remove-act-btn" (click)="removeActivity(day, i)">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="add-activity-row">
+            <input placeholder="Add activity..." [(ngModel)]="newActivity"
+              (keyup.enter)="addActivity(day)" class="act-input" />
+            <button class="add-act-btn" (click)="addActivity(day)">
+              <span class="material-icons">add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BUDGET TAB -->
+    <div *ngIf="detailTab === 'budget'" class="budget-section">
+
+      <!-- Budget overview -->
+      <div class="budget-overview-card">
+        <div class="budget-amounts">
+          <div class="budget-amt">
+            <span class="budget-amt-val">₹{{ totalSpent | number }}</span>
+            <span class="budget-amt-label">Spent</span>
+          </div>
+          <div class="budget-divider"></div>
+          <div class="budget-amt">
+            <span class="budget-amt-val" [class.over-budget]="budgetLeft < 0">
+              ₹{{ budgetLeft | number }}
+            </span>
+            <span class="budget-amt-label">{{ budgetLeft >= 0 ? 'Remaining' : 'Over Budget' }}</span>
+          </div>
+          <div class="budget-divider"></div>
+          <div class="budget-amt">
+            <span class="budget-amt-val">₹{{ selectedTrip.budget | number }}</span>
+            <span class="budget-amt-label">Total Budget</span>
+          </div>
+        </div>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill"
+            [style.width.%]="budgetPercent"
+            [class.over-bar]="budgetLeft < 0">
+          </div>
+        </div>
+        <span class="budget-pct-label">{{ budgetPercent }}% used</span>
+      </div>
+
+      <!-- Category breakdown -->
+      <div class="expense-breakdown" *ngIf="expensesByCategory.length > 0">
+        <div class="section-label">By Category</div>
+        <div class="cat-breakdown-row" *ngFor="let c of expensesByCategory">
+          <span class="material-icons cat-exp-icon">{{ c.icon }}</span>
+          <span class="cat-exp-name">{{ c.cat | titlecase }}</span>
+          <div class="cat-exp-bar-track">
+            <div class="cat-exp-bar-fill"
+              [style.width.%]="totalSpent > 0 ? (c.total / totalSpent * 100) : 0">
+            </div>
+          </div>
+          <span class="cat-exp-amt">₹{{ c.total | number }}</span>
+        </div>
+      </div>
+
+      <!-- Add expense -->
+      <div class="add-expense-row">
+        <button class="add-expense-btn" (click)="showExpenseModal = true">
+          <span class="material-icons">add</span> Add Expense
+        </button>
+      </div>
+
+      <!-- Expense list -->
+      <div class="expense-list">
+        <div class="expense-item" *ngFor="let exp of selectedTrip.expenses; trackBy: trackById">
+          <div class="exp-left">
+            <span class="material-icons exp-icon">{{ expenseCategoryIcons[exp.category] || 'receipt' }}</span>
+            <div class="exp-info">
+              <span class="exp-title">{{ exp.title }}</span>
+              <span class="exp-meta">{{ exp.category | titlecase }} · {{ formatDate(exp.date) }}</span>
+            </div>
+          </div>
+          <div class="exp-right">
+            <span class="exp-amount">₹{{ exp.amount | number }}</span>
+            <button class="remove-exp-btn" (click)="removeExpense(exp)">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="selectedTrip.expenses.length === 0" class="empty-inline">
+          <span class="material-icons">receipt_long</span> No expenses logged yet.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== ADD/EDIT TRIP MODAL ===================== -->
+<div class="modal" *ngIf="showTripModal" (click)="closeTripModal()">
+  <div class="trip-modal" (click)="$event.stopPropagation()">
+
+    <h3>
+      <span class="material-icons modal-icon">{{ editMode ? 'edit' : 'travel_explore' }}</span>
+      {{ editMode ? 'Edit Trip' : 'New Trip' }}
+    </h3>
+
+    <div class="form-row">
+      <div class="form-group flex2">
+        <label>Trip Name</label>
+        <input placeholder="e.g. Goa Getaway" [(ngModel)]="tripForm.name" />
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="tripForm.status">
+          <option *ngFor="let s of statusOptions" [value]="s">{{ statusConfig[s].label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Destination</label>
+      <input placeholder="e.g. Goa, India" [(ngModel)]="tripForm.destination" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" [(ngModel)]="tripForm.startDate" />
+      </div>
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="date" [(ngModel)]="tripForm.endDate" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Budget (₹)</label>
+      <input type="number" [(ngModel)]="tripForm.budget" min="0" />
+    </div>
+
+    <div class="form-group">
+      <label>Cover Color</label>
+      <div class="color-picker">
+        <div *ngFor="let c of coverColors" class="color-swatch"
+          [style.background]="c"
+          [class.selected-color]="tripForm.coverColor === c"
+          (click)="tripForm.coverColor = c">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea [(ngModel)]="tripForm.notes" placeholder="Any notes about this trip..." rows="2"></textarea>
+    </div>
+
+    <p class="error" *ngIf="tripFormError">{{ tripFormError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeTripModal()">Cancel</button>
+      <button class="save-btn" (click)="saveTrip()">
+        <span class="material-icons">save</span> {{ editMode ? 'Update' : 'Save' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="modal" *ngIf="showExpenseModal" (click)="showExpenseModal = false">
+  <div class="expense-modal" (click)="$event.stopPropagation()">
+    <h3><span class="material-icons modal-icon">receipt</span> Add Expense</h3>
+
+    <div class="form-group">
+      <label>Title</label>
+      <input placeholder="e.g. Hotel stay" [(ngModel)]="expenseForm.title" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input type="number" [(ngModel)]="expenseForm.amount" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="expenseForm.category">
+          <option *ngFor="let c of expenseCategories" [value]="c">{{ c | titlecase }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" [(ngModel)]="expenseForm.date" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="showExpenseModal = false">Cancel</button>
+      <button class="save-btn" (click)="addExpense()">
+        <span class="material-icons">add</span> Add
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Delete this trip?</h3>
+    <p>All packing, itinerary and expenses will be lost.</p>
+    <div class="confirm-actions">
+      <button class="no-btn"  (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="doDelete()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

@@ -19,6 +19,8 @@ export class SleepComponent implements OnInit {
   entryToDelete: string | null = null;
   loading = false;
   error = '';
+  editMode = false;
+  editingId: string | null = null;
 
   entries: SleepEntry[] = [];
 
@@ -84,7 +86,7 @@ export class SleepComponent implements OnInit {
     this.showModal = true;
   }
 
-  closeModal() { this.showModal = false; }
+  closeModal() { this.showModal = false; this.editMode = false; this.editingId = null; }
 
   calcDuration(sleepDT: string, wakeDT: string): number {
     return Math.round((new Date(wakeDT).getTime() - new Date(sleepDT).getTime()) / 60000);
@@ -100,35 +102,38 @@ export class SleepComponent implements OnInit {
       return;
     }
 
-    const totalStages = this.form.deepMinutes + this.form.lightMinutes + this.form.remMinutes;
-    if (totalStages > duration) {
-      this.formError = `Stage total (${totalStages}min) cannot exceed duration (${duration}min).`;
-      return;
+    if (this.editMode && this.editingId) {
+      // UPDATE existing entry
+      const idx = this.entries.findIndex(e => e._id === this.editingId);
+      if (idx > -1) {
+        this.entries[idx] = {
+          ...this.entries[idx],
+          sleepTime: sleepDT,
+          wakeTime:  wakeDT,
+          duration,
+          quality: this.form.quality,
+          stages: { deep: this.form.deepMinutes, light: this.form.lightMinutes, rem: this.form.remMinutes },
+          notes: this.form.notes
+        };
+      }
+    } else {
+      // CREATE new entry
+      const entry: SleepEntry = {
+        _id: Date.now().toString(),
+        sleepTime: sleepDT,
+        wakeTime:  wakeDT,
+        duration,
+        quality: this.form.quality,
+        stages: { deep: this.form.deepMinutes, light: this.form.lightMinutes, rem: this.form.remMinutes },
+        notes: this.form.notes,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+      this.entries.unshift(entry);
     }
 
-    const payload: Partial<SleepEntry> = {
-      sleepTime: sleepDT,
-      wakeTime:  wakeDT,
-      duration,
-      quality:   this.form.quality,
-      stages: {
-        deep:  this.form.deepMinutes,
-        light: this.form.lightMinutes,
-        rem:   this.form.remMinutes
-      },
-      notes: this.form.notes
-    };
-
-    this.sleepService.createSleepEntry(payload).subscribe({
-      next: (created) => {
-        this.entries.unshift(created);
-        this.showModal = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.formError = 'Failed to save. Please try again.';
-      }
-    });
+    this.showModal = false;
+    this.editMode  = false;
+    this.editingId = null;
   }
 
   confirmDelete(id: string) {
@@ -220,4 +225,33 @@ export class SleepComponent implements OnInit {
   }
 
   trackByEntry(_: number, e: SleepEntry) { return e._id; }
+
+  openEditModal(entry: SleepEntry) {
+  const sleepDT = new Date(entry.sleepTime);
+  const wakeDT  = new Date(entry.wakeTime);
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  const toDateStr = (d: Date) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  const toTimeStr = (d: Date) =>
+    `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+  this.form = {
+    sleepDate:    toDateStr(sleepDT),
+    sleepTime:    toTimeStr(sleepDT),
+    wakeDate:     toDateStr(wakeDT),
+    wakeTime:     toTimeStr(wakeDT),
+    quality:      entry.quality,
+    deepMinutes:  entry.stages?.deep  || 0,
+    lightMinutes: entry.stages?.light || 0,
+    remMinutes:   entry.stages?.rem   || 0,
+    notes:        entry.notes || ''
+  };
+  this.editingId = entry._id!;
+  this.editMode  = true;
+  this.formError = '';
+  this.showModal = true;
+}
 }

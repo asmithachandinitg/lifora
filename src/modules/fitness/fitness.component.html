@@ -1,0 +1,369 @@
+<div class="fitness-wrapper">
+
+  <!-- HEADER -->
+  <div class="fitness-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">fitness_center</span> Fitness Tracker</h2>
+      <span class="fitness-subtitle">Stay consistent, stay strong</span>
+    </div>
+    <button class="add-btn" (click)="openModal()">
+      <span class="material-icons">add</span> Log Workout
+    </button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'dashboard'" (click)="onTabChange('dashboard')">Dashboard</button>
+    <button [class.active]="activeTab === 'history'"   (click)="onTabChange('history')">History</button>
+    <button [class.active]="activeTab === 'records'"   (click)="onTabChange('records')">PRs</button>
+  </div>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <div *ngIf="activeTab === 'dashboard'">
+
+    <div *ngIf="entries.length === 0" class="empty">
+      <span class="material-icons empty-icon">fitness_center</span>
+      <p>No workouts yet. Log your first session!</p>
+    </div>
+
+    <div *ngIf="entries.length > 0">
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#8B5CF6">event_available</span>
+          <span class="stat-number">{{ totalWorkouts }}</span>
+          <span class="stat-label">Total Workouts</span>
+        </div>
+        <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#ef4444">local_fire_department</span>
+          <span class="stat-number">{{ totalCalories | number }}</span>
+          <span class="stat-label">Total Calories</span>
+        </div>
+        <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#f59e0b">schedule</span>
+          <span class="stat-number">{{ totalMinutes }}<span class="stat-unit">min</span></span>
+          <span class="stat-label">Total Time</span>
+        </div>
+        <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#22c55e">trending_up</span>
+          <span class="stat-number">{{ thisWeekWorkouts }}</span>
+          <span class="stat-label">This Week</span>
+        </div>
+        <!-- <div class="stat-card">
+          <span class="material-icons stat-icon" style="color:#06b6d4">directions_walk</span>
+          <span class="stat-number">{{ totalSteps | number }}</span>
+          <span class="stat-label">Total Steps</span>
+        </div> -->
+      </div>
+
+      <!-- CHARTS -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3><span class="material-icons">bar_chart</span> Activity Charts</h3>
+          <div class="chart-toggle">
+            <button [class.active-toggle]="chartView === 'daily'"   (click)="setChartView('daily')">Daily</button>
+            <button [class.active-toggle]="chartView === 'weekly'"  (click)="setChartView('weekly')">Weekly</button>
+            <button [class.active-toggle]="chartView === 'monthly'" (click)="setChartView('monthly')">Monthly</button>
+          </div>
+        </div>
+
+        <!-- Daily -->
+        <div *ngIf="chartView === 'daily'">
+          <div class="chart-sub-label">Today's workouts by time of day</div>
+          <div id="daily-chart" class="d3-chart-container"></div>
+          <div class="chart-legend">
+            <span *ngFor="let cat of categories" class="legend-item">
+              <span class="legend-dot" [style.background]="getCatColor(cat)"></span>
+              {{ getCatLabel(cat) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Weekly -->
+        <div *ngIf="chartView === 'weekly'">
+          <div class="chart-sub-label">Last 7 days — duration per day</div>
+          <div id="weekly-chart" class="d3-chart-container"></div>
+        </div>
+
+        <!-- Monthly -->
+        <div *ngIf="chartView === 'monthly'">
+          <div class="month-nav">
+            <button class="month-nav-btn" (click)="prevMonth()">
+              <span class="material-icons">chevron_left</span>
+            </button>
+            <span class="month-label">{{ selectedMonthLabel }}</span>
+            <button class="month-nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth">
+              <span class="material-icons">chevron_right</span>
+            </button>
+          </div>
+          <div id="monthly-chart" class="d3-chart-container"></div>
+          <div class="monthly-legend">
+            <span class="ml-item"><span class="ml-dot" style="background:rgba(139,92,246,0.2)"></span> Light</span>
+            <span class="ml-item"><span class="ml-dot" style="background:rgba(139,92,246,0.6)"></span> Moderate</span>
+            <span class="ml-item"><span class="ml-dot" style="background:rgba(139,92,246,0.95)"></span> Intense</span>
+            <span class="ml-item"><span class="ml-dot" style="background:#f3f4f6"></span> Rest</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORY BREAKDOWN -->
+      <div class="breakdown-card">
+        <h3><span class="material-icons">donut_large</span> Category Breakdown</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let c of categoryBreakdown">
+            <div class="breakdown-left">
+              <span class="material-icons breakdown-icon" [style.color]="c.color">{{ c.icon }}</span>
+              <span class="breakdown-name">{{ c.label }}</span>
+            </div>
+            <div class="breakdown-right">
+              <div class="breakdown-bar-track">
+                <div class="breakdown-bar-fill" [style.width.%]="c.pct" [style.background]="c.color"></div>
+              </div>
+              <span class="breakdown-count">{{ c.count }}x</span>
+              <span class="breakdown-pct">{{ c.pct }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LATEST WORKOUT -->
+      <div class="latest-card" *ngIf="sortedEntries[0] as latest">
+        <div class="latest-top">
+          <div class="latest-cat-badge" [style.background]="getCatColor(latest.category) + '18'"
+            [style.color]="getCatColor(latest.category)">
+            <span class="material-icons">{{ getCatIcon(latest.category) }}</span>
+            {{ getCatLabel(latest.category) }}
+          </div>
+          <span class="latest-date">{{ latest.date | date:'EEE, dd MMM' }}</span>
+        </div>
+        <h3 class="latest-title">{{ latest.title }}</h3>
+        <div class="latest-meta">
+          <span><span class="material-icons">schedule</span> {{ latest.duration }}min</span>
+          <span><span class="material-icons">local_fire_department</span> {{ latest.caloriesBurned }} kcal</span>
+          <span><span class="material-icons">fitness_center</span> {{ latest.exercises.length }} exercise(s)</span>
+        </div>
+        <div class="latest-exercises" *ngIf="latest.exercises.length > 0">
+          <div class="ex-chip" *ngFor="let ex of latest.exercises">
+            {{ ex.name }} <span class="ex-sets">{{ formatSets(ex) }}</span>
+          </div>
+        </div>
+        <p class="latest-notes" *ngIf="latest.notes">
+          <span class="material-icons">notes</span> {{ latest.notes }}
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== HISTORY ===================== -->
+  <div *ngIf="activeTab === 'history'">
+
+    <div *ngIf="entries.length === 0" class="empty">
+      <span class="material-icons empty-icon">history</span>
+      <p>No workout history yet.</p>
+    </div>
+
+    <div class="history-list">
+      <div class="history-card" *ngFor="let entry of sortedEntries; trackBy: trackById">
+
+        <div class="hc-left">
+          <div class="cat-dot" [style.background]="getCatColor(entry.category)">
+            <span class="material-icons cat-dot-icon">{{ getCatIcon(entry.category) }}</span>
+          </div>
+          <div class="hc-info">
+            <span class="hc-title">{{ entry.title }}</span>
+            <span class="hc-date">{{ entry.date | date:'EEE, dd MMM yyyy' }}</span>
+            <div class="hc-exercises" *ngIf="entry.exercises.length > 0">
+              <span class="ex-tag" *ngFor="let ex of entry.exercises.slice(0,3)">{{ ex.name }}</span>
+              <span class="ex-tag more" *ngIf="entry.exercises.length > 3">+{{ entry.exercises.length - 3 }}</span>
+            </div>
+            <p class="hc-notes" *ngIf="entry.notes">{{ entry.notes }}</p>
+          </div>
+        </div>
+
+        <div class="hc-right">
+          <div class="hc-stats">
+            <span class="hc-stat"><span class="material-icons">schedule</span>{{ entry.duration }}m</span>
+            <span class="hc-stat"><span class="material-icons">local_fire_department</span>{{ entry.caloriesBurned }}</span>
+          </div>
+          <div class="hc-actions">
+            <button class="edit-btn" (click)="openEditModal(entry)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="delete-btn" (click)="confirmDelete(entry._id!)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PERSONAL RECORDS ===================== -->
+  <div *ngIf="activeTab === 'records'">
+
+    <div *ngIf="personalRecords.length === 0" class="empty">
+      <span class="material-icons empty-icon">emoji_events</span>
+      <p>No records yet. Log strength workouts with sets & weights!</p>
+    </div>
+
+    <div class="pr-grid" *ngIf="personalRecords.length > 0">
+      <div class="pr-card" *ngFor="let pr of personalRecords">
+        <span class="material-icons pr-trophy">emoji_events</span>
+        <div class="pr-info">
+          <span class="pr-name">{{ pr.exerciseName }}</span>
+          <span class="pr-date">{{ pr.date | date:'dd MMM yyyy' }}</span>
+        </div>
+        <div class="pr-stats">
+          <div class="pr-stat" *ngIf="pr.maxWeight > 0">
+            <span class="pr-val">{{ pr.maxWeight }}<span class="pr-unit">kg</span></span>
+            <span class="pr-label">Best Weight</span>
+          </div>
+          <div class="pr-stat">
+            <span class="pr-val">{{ pr.maxReps }}<span class="pr-unit">reps</span></span>
+            <span class="pr-label">Best Reps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+  <div class="workout-modal" (click)="$event.stopPropagation()">
+
+    <h3>
+      <span class="material-icons modal-icon">{{ editMode ? 'edit' : 'fitness_center' }}</span>
+      {{ editMode ? 'Edit Workout' : 'Log Workout' }}
+    </h3>
+
+    <!-- Title + Date -->
+    <div class="form-row">
+      <div class="form-group flex2">
+        <label>Workout Title</label>
+        <input placeholder="e.g. Morning Run" [(ngModel)]="form.title" />
+      </div>
+    </div>
+
+    <!-- Category -->
+    <label class="form-label">Category</label>
+    <div class="cat-selector">
+      <div *ngFor="let cat of categories" class="cat-option"
+        [class.selected-cat]="form.category === cat"
+        [style.border-color]="form.category === cat ? getCatColor(cat) : 'transparent'"
+        [style.background]="form.category === cat ? getCatColor(cat) + '15' : ''"
+        (click)="form.category = cat">
+        <span class="material-icons" [style.color]="form.category === cat ? getCatColor(cat) : '#9ca3af'">
+          {{ getCatIcon(cat) }}
+        </span>
+        <span class="cat-opt-label">{{ getCatLabel(cat) }}</span>
+      </div>
+    </div>
+
+    <!-- Date + Time -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="form.date" [max]="today" />
+      </div>
+      <div class="form-group">
+        <label>Workout Time</label>
+        <input type="time" [(ngModel)]="form.workoutTime" />
+      </div>
+    </div>
+
+    <!-- Duration + Calories -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Duration (min)</label>
+        <input type="number" [(ngModel)]="form.duration" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Workout Calories</label>
+        <input type="number" [(ngModel)]="form.caloriesBurned" min="0" />
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <!-- <div class="form-row">
+      <div class="form-group">
+        <label>Steps Walked Today</label>
+        <input type="number" [(ngModel)]="form.stepsWalked" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Steps Calories (auto)</label>
+        <div class="calc-preview">
+          <span class="calc-val">{{ stepsCaloriesPreview }} kcal</span>
+          <span class="calc-total">Total: {{ totalCaloriesPreview }} kcal</span>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Exercises -->
+    <div class="exercises-section">
+      <div class="exercises-header">
+        <label class="form-label">Exercises</label>
+        <button class="add-ex-btn" (click)="addExercise()">
+          <span class="material-icons">add</span> Add Exercise
+        </button>
+      </div>
+
+      <div class="exercise-item" *ngFor="let ex of form.exercises; let ei = index">
+        <div class="ex-header">
+          <input class="ex-name-input" placeholder="Exercise name" [(ngModel)]="ex.name" />
+          <button class="remove-ex-btn" (click)="removeExercise(ei)" *ngIf="form.exercises.length > 1">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="sets-list">
+          <div class="set-row" *ngFor="let set of ex.sets; let si = index">
+            <span class="set-num">{{ si + 1 }}</span>
+            <input type="number" placeholder="Reps" [(ngModel)]="set.reps" min="0" class="set-input" />
+            <input type="number" placeholder="kg (opt)" [(ngModel)]="set.weight" min="0" class="set-input" />
+            <button class="remove-set-btn" (click)="removeSet(ex, si)" *ngIf="ex.sets.length > 1">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <button class="add-set-btn" (click)="addSet(ex)">
+            <span class="material-icons">add</span> Add Set
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <label class="form-label">Notes</label>
+    <textarea [(ngModel)]="form.notes" placeholder="How was the workout?" rows="2"></textarea>
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn" (click)="saveEntry()">
+        <span class="material-icons">save</span> {{ editMode ? 'Update' : 'Save' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Delete this workout?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="deleteEntry()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

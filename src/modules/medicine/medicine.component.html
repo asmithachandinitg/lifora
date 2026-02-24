@@ -1,0 +1,343 @@
+<div class="medicine-wrapper">
+
+  <!-- HEADER -->
+  <div class="med-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">medication</span> Medicine Tracker</h2>
+      <span class="med-subtitle">Never miss a dose</span>
+    </div>
+    <button class="add-btn" (click)="openAddModal()">
+      <span class="material-icons">add</span> Add Medicine
+    </button>
+  </div>
+
+  <!-- LOW STOCK ALERT -->
+  <div class="alert-banner" *ngIf="lowStockMedicines.length > 0">
+    <span class="material-icons alert-icon">warning</span>
+    <span>Low stock: <strong>{{ lowStockMedicines[0].name }}</strong>
+      <span *ngIf="lowStockMedicines.length > 1"> and {{ lowStockMedicines.length - 1 }} more</span>
+      — refill soon!
+    </span>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'today'"     (click)="activeTab = 'today'">Today</button>
+    <button [class.active]="activeTab === 'medicines'" (click)="activeTab = 'medicines'">Medicines</button>
+    <button [class.active]="activeTab === 'history'"   (click)="activeTab = 'history'">History</button>
+  </div>
+
+  <!-- ===================== TODAY ===================== -->
+  <div *ngIf="activeTab === 'today'">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#8B5CF6">medication</span>
+        <span class="stat-number">{{ activeMedicines.length }}</span>
+        <span class="stat-label">Active</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#22c55e">check_circle</span>
+        <span class="stat-number">{{ todayDoses.length }}</span>
+        <span class="stat-label">Taken Today</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon" style="color:#f59e0b">pending</span>
+        <span class="stat-number">{{ todayMedicines.length - todayDoses.length < 0 ? 0 : todayMedicines.length - todayDoses.length }}</span>
+        <span class="stat-label">Remaining</span>
+      </div>
+      <div class="stat-card" [class.low-stock-card]="lowStockMedicines.length > 0">
+        <span class="material-icons stat-icon" [style.color]="lowStockMedicines.length > 0 ? '#ef4444' : '#9ca3af'">inventory</span>
+        <span class="stat-number">{{ lowStockMedicines.length }}</span>
+        <span class="stat-label">Low Stock</span>
+      </div>
+    </div>
+
+    <!-- Today's medicines -->
+    <div class="section-title">
+      <span class="material-icons">today</span> Today's Schedule
+    </div>
+
+    <div *ngIf="todayMedicines.length === 0" class="empty">
+      <span class="material-icons empty-icon">medication</span>
+      <p>No medicines scheduled for today.</p>
+    </div>
+
+    <div class="today-list">
+      <div class="today-card" *ngFor="let med of todayMedicines; trackBy: trackById"
+        [class.taken-card]="isTakenToday(med)">
+
+        <div class="today-left">
+          <div class="med-icon-circle" [class.taken-icon]="isTakenToday(med)">
+            <span class="material-icons">{{ isTakenToday(med) ? 'check' : 'medication' }}</span>
+          </div>
+          <div class="today-info">
+            <span class="today-name">{{ med.name }}</span>
+            <span class="today-dosage">{{ med.dosage }}</span>
+            <div class="reminder-times">
+              <span class="reminder-chip" *ngFor="let r of med.reminders">
+                <span class="material-icons">schedule</span> {{ r.time }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="today-right">
+          <div class="stock-badge" [class.low-stock-badge]="isLowStock(med)">
+            <span class="material-icons">inventory_2</span> {{ med.stock }} left
+          </div>
+          <button class="take-btn" *ngIf="!isTakenToday(med)" (click)="openLogModal(med)">
+            <span class="material-icons">check</span> Take
+          </button>
+          <span class="taken-label" *ngIf="isTakenToday(med)">
+            <span class="material-icons">check_circle</span> Taken
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MEDICINES ===================== -->
+  <div *ngIf="activeTab === 'medicines'">
+
+    <div *ngIf="medicines.length === 0" class="empty">
+      <span class="material-icons empty-icon">medication</span>
+      <p>No medicines added yet.</p>
+    </div>
+
+    <div class="medicine-list">
+      <div class="medicine-card" *ngFor="let med of medicines; trackBy: trackById">
+
+        <div class="mc-top">
+          <div class="mc-left">
+            <div class="mc-name-row">
+              <span class="mc-name">{{ med.name }}</span>
+              <span class="status-badge" [style.background]="statusConfig[med.status].color + '20'"
+                [style.color]="statusConfig[med.status].color">
+                {{ statusConfig[med.status].label }}
+              </span>
+            </div>
+            <span class="mc-dosage">{{ med.dosage }}</span>
+            <div class="mc-meta">
+              <span class="mc-meta-item">
+                <span class="material-icons">{{ frequencyConfig[med.frequency].icon }}</span>
+                {{ frequencyConfig[med.frequency].label }}
+              </span>
+              <span class="mc-meta-item">
+                <span class="material-icons">calendar_today</span>
+                {{ formatDate(med.startDate) }}
+                <span *ngIf="med.endDate"> → {{ formatDate(med.endDate) }}</span>
+              </span>
+            </div>
+            <div class="reminder-times" *ngIf="med.reminders.length > 0">
+              <span class="reminder-chip" *ngFor="let r of med.reminders">
+                <span class="material-icons">schedule</span> {{ r.time }}
+              </span>
+            </div>
+          </div>
+          <div class="mc-actions">
+            <button class="edit-btn" (click)="openEditModal(med)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="delete-btn" (click)="confirmDelete(med._id!, 'medicine')">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stock bar -->
+        <div class="stock-section">
+          <div class="stock-info">
+            <span class="stock-label">
+              <span class="material-icons">inventory_2</span> Stock
+            </span>
+            <span class="stock-count" [class.low-stock-text]="isLowStock(med)">
+              {{ med.stock }} remaining
+              <span *ngIf="isLowStock(med)" class="low-badge">Low!</span>
+            </span>
+          </div>
+          <div class="stock-bar-track">
+            <div class="stock-bar-fill"
+              [style.width.%]="getStockPercent(med)"
+              [class.low-fill]="isLowStock(med)">
+            </div>
+          </div>
+        </div>
+
+        <p class="mc-notes" *ngIf="med.notes">
+          <span class="material-icons">notes</span> {{ med.notes }}
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== HISTORY ===================== -->
+  <div *ngIf="activeTab === 'history'">
+
+    <div *ngIf="doseLogs.length === 0" class="empty">
+      <span class="material-icons empty-icon">history</span>
+      <p>No dose history yet.</p>
+    </div>
+
+    <div class="history-list">
+      <div class="history-card" *ngFor="let log of sortedLogs; trackBy: trackById">
+        <div class="hc-left">
+          <div class="log-icon">
+            <span class="material-icons">medication</span>
+          </div>
+          <div class="hc-info">
+            <span class="hc-name">{{ log.medicineName }}</span>
+            <span class="hc-dosage">{{ log.dosage }}</span>
+            <p class="hc-notes" *ngIf="log.notes">{{ log.notes }}</p>
+          </div>
+        </div>
+        <div class="hc-right">
+          <div class="hc-time">
+            <span class="material-icons">schedule</span>
+            {{ formatTime(log.takenAt) }}
+          </div>
+          <div class="hc-date">{{ formatDate(log.takenAt) }}</div>
+          <button class="delete-btn" (click)="confirmDelete(log._id!, 'log')">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== ADD/EDIT MEDICINE MODAL ===================== -->
+<div class="modal" *ngIf="showMedicineModal" (click)="closeModal()">
+  <div class="med-modal" (click)="$event.stopPropagation()">
+
+    <h3>
+      <span class="material-icons modal-icon">{{ editMode ? 'edit' : 'medication' }}</span>
+      {{ editMode ? 'Edit Medicine' : 'Add Medicine' }}
+    </h3>
+
+    <!-- Name + Dosage -->
+    <div class="form-row">
+      <div class="form-group flex2">
+        <label>Medicine Name</label>
+        <input placeholder="e.g. Paracetamol" [(ngModel)]="form.name" />
+      </div>
+      <div class="form-group">
+        <label>Dosage</label>
+        <input placeholder="e.g. 500mg" [(ngModel)]="form.dosage" />
+      </div>
+    </div>
+
+    <!-- Frequency -->
+    <label class="form-label">Frequency</label>
+    <div class="freq-selector">
+      <div *ngFor="let f of frequencyOptions" class="freq-option"
+        [class.selected-freq]="form.frequency === f"
+        [style.border-color]="form.frequency === f ? frequencyConfig[f].color : 'transparent'"
+        [style.background]="form.frequency === f ? frequencyConfig[f].color + '15' : ''"
+        (click)="form.frequency = f">
+        <span class="material-icons" [style.color]="form.frequency === f ? frequencyConfig[f].color : '#9ca3af'">
+          {{ frequencyConfig[f].icon }}
+        </span>
+        <span class="freq-label">{{ frequencyConfig[f].label }}</span>
+      </div>
+    </div>
+
+    <!-- Reminders -->
+    <div class="reminders-header">
+      <label class="form-label"><span class="material-icons">schedule</span> Reminder Times</label>
+      <button class="add-reminder-btn" (click)="addReminder()">
+        <span class="material-icons">add</span>
+      </button>
+    </div>
+    <div class="reminders-list">
+      <div class="reminder-row" *ngFor="let r of form.reminders; let i = index">
+        <input type="time" [(ngModel)]="r.time" class="time-input" />
+        <button class="remove-btn" (click)="removeReminder(i)" *ngIf="form.reminders.length > 1">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stock -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Current Stock</label>
+        <input type="number" [(ngModel)]="form.stock" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Low Stock Alert</label>
+        <input type="number" [(ngModel)]="form.lowStockThreshold" min="0" />
+      </div>
+    </div>
+
+    <!-- Dates -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" [(ngModel)]="form.startDate" />
+      </div>
+      <div class="form-group">
+        <label>End Date (optional)</label>
+        <input type="date" [(ngModel)]="form.endDate" />
+      </div>
+    </div>
+
+    <!-- Status (edit only) -->
+    <div class="form-group" *ngIf="editMode">
+      <label>Status</label>
+      <select [(ngModel)]="form.status">
+        <option *ngFor="let s of statusOptions" [value]="s">{{ statusConfig[s].label }}</option>
+      </select>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-group">
+      <label>Notes / Instructions</label>
+      <textarea [(ngModel)]="form.notes" placeholder="Take after meals..." rows="2"></textarea>
+    </div>
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn" (click)="saveMedicine()">
+        <span class="material-icons">save</span> {{ editMode ? 'Update' : 'Save' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG DOSE MODAL -->
+<div class="modal" *ngIf="showLogModal" (click)="closeLogModal()">
+  <div class="log-modal" (click)="$event.stopPropagation()">
+    <span class="material-icons log-icon-big">medication</span>
+    <h3>Log Dose</h3>
+    <p class="log-med-name">{{ selectedMedicineForLog?.name }} · {{ selectedMedicineForLog?.dosage }}</p>
+    <textarea [(ngModel)]="logNote" placeholder="Any notes? (optional)" rows="2"></textarea>
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeLogModal()">Cancel</button>
+      <button class="save-btn" (click)="logDose()">
+        <span class="material-icons">check</span> Mark Taken
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>{{ deletingType === 'medicine' ? 'Delete medicine?' : 'Delete dose log?' }}</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="no-btn"  (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="doDelete()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

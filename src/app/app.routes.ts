@@ -16,7 +16,9 @@ import { ExpensesComponent } from '../modules/expenses/expenses.component';
 import { MoodComponent } from '../modules/mood/mood.component';
 import { GoalsComponent } from '../modules/goals/goals.component';
 import { SleepComponent } from '../modules/sleep/sleep.component';
-
+import { FitnessComponent } from '../modules/fitness/fitness.component';
+import { MedicineComponent } from '../modules/medicine/medicine.component';
+import { TravelComponent } from '../modules/travel/travel.component';
 
 export const routes: Routes = [
 
@@ -67,6 +69,18 @@ export const routes: Routes = [
              {
                 path: 'sleep',
                 component: SleepComponent
+            },
+             {
+                path: 'fitness',
+                component: FitnessComponent
+            },
+            {
+                path: 'medicine',
+                component: MedicineComponent
+            },
+            {
+                path: 'travel',
+                component: TravelComponent
             }
         ]
     },
