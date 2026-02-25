@@ -1,0 +1,370 @@
+<div class="pregnancy-wrapper">
+
+  <!-- HEADER -->
+  <div class="pregnancy-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">child_friendly</span> Pregnancy Tracker</h2>
+      <span class="pregnancy-subtitle">Every week is a milestone</span>
+    </div>
+    <div class="header-actions">
+      <button class="profile-btn" (click)="openProfileModal()">
+        <span class="material-icons">settings</span>
+        {{ profile ? 'Update Due Date' : 'Set Due Date' }}
+      </button>
+      <button class="add-entry-btn" (click)="openModal()" *ngIf="profile">
+        <span class="material-icons">add</span> Log Entry
+      </button>
+    </div>
+  </div>
+
+  <!-- No profile yet -->
+  <div *ngIf="!profile" class="setup-prompt">
+    <span class="material-icons setup-icon">child_friendly</span>
+    <h3>Welcome to Pregnancy Tracker</h3>
+    <p>Set your due date to start tracking your journey.</p>
+    <button class="setup-btn" (click)="openProfileModal()">
+      <span class="material-icons">add</span> Set Due Date
+    </button>
+  </div>
+
+  <div *ngIf="profile">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'">Dashboard</button>
+      <button [class.active]="activeTab === 'weekly'" (click)="activeTab = 'weekly'">Weekly Guide</button>
+      <button [class.active]="activeTab === 'history'" (click)="activeTab = 'history'">History</button>
+    </div>
+
+    <!-- ===================== DASHBOARD TAB ===================== -->
+    <div *ngIf="activeTab === 'dashboard'">
+
+      <!-- PREGNANCY OVERVIEW -->
+      <div class="overview-card">
+        <div class="overview-left">
+          <div class="week-badge">
+            <span class="week-num">{{ currentWeek }}</span>
+            <span class="week-label">weeks</span>
+          </div>
+          <div class="overview-info">
+            <h3>Week {{ currentWeek }} of 40</h3>
+            <span class="trimester-tag">{{ trimesterLabel }}</span>
+            <div class="due-date-row">
+              <span class="material-icons">event</span>
+              Due: {{ profile.dueDate | date:'dd MMMM yyyy' }}
+            </div>
+          </div>
+        </div>
+        <div class="countdown-wrap">
+          <span class="countdown-days">{{ daysUntilDue }}</span>
+          <span class="countdown-label">days to go</span>
+        </div>
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>Pregnancy Progress</span>
+          <span class="progress-pct">{{ pregnancyProgress }}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="pregnancyProgress"></div>
+          <!-- Trimester markers -->
+          <div class="trim-marker" style="left:32.5%">
+            <span class="trim-tick"></span>
+            <span class="trim-label">T2</span>
+          </div>
+          <div class="trim-marker" style="left:65%">
+            <span class="trim-tick"></span>
+            <span class="trim-label">T3</span>
+          </div>
+        </div>
+        <div class="week-markers">
+          <span>Wk 1</span><span>Wk 13</span><span>Wk 26</span><span>Wk 40</span>
+        </div>
+      </div>
+
+      <!-- BABY SIZE THIS WEEK -->
+      <div class="baby-size-card" *ngIf="currentBabySize">
+        <div class="baby-emoji">{{ currentBabySize.emoji }}</div>
+        <div class="baby-info">
+          <h3>Your baby is the size of a <strong>{{ currentBabySize.size }}</strong></h3>
+          <p>{{ currentBabySize.description }}</p>
+          <span class="week-milestone" *ngIf="getWeeklyMilestone(currentWeek)">
+            <span class="material-icons">star</span>
+            {{ getWeeklyMilestone(currentWeek) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- LATEST LOG -->
+      <div class="latest-card" *ngIf="latestEntry">
+        <div class="latest-header">
+          <h3>Latest Log</h3>
+          <span class="latest-week-badge">Week {{ latestEntry.week }}</span>
+        </div>
+        <div class="latest-date">{{ latestEntry.date | date:'EEEE, dd MMM yyyy' }}</div>
+
+        <div class="vitals-row">
+          <div class="vital-chip" *ngIf="latestEntry.weight">
+            <span class="material-icons vital-icon" style="color:#6366f1">monitor_weight</span>
+            <span class="vital-val">{{ latestEntry.weight }} kg</span>
+          </div>
+          <div class="vital-chip" *ngIf="latestEntry.bloodPressure">
+            <span class="material-icons vital-icon" style="color:#ef4444">favorite</span>
+            <span class="vital-val">{{ latestEntry.bloodPressure.systolic }}/{{ latestEntry.bloodPressure.diastolic }}</span>
+          </div>
+          <div class="vital-chip" *ngIf="latestEntry.babyMovements != null">
+            <span class="material-icons vital-icon" style="color:#ec4899">child_care</span>
+            <span class="vital-val">{{ latestEntry.babyMovements }} movements</span>
+          </div>
+          <div class="vital-chip" *ngIf="latestEntry.mood">
+            <span class="material-icons vital-icon" [style.color]="getMoodColor(latestEntry.mood)">
+              {{ getMoodIcon(latestEntry.mood) }}
+            </span>
+            <span class="vital-val" [style.color]="getMoodColor(latestEntry.mood)">
+              {{ getMoodLabel(latestEntry.mood) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="symptoms-section" *ngIf="latestEntry.symptoms.length > 0">
+          <h4>Symptoms</h4>
+          <div class="symptom-chips">
+            <span class="symptom-chip" *ngFor="let s of latestEntry.symptoms">
+              <span class="material-icons schip-icon">{{ getSymptomIcon(s) }}</span>
+              {{ getSymptomLabel(s) }}
+            </span>
+          </div>
+        </div>
+
+        <p class="latest-notes" *ngIf="latestEntry.notes">
+          <span class="material-icons notes-icon">notes</span> {{ latestEntry.notes }}
+        </p>
+      </div>
+
+      <div *ngIf="!latestEntry" class="empty" style="padding: 40px 20px">
+        <span class="material-icons empty-icon">edit_note</span>
+        <p>No logs yet. Tap "Log Entry" to start tracking!</p>
+      </div>
+
+    </div>
+
+    <!-- ===================== WEEKLY GUIDE TAB ===================== -->
+    <div *ngIf="activeTab === 'weekly'">
+      <div class="weekly-guide">
+        <h3 class="guide-title">
+          <span class="material-icons">menu_book</span> Pregnancy Week by Week
+        </h3>
+        <div class="week-cards-grid">
+          <div class="week-guide-card" *ngFor="let wk of [4,6,8,10,12,16,20,24,28,32,36,40]"
+            [class.current-week-card]="currentWeek >= wk && currentWeek < wk + (wk === 40 ? 3 : 2)"
+            [class.past-week-card]="currentWeek > wk">
+            <div class="wk-badge">Wk {{ wk }}</div>
+            <div class="wk-emoji">{{ babySizeByWeek[wk]?.emoji }}</div>
+            <div class="wk-size">{{ babySizeByWeek[wk]?.size }}</div>
+            <div class="wk-desc">{{ babySizeByWeek[wk]?.description }}</div>
+            <div class="wk-milestone" *ngIf="getWeeklyMilestone(wk)">
+              <span class="material-icons">star</span> {{ getWeeklyMilestone(wk) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== HISTORY TAB ===================== -->
+    <div *ngIf="activeTab === 'history'">
+
+      <div *ngIf="entries.length === 0" class="empty">
+        <span class="material-icons empty-icon">history</span>
+        <p>No pregnancy entries yet.</p>
+      </div>
+
+      <div class="history-list">
+        <div class="history-card" *ngFor="let entry of sortedEntries; trackBy: trackByEntry">
+
+          <div class="hc-week-badge">Wk {{ entry.week }}</div>
+
+          <div class="hc-body">
+            <div class="hc-date">{{ entry.date | date:'EEE, dd MMM yyyy' }}</div>
+
+            <div class="hc-vitals">
+              <span class="hc-vital" *ngIf="entry.weight">
+                <span class="material-icons">monitor_weight</span> {{ entry.weight }}kg
+              </span>
+              <span class="hc-vital" *ngIf="entry.bloodPressure">
+                <span class="material-icons">favorite</span>
+                {{ entry.bloodPressure.systolic }}/{{ entry.bloodPressure.diastolic }}
+              </span>
+              <span class="hc-vital" *ngIf="entry.babyMovements != null">
+                <span class="material-icons">child_care</span> {{ entry.babyMovements }} moves
+              </span>
+            </div>
+
+            <div class="hc-symptoms" *ngIf="entry.symptoms.length > 0">
+              <span class="sym-pill" *ngFor="let s of entry.symptoms.slice(0, 4)">{{ getSymptomLabel(s) }}</span>
+              <span class="sym-more" *ngIf="entry.symptoms.length > 4">+{{ entry.symptoms.length - 4 }}</span>
+            </div>
+
+            <p class="hc-notes" *ngIf="entry.notes">{{ entry.notes }}</p>
+          </div>
+
+          <div class="hc-right">
+            <div class="hc-mood" *ngIf="entry.mood">
+              <span class="material-icons" [style.color]="getMoodColor(entry.mood)">
+                {{ getMoodIcon(entry.mood) }}
+              </span>
+            </div>
+            <div class="hc-actions">
+              <button class="edit-btn" (click)="openEditModal(entry)">
+                <span class="material-icons">edit</span>
+              </button>
+              <button class="delete-btn" (click)="confirmDelete(entry._id!)">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== LOG ENTRY MODAL ===================== -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+  <div class="pregnancy-modal" (click)="$event.stopPropagation()">
+
+    <h3>
+      <span class="material-icons modal-title-icon">child_friendly</span>
+      {{ editMode ? 'Edit Entry' : 'Log Today' }}
+    </h3>
+
+    <!-- Date & Week -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-section-label">
+          <span class="material-icons">today</span> Date
+        </label>
+        <input type="date" [(ngModel)]="form.date" />
+      </div>
+      <div class="form-group">
+        <label class="form-section-label">
+          <span class="material-icons">calendar_view_week</span> Week
+        </label>
+        <input type="number" [(ngModel)]="form.week" min="1" max="42" />
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="form-section-label"><span class="material-icons">monitor_heart</span> Vitals (optional)</div>
+    <div class="vitals-grid">
+      <div class="vital-input-group">
+        <label class="vital-label">
+          <span class="material-icons" style="color:#6366f1">monitor_weight</span> Weight (kg)
+        </label>
+        <input type="number" [(ngModel)]="form.weight" min="30" max="200" step="0.1" placeholder="e.g. 65.5" />
+      </div>
+      <div class="vital-input-group">
+        <label class="vital-label">
+          <span class="material-icons" style="color:#ef4444">favorite</span> Blood Pressure
+        </label>
+        <div class="bp-inputs">
+          <input type="number" [(ngModel)]="form.systolic" placeholder="Sys" min="60" max="200" />
+          <span class="bp-sep">/</span>
+          <input type="number" [(ngModel)]="form.diastolic" placeholder="Dia" min="40" max="130" />
+        </div>
+      </div>
+      <div class="vital-input-group">
+        <label class="vital-label">
+          <span class="material-icons" style="color:#ec4899">child_care</span> Baby Movements
+        </label>
+        <input type="number" [(ngModel)]="form.babyMovements" min="0" max="200" placeholder="Count today" />
+      </div>
+    </div>
+
+    <!-- Symptoms -->
+    <div class="form-section-label"><span class="material-icons">medical_services</span> Symptoms</div>
+    <div class="symptoms-grid">
+      <div *ngFor="let s of allSymptoms"
+        class="symptom-toggle"
+        [class.active]="hasSymptom(s.key)"
+        (click)="toggleSymptom(s.key)">
+        <span class="material-icons symp-icon">{{ s.icon }}</span>
+        <span class="symp-label">{{ s.label }}</span>
+      </div>
+    </div>
+
+    <!-- Mood -->
+    <div class="form-section-label"><span class="material-icons">mood</span> Mood</div>
+    <div class="mood-selector">
+      <div *ngFor="let m of [1,2,3,4,5]"
+        class="mood-option"
+        [class.selected]="form.mood === m"
+        [style.border-color]="form.mood === m ? getMoodColor(m) : 'transparent'"
+        [style.background]="form.mood === m ? getMoodColor(m) + '18' : ''"
+        (click)="form.mood = m">
+        <span class="material-icons" [style.color]="form.mood === m ? getMoodColor(m) : '#9ca3af'">
+          {{ getMoodIcon(m) }}
+        </span>
+        <span class="mood-opt-label">{{ moodLabels[m] }}</span>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-section-label"><span class="material-icons">notes</span> Notes</div>
+    <textarea [(ngModel)]="form.notes" placeholder="How are you feeling today?" rows="3"></textarea>
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn" (click)="saveEntry()">
+        <span class="material-icons">save</span> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PROFILE MODAL ===================== -->
+<div class="modal" *ngIf="showProfileModal" (click)="showProfileModal = false">
+  <div class="profile-modal" (click)="$event.stopPropagation()">
+    <h3><span class="material-icons modal-title-icon">child_friendly</span> Pregnancy Details</h3>
+
+    <div class="form-section-label">
+      <span class="material-icons">event</span> Due Date <span class="required">*</span>
+    </div>
+    <input type="date" [(ngModel)]="profileForm.dueDate" />
+
+    <div class="form-section-label" style="margin-top: 16px;">
+      <span class="material-icons">calendar_today</span> Last Menstrual Period (LMP)
+      <span class="optional">(optional)</span>
+    </div>
+    <input type="date" [(ngModel)]="profileForm.lmpDate" />
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="showProfileModal = false">Cancel</button>
+      <button class="save-btn" (click)="saveProfile()">
+        <span class="material-icons">save</span> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Delete this entry?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="deleteEntry()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

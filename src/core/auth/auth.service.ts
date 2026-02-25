@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class AuthService {
+private userSubject = new BehaviorSubject<any>(this.getUser());
+user$ = this.userSubject.asObservable();
 
   private apiUrl =
     'http://localhost:5000/api/users';
@@ -17,24 +20,12 @@ private user: any = null;
     private http: HttpClient
   ) {}
 
-
-
-  // =========================
-  // REGISTER
-  // =========================
-
   register(data: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/register`,
       data
     );
   }
-
-
-
-  // =========================
-  // LOGIN
-  // =========================
 
   login(data: any): Observable<any> {
     return this.http.post(
@@ -43,48 +34,26 @@ private user: any = null;
     );
   }
 
-
-
-  // =========================
-  // TOKEN STORAGE
-  // =========================
-
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
-
-
 
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-
-
-  // =========================
-  // LOGIN STATE
-  // =========================
-
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
-
-
-
-  // =========================
-  // LOGOUT
-  // =========================
 
   logout() {
     localStorage.removeItem('token');
   }
 
-  /* PROFILE API */
 getProfile() {
   return this.http.get('http://localhost:5000/api/users/profile');
 }
 
-/* LOAD + CACHE */
 loadUser() {
   return this.getProfile().pipe(
     tap((res: any) => {
@@ -93,16 +62,29 @@ loadUser() {
   );
 }
 
-/* GET CACHED USER */
-getUser() {
-  return this.user;
-}
-
 forgotPassword(email: string) {
   return this.http.post(
     '/api/users/forgot-password',
     { email }
   );
+}
+
+updateModules(modules: { key: string; enabled: boolean }[]): void {
+  const user = this.getUser();
+  if (user) {
+    user.modules = modules;
+    this.setUser(user);
+  }
+}
+
+setUser(user: any): void {
+  localStorage.setItem('user', JSON.stringify(user));
+  this.userSubject.next(user);
+}
+
+getUser(): any {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
 }
 
 }

@@ -1,0 +1,321 @@
+<div class="reading-wrapper">
+
+  <!-- HEADER -->
+  <div class="read-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">auto_stories</span> Reading Tracker</h2>
+      <span class="read-subtitle">Track your reading journey</span>
+    </div>
+    <div class="header-right">
+      <div class="toggle-view">
+        <button class="toggle-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+          <span class="material-icons">grid_view</span>
+        </button>
+        <button class="toggle-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+          <span class="material-icons">view_list</span>
+        </button>
+      </div>
+      <button class="add-btn" (click)="openModal()">
+        <span class="material-icons">add</span> Add Book
+      </button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'all'"       (click)="onTabChange('all')">All Books</button>
+    <button [class.active]="activeTab === 'reading'"   (click)="onTabChange('reading')">📖 Reading</button>
+    <button [class.active]="activeTab === 'want'"      (click)="onTabChange('want')">🔖 Want to Read</button>
+    <button [class.active]="activeTab === 'completed'" (click)="onTabChange('completed')">✅ Completed</button>
+    <button [class.active]="activeTab === 'dnf'"       (click)="onTabChange('dnf')">🚫 Dropped</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="material-icons stat-icon" style="color:#8B5CF6">auto_stories</span>
+      <span class="stat-number">{{ totalBooks }}</span>
+      <span class="stat-label">Total Books</span>
+    </div>
+    <div class="stat-card">
+      <span class="material-icons stat-icon" style="color:#8B5CF6">menu_book</span>
+      <span class="stat-number">{{ readingCount }}</span>
+      <span class="stat-label">Reading Now</span>
+    </div>
+    <div class="stat-card">
+      <span class="material-icons stat-icon" style="color:#22c55e">task_alt</span>
+      <span class="stat-number">{{ completedCount }}</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-card">
+      <span class="material-icons stat-icon" style="color:#3b82f6">bookmark</span>
+      <span class="stat-number">{{ wantCount }}</span>
+      <span class="stat-label">Want to Read</span>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <span class="material-icons">search</span>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="Search by title, author, genre..."
+      [(ngModel)]="searchQuery"
+    />
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="empty">
+    <span class="material-icons empty-icon">hourglass_empty</span>
+    <p>Loading your books...</p>
+  </div>
+
+  <!-- EMPTY -->
+  <div *ngIf="!loading && books.length === 0" class="empty">
+    <span class="material-icons empty-icon">auto_stories</span>
+    <p>No books yet. Add your first book!</p>
+  </div>
+
+  <!-- ===================== GRID VIEW ===================== -->
+  <ng-container *ngIf="!loading && viewMode === 'grid'">
+
+    <ng-container *ngFor="let status of statuses">
+      <div class="section" *ngIf="getBooksForStatus(status).length > 0">
+        <div class="section-title">
+          <span class="material-icons">auto_stories</span>
+          {{ statusConfig[status].icon }} {{ statusConfig[status].label }}
+          <span class="count-badge">{{ getBooksForStatus(status).length }}</span>
+        </div>
+        <div class="grid-view">
+          <div
+            class="book-card"
+            *ngFor="let book of getBooksForStatus(status); trackBy: trackById"
+            (click)="openEditModal(book)"
+          >
+            <div class="book-cover" [ngClass]="getCoverColor(book)">
+              <img *ngIf="book.coverUrl" [src]="book.coverUrl" [alt]="book.title" />
+              <div *ngIf="!book.coverUrl" class="cover-placeholder">
+                <span class="material-icons">menu_book</span>
+              </div>
+              <span class="status-badge" [ngClass]="statusConfig[book.status].badgeClass">
+                {{ statusConfig[book.status].icon }}
+              </span>
+              <div class="rating-overlay" *ngIf="book.rating">★ {{ book.rating }}</div>
+            </div>
+            <div class="book-info">
+              <div class="book-title">{{ book.title }}</div>
+              <div class="book-author">{{ book.author || 'Unknown Author' }}</div>
+              <ng-container *ngIf="book.status === 'reading' && book.pagesTotal">
+                <div class="progress-label">
+                  <span>{{ book.pagesRead }}/{{ book.pagesTotal }} pg</span>
+                  <span>{{ getProgress(book) }}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getProgress(book)"></div>
+                </div>
+              </ng-container>
+              <div class="book-tags">
+                <span class="tag" *ngFor="let tag of book.tags">{{ tag }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="!loading && books.length > 0 && filteredBooks.length === 0" class="empty">
+      <span class="material-icons empty-icon">search_off</span>
+      <p>No books match your search.</p>
+    </div>
+
+  </ng-container>
+
+  <!-- ===================== LIST VIEW ===================== -->
+  <div *ngIf="!loading && viewMode === 'list'" class="list-view">
+
+    <div
+      class="book-row"
+      [ngClass]="'row-' + book.status"
+      *ngFor="let book of filteredBooks; trackBy: trackById"
+      (click)="openEditModal(book)"
+    >
+      <div class="row-cover-icon" [ngClass]="getCoverColor(book)">
+        <span class="material-icons">menu_book</span>
+      </div>
+
+      <div class="row-meta">
+        <div class="row-title">{{ book.title }}</div>
+        <div class="row-author">{{ book.author || 'Unknown' }} · {{ book.genre }}</div>
+        <div class="row-tags">
+          <span class="tag" *ngFor="let tag of book.tags">{{ tag }}</span>
+        </div>
+      </div>
+
+      <div class="row-progress">
+        <ng-container *ngIf="book.pagesTotal">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getProgress(book)"></div>
+          </div>
+          <small>{{ book.pagesRead }}/{{ book.pagesTotal }} · {{ getProgress(book) }}%</small>
+        </ng-container>
+        <span class="status-badge row-badge" [ngClass]="statusConfig[book.status].badgeClass">
+          {{ statusConfig[book.status].icon }} {{ statusConfig[book.status].label }}
+        </span>
+      </div>
+
+      <div class="row-dates">
+        <small *ngIf="book.startDate"><span class="material-icons">event</span> {{ book.startDate }}</small><br />
+        <small *ngIf="book.endDate"><span class="material-icons">event_available</span> {{ book.endDate }}</small>
+      </div>
+
+      <div class="row-rating" *ngIf="book.rating">{{ getStars(book.rating) }}</div>
+
+      <div class="hc-actions" (click)="$event.stopPropagation()">
+        <button class="edit-btn" (click)="openEditModal(book)">
+          <span class="material-icons">edit</span>
+        </button>
+        <button class="delete-btn" (click)="confirmDelete(book._id!)">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && books.length > 0 && filteredBooks.length === 0" class="empty">
+      <span class="material-icons empty-icon">search_off</span>
+      <p>No books match your search.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+  <div class="read-modal" (click)="$event.stopPropagation()">
+
+    <h3>
+      <span class="material-icons modal-icon">{{ editMode ? 'edit' : 'auto_stories' }}</span>
+      {{ editMode ? 'Edit Book' : 'Add New Book' }}
+    </h3>
+
+    <!-- Title -->
+    <div class="form-row">
+      <div class="form-group" style="flex:1">
+        <label>Book Title *</label>
+        <input type="text" placeholder="Enter book title" [(ngModel)]="form.title" />
+      </div>
+    </div>
+
+    <!-- Author + Status -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Author</label>
+        <input type="text" placeholder="Author name" [(ngModel)]="form.author" />
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="form.status">
+          <option value="want">🔖 Want to Read</option>
+          <option value="reading">📖 Currently Reading</option>
+          <option value="completed">✅ Completed</option>
+          <option value="dnf">🚫 Dropped / DNF</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Genre + Tags -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Genre</label>
+        <input type="text" placeholder="Fiction, Self-help..." [(ngModel)]="form.genre" />
+      </div>
+      <div class="form-group">
+        <label>Tags <span style="font-weight:400;color:#9ca3af">(comma separated)</span></label>
+        <input type="text" placeholder="inspiring, classic" [(ngModel)]="tagsInput" />
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Total Pages</label>
+        <input type="number" min="0" [(ngModel)]="form.pagesTotal" />
+      </div>
+      <div class="form-group">
+        <label>Pages Read</label>
+        <input type="number" min="0" [(ngModel)]="form.pagesRead" />
+      </div>
+    </div>
+
+    <!-- Dates -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" [(ngModel)]="form.startDate" [max]="today" />
+      </div>
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="date" [(ngModel)]="form.endDate" [max]="today" />
+      </div>
+    </div>
+
+    <!-- Cover URL -->
+    <div class="form-row">
+      <div class="form-group" style="flex:1">
+        <label>Cover Image URL</label>
+        <input type="url" placeholder="https://..." [(ngModel)]="form.coverUrl" />
+      </div>
+    </div>
+
+    <!-- Rating -->
+    <label class="form-label">
+      <span class="material-icons">star</span> Rating
+    </label>
+    <div class="star-row">
+      <span
+        *ngFor="let i of [1,2,3,4,5]"
+        class="star"
+        [class.active]="i <= selectedRating"
+        (click)="setRating(i)"
+      >★</span>
+    </div>
+
+    <!-- Review -->
+    <label class="form-label">
+      <span class="material-icons">rate_review</span> Review
+    </label>
+    <textarea [(ngModel)]="form.review" placeholder="Your thoughts on this book..." rows="2"></textarea>
+
+    <!-- Notes -->
+    <label class="form-label">
+      <span class="material-icons">notes</span> Notes / Highlights
+    </label>
+    <textarea [(ngModel)]="form.notes" placeholder="Key quotes, chapters to revisit..." rows="2"></textarea>
+
+    <p class="error" *ngIf="formError">{{ formError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="save-btn" (click)="saveBook()">
+        <span class="material-icons">save</span> {{ editMode ? 'Update' : 'Save' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Remove this book?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="yes-btn" (click)="deleteBook()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

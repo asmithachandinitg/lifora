@@ -1,0 +1,355 @@
+<div class="profile-wrapper">
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">manage_accounts</span> My Profile</h2>
+      <span class="profile-subtitle">Manage your personal information &amp; preferences</span>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="empty">
+    <span class="material-icons empty-icon">hourglass_empty</span>
+    <p>Loading your profile...</p>
+  </div>
+
+  <div *ngIf="!loading" class="profile-layout">
+
+    <!-- ── LEFT SIDEBAR CARD ── -->
+    <div class="profile-sidebar-card">
+
+      <div class="avatar-section">
+        <div class="avatar-circle">
+          <img *ngIf="profile.profilePhoto" [src]="profile.profilePhoto" alt="avatar"/>
+          <span *ngIf="!profile.profilePhoto" class="avatar-initials">{{ avatarInitials }}</span>
+        </div>
+        <div class="avatar-name">{{ profile.firstName }} {{ profile.lastName }}</div>
+        <div class="avatar-email">{{ profile.email }}</div>
+        <div class="gender-badge" *ngIf="profile.gender">
+          {{ profile.gender === 'male' ? '♂' : profile.gender === 'female' ? '♀' : '⚧' }}
+          {{ profile.gender | titlecase }}
+        </div>
+      </div>
+
+      <div class="quick-stats">
+        <div class="qs-item">
+          <span class="material-icons qs-icon">cake</span>
+          <div class="qs-info">
+            <span class="qs-val">{{ calculatedAge || '—' }}</span>
+            <span class="qs-label">Age</span>
+          </div>
+        </div>
+        <div class="qs-item">
+          <span class="material-icons qs-icon">monitor_weight</span>
+          <div class="qs-info">
+            <span class="qs-val">{{ profile.weight || '—' }} <small *ngIf="profile.weight">kg</small></span>
+            <span class="qs-label">Weight</span>
+          </div>
+        </div>
+        <div class="qs-item">
+          <span class="material-icons qs-icon">height</span>
+          <div class="qs-info">
+            <span class="qs-val">{{ profile.height || '—' }} <small *ngIf="profile.height">cm</small></span>
+            <span class="qs-label">Height</span>
+          </div>
+        </div>
+        <div class="qs-item">
+          <span class="material-icons qs-icon">favorite</span>
+          <div class="qs-info">
+            <span class="qs-val" [style.color]="bmiCategory.color">{{ calculatedBMI || '—' }}</span>
+            <span class="qs-label">BMI · {{ bmiCategory.label }}</span>
+          </div>
+        </div>
+        <div class="qs-item">
+          <span class="material-icons qs-icon">apps</span>
+          <div class="qs-info">
+            <span class="qs-val">{{ enabledModulesCount }}</span>
+            <span class="qs-label">Active Modules</span>
+          </div>
+        </div>
+        <div class="qs-item">
+          <span class="material-icons qs-icon">location_on</span>
+          <div class="qs-info">
+            <span class="qs-val">{{ profile.city || '—' }}</span>
+            <span class="qs-label">{{ profile.country || 'Location' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT MAIN CARD ── -->
+    <div class="profile-main-card">
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button [class.active]="activeTab === 'personal'" (click)="onTabChange('personal')">
+          <span class="material-icons">person</span> Personal
+        </button>
+        <button [class.active]="activeTab === 'body'" (click)="onTabChange('body')">
+          <span class="material-icons">monitor_weight</span> Body
+        </button>
+        <button [class.active]="activeTab === 'modules'" (click)="onTabChange('modules')">
+          <span class="material-icons">apps</span> Modules
+        </button>
+        <button [class.active]="activeTab === 'security'" (click)="onTabChange('security')">
+          <span class="material-icons">lock</span> Security
+        </button>
+      </div>
+
+      <!-- BANNERS -->
+      <div class="alert-banner success-banner" *ngIf="successMsg">
+        <span class="material-icons">check_circle</span> {{ successMsg }}
+      </div>
+      <div class="alert-banner error-banner" *ngIf="errorMsg">
+        <span class="material-icons">error</span> {{ errorMsg }}
+      </div>
+
+      <!-- ===== PERSONAL ===== -->
+      <div *ngIf="activeTab === 'personal'" class="tab-content">
+
+        <div class="section-label"><span class="material-icons">badge</span> Basic Information</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" [(ngModel)]="profile.firstName" placeholder="First name"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" [(ngModel)]="profile.lastName" placeholder="Last name"/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="profile.email" placeholder="Email address"/>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" [(ngModel)]="profile.phone" placeholder="+91 9999999999"/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" [(ngModel)]="profile.dob"/>
+          </div>
+          <div class="form-group">
+            <label>Age <span class="auto-label">(auto-calculated)</span></label>
+            <input type="number" [value]="calculatedAge" disabled class="disabled-input"/>
+          </div>
+        </div>
+
+        <div class="form-group-full">
+          <label>Gender</label>
+          <div class="gender-selector">
+            <div
+              *ngFor="let g of genderOptions"
+              class="gender-option"
+              [class.selected-gender]="profile.gender === g.value"
+              (click)="profile.gender = g.value"
+            >
+              <span class="gender-symbol">{{ g.icon }}</span>
+              <span class="gender-label">{{ g.label }}</span>
+            </div>
+          </div>
+          <div class="gender-hint" *ngIf="isMale">
+            <span class="material-icons">info</span>
+            Period &amp; Pregnancy modules are automatically hidden for male profiles.
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:8px"><span class="material-icons">location_on</span> Location</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Country</label>
+            <input type="text" [(ngModel)]="profile.country" placeholder="e.g. India"/>
+          </div>
+          <div class="form-group">
+            <label>State</label>
+            <input type="text" [(ngModel)]="profile.state" placeholder="e.g. Karnataka"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" [(ngModel)]="profile.city" placeholder="e.g. Bangalore"/>
+          </div>
+        </div>
+
+        <div class="tab-footer">
+          <button class="save-btn" (click)="saveProfile()" [disabled]="saving">
+            <span class="material-icons">save</span>
+            {{ saving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ===== BODY ===== -->
+      <div *ngIf="activeTab === 'body'" class="tab-content">
+
+        <div class="section-label"><span class="material-icons">monitor_weight</span> Body Metrics</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Weight <span class="unit-label">(kg)</span></label>
+            <input type="number" min="0" [(ngModel)]="profile.weight" placeholder="e.g. 65"/>
+          </div>
+          <div class="form-group">
+            <label>Height <span class="unit-label">(cm)</span></label>
+            <input type="number" min="0" [(ngModel)]="profile.height" placeholder="e.g. 165"/>
+          </div>
+        </div>
+
+        <div class="bmi-card" *ngIf="calculatedBMI">
+          <div class="bmi-left">
+            <div class="bmi-value" [style.color]="bmiCategory.color">{{ calculatedBMI }}</div>
+            <div class="bmi-label">BMI</div>
+          </div>
+          <div class="bmi-right">
+            <div class="bmi-category" [style.color]="bmiCategory.color">{{ bmiCategory.label }}</div>
+            <div class="bmi-bar-track">
+              <div class="bmi-bar-fill"
+                [style.background]="bmiCategory.color"
+                [style.width.%]="Math.min((calculatedBMI / 40) * 100, 100)">
+              </div>
+            </div>
+            <div class="bmi-scale">
+              <span>Underweight</span><span>Normal</span><span>Overweight</span><span>Obese</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bmi-empty" *ngIf="!calculatedBMI">
+          <span class="material-icons">info</span>
+          Enter your weight and height to calculate BMI automatically.
+        </div>
+
+        <div class="tab-footer">
+          <button class="save-btn" (click)="saveProfile()" [disabled]="saving">
+            <span class="material-icons">save</span>
+            {{ saving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ===== MODULES ===== -->
+      <div *ngIf="activeTab === 'modules'" class="tab-content">
+
+        <div class="modules-top">
+          <div class="section-label" style="margin-bottom:0">
+            <span class="material-icons">apps</span> App Modules
+          </div>
+          <div class="modules-actions">
+            <button class="mini-btn" (click)="enableAll()">Enable All</button>
+            <button class="mini-btn mini-btn-outline" (click)="disableAll()">Disable All</button>
+          </div>
+        </div>
+
+        <p class="modules-hint">
+          Toggle modules on/off. Changes are reflected in the sidebar after saving.
+          <span *ngIf="isMale">Period &amp; Pregnancy are hidden (gender: Male).</span>
+        </p>
+
+        <div class="modules-grid">
+          <div
+            class="module-card"
+            *ngFor="let mod of visibleModules"
+            [class.module-enabled]="mod.enabled"
+            [class.module-disabled]="!mod.enabled"
+            (click)="toggleModule(mod)"
+          >
+            <div class="module-icon-wrap" [class.icon-enabled]="mod.enabled">
+              <span class="material-icons">{{ mod.icon }}</span>
+            </div>
+            <span class="module-name">{{ mod.label }}</span>
+            <div class="module-toggle" [class.toggle-on]="mod.enabled">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-footer">
+          <button class="save-btn" (click)="saveModules()" [disabled]="saving">
+            <span class="material-icons">save</span>
+            {{ saving ? 'Saving...' : 'Save Module Preferences' }}
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ===== SECURITY ===== -->
+      <div *ngIf="activeTab === 'security'" class="tab-content">
+
+        <div class="section-label"><span class="material-icons">lock</span> Change Password</div>
+
+        <div class="alert-banner success-banner" *ngIf="passwordSuccess">
+          <span class="material-icons">check_circle</span> {{ passwordSuccess }}
+        </div>
+        <div class="alert-banner error-banner" *ngIf="passwordError">
+          <span class="material-icons">error</span> {{ passwordError }}
+        </div>
+
+        <div class="form-group-full">
+          <label>Current Password</label>
+          <div class="pwd-wrap">
+            <input [type]="showCurrentPwd ? 'text' : 'password'" [(ngModel)]="currentPassword" placeholder="Enter current password"/>
+            <span class="material-icons pwd-eye" (click)="showCurrentPwd = !showCurrentPwd">
+              {{ showCurrentPwd ? 'visibility_off' : 'visibility' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group-full">
+          <label>New Password</label>
+          <div class="pwd-wrap">
+            <input [type]="showNewPwd ? 'text' : 'password'" [(ngModel)]="newPassword" placeholder="Minimum 6 characters"/>
+            <span class="material-icons pwd-eye" (click)="showNewPwd = !showNewPwd">
+              {{ showNewPwd ? 'visibility_off' : 'visibility' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="pwd-strength" *ngIf="newPassword.length > 0">
+          <div class="strength-bar">
+            <div class="strength-fill"
+              [style.width.%]="newPassword.length >= 10 ? 100 : newPassword.length >= 6 ? 60 : 30"
+              [style.background]="newPassword.length >= 10 ? '#22c55e' : newPassword.length >= 6 ? '#f59e0b' : '#ef4444'">
+            </div>
+          </div>
+          <span class="strength-label"
+            [style.color]="newPassword.length >= 10 ? '#22c55e' : newPassword.length >= 6 ? '#f59e0b' : '#ef4444'">
+            {{ newPassword.length >= 10 ? 'Strong' : newPassword.length >= 6 ? 'Medium' : 'Weak' }}
+          </span>
+        </div>
+
+        <div class="form-group-full">
+          <label>Confirm New Password</label>
+          <div class="pwd-wrap">
+            <input [type]="showConfirmPwd ? 'text' : 'password'" [(ngModel)]="confirmPassword" placeholder="Repeat new password"/>
+            <span class="material-icons pwd-eye" (click)="showConfirmPwd = !showConfirmPwd">
+              {{ showConfirmPwd ? 'visibility_off' : 'visibility' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="tab-footer">
+          <button class="save-btn" (click)="changePassword()" [disabled]="saving">
+            <span class="material-icons">lock_reset</span>
+            {{ saving ? 'Updating...' : 'Update Password' }}
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

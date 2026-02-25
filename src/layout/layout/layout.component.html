@@ -8,14 +8,17 @@
   <!-- Main Area -->
   <div class="main">
 
-    <!-- Topbar -->
+    <!-- Topbar (stays pinned) -->
     <app-topbar></app-topbar>
 
-    <!-- Page Content -->
+    <!-- Page Content (only this scrolls) -->
     <div class="content">
       <router-outlet></router-outlet>
     </div>
 
   </div>
+
+  <!-- Global Toast Notifications -->
+  <app-toast></app-toast>
 
 </div>

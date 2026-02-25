@@ -1,0 +1,600 @@
+<div class="period-wrapper">
+
+  <!-- HEADER -->
+  <div class="period-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">water_drop</span> Period Tracker</h2>
+      <span class="period-subtitle">Know your cycle, know your body</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="openDailyModal()">
+        <span class="material-icons">edit_note</span> Log Today's Symptoms
+      </button>
+      <button class="btn-primary" (click)="openPeriodModal()">
+        <span class="material-icons">add</span> Log Period
+      </button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab==='dashboard'" (click)="activeTab='dashboard'">Dashboard</button>
+    <button [class.active]="activeTab==='calendar'"  (click)="activeTab='calendar'; buildCalendar()">Calendar</button>
+    <button [class.active]="activeTab==='history'"   (click)="activeTab='history'">History</button>
+  </div>
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <div *ngIf="activeTab==='dashboard'">
+
+    <div *ngIf="periodEntries.length === 0" class="empty">
+      <span class="material-icons empty-icon">water_drop</span>
+      <p>No periods logged yet. Start tracking your cycle!</p>
+    </div>
+
+    <div *ngIf="periodEntries.length > 0">
+
+      <!-- CYCLE OVERVIEW CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card accent-pink">
+          <span class="material-icons stat-icon">autorenew</span>
+          <span class="stat-val">{{ avgCycleLength }}d</span>
+          <span class="stat-lbl">Avg Cycle</span>
+        </div>
+        <div class="stat-card accent-red">
+          <span class="material-icons stat-icon">calendar_today</span>
+          <span class="stat-val">{{ avgPeriodLength }}d</span>
+          <span class="stat-lbl">Avg Duration</span>
+        </div>
+        <div class="stat-card accent-purple">
+          <span class="material-icons stat-icon">history</span>
+          <span class="stat-val">{{ periodEntries.length }}</span>
+          <span class="stat-lbl">Cycles Logged</span>
+        </div>
+        <div class="stat-card accent-pink" [class.urgent]="daysUntilNextPeriod <= 5">
+          <span class="material-icons stat-icon">schedule</span>
+          <span class="stat-val">{{ daysUntilNextPeriod }}d</span>
+          <span class="stat-lbl">Until Next Period</span>
+        </div>
+      </div>
+
+      <!-- CYCLE PHASE BANNER -->
+      <div class="cycle-banner">
+        <div class="cycle-banner-left">
+          <h3>Cycle Day {{ currentCycleDay }}</h3>
+          <div class="cycle-progress-track">
+            <div class="cycle-progress-fill"
+              [style.width.%]="(currentCycleDay / avgCycleLength) * 100">
+            </div>
+            <div class="cycle-marker ovul-marker"
+              [style.left.%]="((avgCycleLength - 14) / avgCycleLength) * 100"
+              title="Ovulation">
+            </div>
+          </div>
+          <div class="cycle-scale">
+            <span>Day 1</span><span>Day {{ avgCycleLength }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREDICTIONS -->
+      <div class="predictions-grid">
+        <div class="pred-card pred-period">
+          <div class="pred-icon"><span class="material-icons">water_drop</span></div>
+          <div class="pred-info">
+            <span class="pred-label">Next Period</span>
+            <span class="pred-date">{{ formatDate(nextPeriodDate) }}</span>
+            <span class="pred-countdown">in {{ daysUntilNextPeriod }} days</span>
+          </div>
+        </div>
+        <div class="pred-card pred-ovul">
+          <div class="pred-icon"><span class="material-icons">egg_alt</span></div>
+          <div class="pred-info">
+            <span class="pred-label">Ovulation</span>
+            <span class="pred-date">{{ formatDate(nextOvulationDate) }}</span>
+            <span class="pred-countdown">in {{ daysUntilOvulation }} days</span>
+          </div>
+        </div>
+        <div class="pred-card pred-fertile">
+          <div class="pred-icon"><span class="material-icons">favorite</span></div>
+          <div class="pred-info">
+            <span class="pred-label">Fertile Window</span>
+            <span class="pred-date">{{ formatDate(nextFertileStart) }}</span>
+            <span class="pred-countdown">to {{ formatDate(nextFertileEnd) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAST PERIOD SUMMARY -->
+      <div class="last-period-card" *ngIf="sortedPeriodEntries[0] as latest">
+        <div class="lp-header">
+          <h3>Last Period</h3>
+          <span class="flow-badge"
+            [style.background]="getFlowColor(latest.flow)+'20'"
+            [style.color]="getFlowColor(latest.flow)">
+            <span class="material-icons">{{ getFlowIcon(latest.flow) }}</span>
+            {{ latest.flow | titlecase }}
+          </span>
+        </div>
+        <div class="lp-dates">
+          <span>{{ latest.startDate | date:'dd MMM' }}</span>
+          <span *ngIf="latest.endDate"> → {{ latest.endDate | date:'dd MMM' }}
+            <span class="dur">({{ latest.periodLength || '?' }}d)</span>
+          </span>
+          <span *ngIf="!latest.endDate" class="ongoing">Ongoing</span>
+        </div>
+        <div class="lp-vitals">
+          <span class="vital-chip" [style.color]="getMoodColor(latest.mood)">
+            <span class="material-icons">{{ getMoodIcon(latest.mood) }}</span>
+            {{ getMoodLabel(latest.mood) }}
+          </span>
+          <span class="vital-chip" [style.color]="getPainColor(latest.painLevel)">
+            <span class="material-icons">flash_on</span>
+            Pain: {{ getPainLabel(latest.painLevel) }}
+          </span>
+        </div>
+        <div class="symptom-chips" *ngIf="latest.symptoms.length > 0">
+          <span class="sym-chip" *ngFor="let s of latest.symptoms.slice(0, 6)">
+            {{ getSymptomLabel(s) }}
+          </span>
+          <span class="sym-more" *ngIf="latest.symptoms.length > 6">+{{ latest.symptoms.length - 6 }} more</span>
+        </div>
+      </div>
+
+      <!-- TOP SYMPTOMS CHART -->
+      <div class="symptoms-chart-card" *ngIf="topSymptoms.length > 0">
+        <h3><span class="material-icons">analytics</span> Most Common Symptoms</h3>
+        <div class="sym-bar-list">
+          <div class="sym-bar-row" *ngFor="let s of topSymptoms">
+            <span class="sym-bar-label">{{ s.label }}</span>
+            <div class="sym-bar-track">
+              <div class="sym-bar-fill"
+                [style.width.%]="(s.count / (periodEntries.length + dailyLogs.length)) * 100">
+              </div>
+            </div>
+            <span class="sym-bar-count">{{ s.count }}x</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== CALENDAR ==================== -->
+  <div *ngIf="activeTab==='calendar'" class="calendar-layout">
+
+    <!-- Calendar panel -->
+    <div class="calendar-panel" [class.has-side-panel]="showDayPanel">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" (click)="prevMonth()">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <h3>{{ calMonthLabel }}</h3>
+        <button class="cal-nav-btn" (click)="nextMonth()">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+
+      <!-- Legend -->
+      <div class="cal-legend">
+        <span class="leg-item"><span class="leg-dot dot-period"></span> Period</span>
+        <span class="leg-item"><span class="leg-dot dot-fertile"></span> Fertile</span>
+        <span class="leg-item"><span class="leg-dot dot-ovul"></span> Ovulation</span>
+        <span class="leg-item"><span class="leg-dot dot-predicted"></span> Predicted</span>
+      </div>
+
+      <!-- Weekday headers -->
+      <div class="cal-week-headers">
+        <span *ngFor="let d of weekDays">{{ d }}</span>
+      </div>
+
+      <!-- Days grid -->
+      <div class="cal-grid">
+        <div *ngFor="let day of calendarDays; trackBy: trackByDate"
+          class="cal-day"
+          [class.other-month]="!day.inMonth"
+          [class.is-today]="day.isToday"
+          [class.day-period]="day.isPeriod"
+          [class.day-fertile]="day.isFertile"
+          [class.day-ovulation]="day.isOvulation"
+          [class.day-predicted]="day.isPredicted"
+          [class.has-log]="day.dailyLog"
+          [class.selected-day]="selectedDay?.date === day.date"
+          (click)="selectDay(day)">
+          <span class="day-num">{{ day.dayNum }}</span>
+          <span class="day-dot" *ngIf="day.dailyLog"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="day-side-panel" *ngIf="showDayPanel && selectedDay">
+      <div class="dsp-header">
+        <div>
+          <h4>{{ selectedDay.date | date:'EEEE' }}</h4>
+          <span class="dsp-date">{{ selectedDay.date | date:'dd MMMM yyyy' }}</span>
+        </div>
+        <button class="close-panel-btn" (click)="closeDayPanel()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <!-- Day type badges -->
+      <div class="dsp-badges">
+        <span class="dsp-badge badge-period"    *ngIf="selectedDay.isPeriod">Period</span>
+        <span class="dsp-badge badge-ovul"      *ngIf="selectedDay.isOvulation">Ovulation</span>
+        <span class="dsp-badge badge-fertile"   *ngIf="selectedDay.isFertile">Fertile</span>
+        <span class="dsp-badge badge-predicted" *ngIf="selectedDay.isPredicted">Predicted Period</span>
+        <span class="dsp-badge badge-today"     *ngIf="selectedDay.isToday">Today</span>
+      </div>
+
+      <!-- Period entry details -->
+      <div class="dsp-section" *ngIf="selectedDay.periodEntry as pe">
+        <h5><span class="material-icons">water_drop</span> Period Log</h5>
+        <div class="dsp-flow">
+          <span class="flow-badge"
+            [style.background]="getFlowColor(pe.flow)+'20'"
+            [style.color]="getFlowColor(pe.flow)">
+            <span class="material-icons">{{ getFlowIcon(pe.flow) }}</span>
+            {{ pe.flow | titlecase }} flow
+          </span>
+        </div>
+        <div class="dsp-vitals">
+          <span [style.color]="getMoodColor(pe.mood)">
+            <span class="material-icons">{{ getMoodIcon(pe.mood) }}</span>
+            {{ getMoodLabel(pe.mood) }}
+          </span>
+          <span [style.color]="getPainColor(pe.painLevel)">
+            <span class="material-icons">flash_on</span>
+            Pain: {{ getPainLabel(pe.painLevel) }}
+          </span>
+        </div>
+        <div class="dsp-symptoms" *ngIf="pe.symptoms.length > 0">
+          <span class="sym-chip" *ngFor="let s of pe.symptoms">{{ getSymptomLabel(s) }}</span>
+        </div>
+        <p class="dsp-notes" *ngIf="pe.notes">{{ pe.notes }}</p>
+        <div class="dsp-actions">
+          <button class="edit-btn"   (click)="openEditPeriodModal(pe)"><span class="material-icons">edit</span></button>
+          <button class="delete-btn" (click)="confirmDelete(pe._id!, 'period')"><span class="material-icons">delete</span></button>
+        </div>
+      </div>
+
+      <!-- Daily log details -->
+      <div class="dsp-section" *ngIf="selectedDay.dailyLog as dl">
+        <h5><span class="material-icons">edit_note</span> Daily Log</h5>
+        <div class="dsp-vitals">
+          <span [style.color]="getMoodColor(dl.mood)">
+            <span class="material-icons">{{ getMoodIcon(dl.mood) }}</span>
+            {{ getMoodLabel(dl.mood) }}
+          </span>
+          <span [style.color]="getPainColor(dl.painLevel)">
+            <span class="material-icons">flash_on</span>
+            Pain: {{ getPainLabel(dl.painLevel) }}
+          </span>
+        </div>
+        <div class="dsp-symptoms" *ngIf="dl.symptoms.length > 0">
+          <span class="sym-chip" *ngFor="let s of dl.symptoms">{{ getSymptomLabel(s) }}</span>
+        </div>
+        <p class="dsp-notes" *ngIf="dl.notes">{{ dl.notes }}</p>
+        <div class="dsp-actions">
+          <button class="edit-btn"   (click)="openDailyModal(dl.date)"><span class="material-icons">edit</span></button>
+          <button class="delete-btn" (click)="confirmDelete(dl._id!, 'daily')"><span class="material-icons">delete</span></button>
+        </div>
+      </div>
+
+      <!-- Empty day -->
+      <div class="dsp-empty" *ngIf="!selectedDay.periodEntry && !selectedDay.dailyLog">
+        <p>Nothing logged for this day.</p>
+        <button class="btn-ghost" (click)="openDailyModal(selectedDay.date)">
+          <span class="material-icons">add</span> Log symptoms
+        </button>
+        <button class="btn-ghost" (click)="openPeriodModal(selectedDay.date)">
+          <span class="material-icons">water_drop</span> Log period
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== HISTORY ==================== -->
+  <div *ngIf="activeTab==='history'">
+
+    <div *ngIf="periodEntries.length === 0 && dailyLogs.length === 0" class="empty">
+      <span class="material-icons empty-icon">history</span>
+      <p>No entries yet.</p>
+    </div>
+
+    <!-- Period entries -->
+    <div *ngIf="periodEntries.length > 0">
+      <h3 class="history-section-title">
+        <span class="material-icons">water_drop</span> Period Logs
+      </h3>
+      <div class="history-list">
+        <div class="history-card" *ngFor="let entry of sortedPeriodEntries; trackBy: trackById">
+          <div class="hc-left">
+            <div class="hc-date-block">
+              <span class="hc-month">{{ entry.startDate | date:'MMM' }}</span>
+              <span class="hc-day">{{ entry.startDate | date:'dd' }}</span>
+            </div>
+            <div class="hc-body">
+              <div class="hc-top-row">
+                <span class="flow-badge"
+                  [style.background]="getFlowColor(entry.flow)+'20'"
+                  [style.color]="getFlowColor(entry.flow)">
+                  <span class="material-icons">{{ getFlowIcon(entry.flow) }}</span>
+                  {{ entry.flow | titlecase }}
+                </span>
+                <span class="hc-dates">
+                  {{ entry.startDate | date:'dd MMM' }}
+                  <ng-container *ngIf="entry.endDate">
+                    → {{ entry.endDate | date:'dd MMM' }}
+                    <span class="dur">({{ entry.periodLength }}d)</span>
+                  </ng-container>
+                  <span *ngIf="!entry.endDate" class="ongoing">Ongoing</span>
+                </span>
+              </div>
+              <div class="hc-vitals">
+                <span [style.color]="getMoodColor(entry.mood)">
+                  <span class="material-icons tiny">{{ getMoodIcon(entry.mood) }}</span>
+                  {{ getMoodLabel(entry.mood) }}
+                </span>
+                <span [style.color]="getPainColor(entry.painLevel)">
+                  <span class="material-icons tiny">flash_on</span>
+                  {{ getPainLabel(entry.painLevel) }}
+                </span>
+              </div>
+              <div class="symptom-chips" *ngIf="entry.symptoms.length > 0">
+                <span class="sym-chip" *ngFor="let s of entry.symptoms.slice(0,5)">{{ getSymptomLabel(s) }}</span>
+                <span class="sym-more" *ngIf="entry.symptoms.length > 5">+{{ entry.symptoms.length-5 }}</span>
+              </div>
+              <p class="hc-notes" *ngIf="entry.notes">{{ entry.notes }}</p>
+            </div>
+          </div>
+          <div class="hc-actions">
+            <button class="edit-btn"   (click)="openEditPeriodModal(entry)"><span class="material-icons">edit</span></button>
+            <button class="delete-btn" (click)="confirmDelete(entry._id!, 'period')"><span class="material-icons">delete</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily logs -->
+    <div *ngIf="dailyLogs.length > 0" style="margin-top: 24px;">
+      <h3 class="history-section-title">
+        <span class="material-icons">edit_note</span> Daily Symptom Logs
+      </h3>
+      <div class="history-list">
+        <div class="history-card" *ngFor="let log of dailyLogs | slice:0:30; trackBy: trackById">
+          <div class="hc-left">
+            <div class="hc-date-block">
+              <span class="hc-month">{{ log.date | date:'MMM' }}</span>
+              <span class="hc-day">{{ log.date | date:'dd' }}</span>
+            </div>
+            <div class="hc-body">
+              <div class="hc-vitals">
+                <span [style.color]="getMoodColor(log.mood)">
+                  <span class="material-icons tiny">{{ getMoodIcon(log.mood) }}</span>
+                  {{ getMoodLabel(log.mood) }}
+                </span>
+                <span [style.color]="getPainColor(log.painLevel)">
+                  <span class="material-icons tiny">flash_on</span>
+                  {{ getPainLabel(log.painLevel) }}
+                </span>
+              </div>
+              <div class="symptom-chips" *ngIf="log.symptoms.length > 0">
+                <span class="sym-chip" *ngFor="let s of log.symptoms.slice(0,5)">{{ getSymptomLabel(s) }}</span>
+                <span class="sym-more" *ngIf="log.symptoms.length > 5">+{{ log.symptoms.length-5 }}</span>
+              </div>
+              <p class="hc-notes" *ngIf="log.notes">{{ log.notes }}</p>
+            </div>
+          </div>
+          <div class="hc-actions">
+            <button class="edit-btn"   (click)="openDailyModal(log.date)"><span class="material-icons">edit</span></button>
+            <button class="delete-btn" (click)="confirmDelete(log._id!, 'daily')"><span class="material-icons">delete</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== PERIOD LOG MODAL ==================== -->
+<div class="modal" *ngIf="showPeriodModal" (click)="closePeriodModal()">
+  <div class="period-modal" (click)="$event.stopPropagation()">
+    <h3><span class="material-icons modal-icon">water_drop</span>
+      {{ editMode ? 'Edit Period' : 'Log Period' }}
+    </h3>
+
+    <!-- Dates -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="field-label"><span class="material-icons">play_circle</span> Start Date</label>
+        <input type="date" [(ngModel)]="periodForm.startDate" />
+      </div>
+      <div class="form-group">
+        <label class="field-label">
+          <span class="material-icons">stop_circle</span> End Date
+          <span class="optional">(optional)</span>
+        </label>
+        <input type="date" [(ngModel)]="periodForm.endDate" />
+      </div>
+    </div>
+
+    <!-- Flow -->
+    <label class="field-label"><span class="material-icons">water_drop</span> Flow Level</label>
+    <div class="flow-selector">
+      <div *ngFor="let f of flowLevels" class="flow-opt"
+        [class.selected]="periodForm.flow === f"
+        [style.--fc]="getFlowColor(f)"
+        (click)="periodForm.flow = f">
+        <span class="material-icons" [style.color]="periodForm.flow===f ? getFlowColor(f) : '#9ca3af'">
+          {{ getFlowIcon(f) }}
+        </span>
+        <span>{{ f | titlecase }}</span>
+      </div>
+    </div>
+
+    <!-- Pain + Mood -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="field-label"><span class="material-icons">flash_on</span> Pain Level</label>
+        <div class="scale-selector">
+          <div *ngFor="let p of [1,2,3,4,5]" class="scale-opt"
+            [class.selected]="periodForm.painLevel===p"
+            [style.--sc]="getPainColor(p)"
+            (click)="periodForm.painLevel=p">
+            {{ p }}<span class="scale-sub">{{ painLabels[p] }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label"><span class="material-icons">mood</span> Mood</label>
+        <div class="mood-selector">
+          <div *ngFor="let m of [1,2,3,4,5]" class="mood-opt"
+            [class.selected]="periodForm.mood===m"
+            [style.--mc]="getMoodColor(m)"
+            (click)="periodForm.mood=m">
+            <span class="material-icons"
+              [style.color]="periodForm.mood===m ? getMoodColor(m) : '#9ca3af'">
+              {{ getMoodIcon(m) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Symptoms by category -->
+    <label class="field-label"><span class="material-icons">medical_services</span> Symptoms</label>
+    <div class="symptom-cats">
+      <div class="sym-cat" *ngFor="let cat of symptomCategories">
+        <div class="sym-cat-header" (click)="toggleCat(cat.label)">
+          <span class="material-icons">{{ cat.icon }}</span>
+          <span>{{ cat.label }}</span>
+          <span class="cat-count" *ngIf="countSelected(cat.symptoms, periodForm.symptoms) > 0">
+            {{ countSelected(cat.symptoms, periodForm.symptoms) }}
+          </span>
+          <span class="material-icons cat-chevron">
+            {{ isCatExpanded(cat.label) ? 'expand_less' : 'expand_more' }}
+          </span>
+        </div>
+        <div class="sym-grid" *ngIf="isCatExpanded(cat.label)">
+          <div *ngFor="let s of cat.symptoms" class="sym-toggle"
+            [class.active]="hasPeriodSymptom(s.key)"
+            (click)="toggleSymptomInPeriod(s.key)">
+            <span class="material-icons">{{ s.icon }}</span>
+            <span>{{ s.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <label class="field-label" style="margin-top:12px">
+      <span class="material-icons">notes</span> Notes (optional)
+    </label>
+    <textarea [(ngModel)]="periodForm.notes" placeholder="How are you feeling?" rows="2"></textarea>
+
+    <p class="form-error" *ngIf="formError">{{ formError }}</p>
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closePeriodModal()">Cancel</button>
+      <button class="save-btn"   (click)="savePeriodEntry()">
+        <span class="material-icons">save</span> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DAILY SYMPTOM MODAL ==================== -->
+<div class="modal" *ngIf="showDailyModal" (click)="closeDailyModal()">
+  <div class="period-modal" (click)="$event.stopPropagation()">
+    <h3><span class="material-icons modal-icon">edit_note</span>
+      Daily Symptom Log
+    </h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="field-label"><span class="material-icons">today</span> Date</label>
+        <input type="date" [(ngModel)]="dailyForm.date" />
+      </div>
+    </div>
+
+    <!-- Pain + Mood -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="field-label"><span class="material-icons">flash_on</span> Pain Level</label>
+        <div class="scale-selector">
+          <div *ngFor="let p of [1,2,3,4,5]" class="scale-opt"
+            [class.selected]="dailyForm.painLevel===p"
+            [style.--sc]="getPainColor(p)"
+            (click)="dailyForm.painLevel=p">
+            {{ p }}<span class="scale-sub">{{ painLabels[p] }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label"><span class="material-icons">mood</span> Mood</label>
+        <div class="mood-selector">
+          <div *ngFor="let m of [1,2,3,4,5]" class="mood-opt"
+            [class.selected]="dailyForm.mood===m"
+            [style.--mc]="getMoodColor(m)"
+            (click)="dailyForm.mood=m">
+            <span class="material-icons"
+              [style.color]="dailyForm.mood===m ? getMoodColor(m) : '#9ca3af'">
+              {{ getMoodIcon(m) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Symptoms by category -->
+    <label class="field-label"><span class="material-icons">medical_services</span> Symptoms</label>
+    <div class="symptom-cats">
+      <div class="sym-cat" *ngFor="let cat of symptomCategories">
+        <div class="sym-cat-header" (click)="toggleCat(cat.label)">
+          <span class="material-icons">{{ cat.icon }}</span>
+          <span>{{ cat.label }}</span>
+          <span class="material-icons cat-chevron">
+            {{ isCatExpanded(cat.label) ? 'expand_less' : 'expand_more' }}
+          </span>
+        </div>
+        <div class="sym-grid" *ngIf="isCatExpanded(cat.label)">
+          <div *ngFor="let s of cat.symptoms" class="sym-toggle"
+            [class.active]="hasDailySymptom(s.key)"
+            (click)="toggleSymptomInDaily(s.key)">
+            <span class="material-icons">{{ s.icon }}</span>
+            <span>{{ s.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <label class="field-label" style="margin-top:12px">
+      <span class="material-icons">notes</span> Notes (optional)
+    </label>
+    <textarea [(ngModel)]="dailyForm.notes" placeholder="Anything to note today?" rows="2"></textarea>
+
+    <p class="form-error" *ngIf="formError">{{ formError }}</p>
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeDailyModal()">Cancel</button>
+      <button class="save-btn-daily" (click)="saveDailyLog()">
+        <span class="material-icons">save</span> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal" *ngIf="showDeleteConfirm">
+  <div class="confirm-modal">
+    <span class="material-icons confirm-icon">delete_forever</span>
+    <h3>Delete this entry?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="cancel-btn" (click)="showDeleteConfirm=false">Cancel</button>
+      <button class="yes-btn"    (click)="doDelete()">
+        <span class="material-icons">delete</span> Delete
+      </button>
+    </div>
+  </div>
+</div>

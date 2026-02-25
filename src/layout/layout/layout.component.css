@@ -1,27 +1,40 @@
+/* ── ROOT: kill ALL page-level scroll ── */
 .layout {
   display: flex;
-  background: var(--bg);
+  height: 100vh;
+  overflow: hidden;          /* nothing scrolls here */
+  background: #f5f7fb;
 }
 
-/* Sidebar */
-.sidebar {
+/* Sidebar: locked, never scrolls, always full height */
+aside.sidebar {
+  flex-shrink: 0;
   width: 240px;
-  background: var(--primary);
-  color: white;
+  height: 100vh;
+  overflow: hidden;          /* sidebar NEVER scrolls */
 }
 
-/* Main section */
+/* Main column: topbar + content stacked */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow: hidden;          /* keeps topbar pinned */
+  min-width: 0;
 }
 
-/* Topbar spacing */
+/* THE one and only scrollable zone */
 .content {
   flex: 1;
-  padding: 24px;
   overflow-y: auto;
-  display: block; 
+  overflow-x: hidden;
+  background: #f5f7fb;
+  /* custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #c4b5fd #f5f7fb;
 }
 
+.content::-webkit-scrollbar       { width: 6px; }
+.content::-webkit-scrollbar-track { background: #f5f7fb; }
+.content::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 6px; }

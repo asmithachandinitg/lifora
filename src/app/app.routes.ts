@@ -1,93 +1,38 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent }
-    from '../modules/dashboard/dashboard.component';
-import { DiaryComponent }
-    from '../modules/diary/diary.component';
-import { RegisterComponent }
-    from '../modules/auth/register/register.component';
-import { LoginComponent }
-    from '../modules/auth/login/login.component';
-import { AuthGuard }
-    from '../core/auth/auth.guard';
-import { LayoutComponent } from '../layout/layout/layout.component';
-import { ForgotPasswordComponent } from '../modules/auth/forgot-password/forgot-password.component';
-import { TasksComponent } from '../modules/tasks/tasks.component';
-import { ExpensesComponent } from '../modules/expenses/expenses.component';
-import { MoodComponent } from '../modules/mood/mood.component';
-import { GoalsComponent } from '../modules/goals/goals.component';
-import { SleepComponent } from '../modules/sleep/sleep.component';
-import { FitnessComponent } from '../modules/fitness/fitness.component';
-import { MedicineComponent } from '../modules/medicine/medicine.component';
-import { TravelComponent } from '../modules/travel/travel.component';
+import { moduleGuard } from '../core/auth/module.guard';
+import { AuthGuard } from '../core/auth/auth.guard';
 
 export const routes: Routes = [
+  {
+    path: '',
+    // Your layout wrapper
+    loadComponent: () => import('../layout/layout/layout.component').then(m => m.LayoutComponent),
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'dashboard',  loadComponent: () => import('../modules/dashboard/dashboard.component').then(m => m.DashboardComponent) },
 
-    /* Public Routes */
-    {
-        path: 'login',
-        component: LoginComponent
-    },
-    {
-        path: 'register',
-        component: RegisterComponent
-    },
-    {
-        path: 'forgot-password',
-        component: ForgotPasswordComponent
-    },
+      // ↓ Add canActivate: [moduleGuard] to every module route
+      { path: 'diary',     canActivate: [moduleGuard], loadComponent: () => import('../modules/diary/diary.component').then(m => m.DiaryComponent) },
+      { path: 'tasks',     canActivate: [moduleGuard], loadComponent: () => import('../modules/tasks/tasks.component').then(m => m.TasksComponent) },
+      { path: 'habits',    canActivate: [moduleGuard], loadComponent: () => import('../modules/habits/habit.component').then(m => m.HabitsComponent) },
+      { path: 'goals',     canActivate: [moduleGuard], loadComponent: () => import('../modules/goals/goals.component').then(m => m.GoalsComponent) },
+      { path: 'food',      canActivate: [moduleGuard], loadComponent: () => import('../modules/food/food.component').then(m => m.FoodComponent) },
+      { path: 'fitness',   canActivate: [moduleGuard], loadComponent: () => import('../modules/fitness/fitness.component').then(m => m.FitnessComponent) },
+      { path: 'sleep',     canActivate: [moduleGuard], loadComponent: () => import('../modules/sleep/sleep.component').then(m => m.SleepComponent) },
+      { path: 'mood',      canActivate: [moduleGuard], loadComponent: () => import('../modules/mood/mood.component').then(m => m.MoodComponent) },
+      { path: 'period',    canActivate: [moduleGuard], loadComponent: () => import('../modules/period/period.component').then(m => m.PeriodComponent) },
+      { path: 'medicine',  canActivate: [moduleGuard], loadComponent: () => import('../modules/medicine/medicine.component').then(m => m.MedicineComponent) },
+      { path: 'expenses',  canActivate: [moduleGuard], loadComponent: () => import('../modules/expenses/expenses.component').then(m => m.ExpensesComponent) },
+      { path: 'travel',    canActivate: [moduleGuard], loadComponent: () => import('../modules/travel/travel.component').then(m => m.TravelComponent) },
+      { path: 'reading',   canActivate: [moduleGuard], loadComponent: () => import('../modules/reading/reading.component').then(m => m.ReadingComponent) },
+      { path: 'pregnancy', canActivate: [moduleGuard], loadComponent: () => import('../modules/pregnancy/pregnancy.component').then(m => m.PregnancyComponent) },
 
-    /* Protected App Layout */
-    {
-        path: '',
-        component: LayoutComponent,
-        canActivate: [AuthGuard],
-        children: [
-            {
-                path: '',
-                component: DashboardComponent
-            },
-            {
-                path: 'diary',
-                component: DiaryComponent
-            },
-            {
-                path: 'tasks',
-                component: TasksComponent
-            },
-             {
-                path: 'expenses',
-                component: ExpensesComponent
-            },
-            {
-                path: 'mood',
-                component: MoodComponent
-            },
-             {
-                path: 'goals',
-                component: GoalsComponent
-            },
-             {
-                path: 'sleep',
-                component: SleepComponent
-            },
-             {
-                path: 'fitness',
-                component: FitnessComponent
-            },
-            {
-                path: 'medicine',
-                component: MedicineComponent
-            },
-            {
-                path: 'travel',
-                component: TravelComponent
-            }
-        ]
-    },
+      { path: 'profile',   loadComponent: () => import('../modules/profile/profile.component').then(m => m.ProfileComponent) },
+      { path: 'settings',  loadComponent: () => import('../modules/settings/settings.component').then(m => m.SettingsComponent) },
+    ]
+  },
 
-    /* Fallback */
-    {
-        path: '**',
-        redirectTo: ''
-    }
+  { path: 'login',    loadComponent: () => import('../modules/auth/login/login.component').then(m => m.LoginComponent) },
+  { path: 'register', loadComponent: () => import('../modules/auth/register/register.component').then(m => m.RegisterComponent) },
+  { path: '**', redirectTo: '/dashboard' }
 ];

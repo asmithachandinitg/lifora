@@ -54,4 +54,9 @@ export class TopbarComponent {
     this.router.navigate(['/profile']);
     this.menuOpen = false;
   }
+
+    goSettings() {
+    this.router.navigate(['/settings']);
+    this.menuOpen = false;
+  }
 }

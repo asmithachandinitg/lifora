@@ -1,62 +1,57 @@
 .sidebar {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 20px 12px;
-  background: linear-gradient(
-    180deg,
-    #A78BFA 0%,
-    #C4B5FD 100%
-  );
+  width: 240px;
+  height: 100vh;
+  overflow: hidden;
+  padding: 16px 10px;
+  background: linear-gradient(180deg, #A78BFA 0%, #C4B5FD 100%);
+  color: white;
+  box-sizing: border-box;
 }
-
-/* Logo */
 
 .logo {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 14px;
   padding-left: 10px;
+  flex-shrink: 0;
 }
-
-/* Menu */
 
 .menu {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  flex: 1;
+  gap: 2px;
+  overflow: hidden;
 }
-
-/* Menu item */
 
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 9px;
   text-decoration: none;
   color: white;
-  transition: 0.2s ease;
+  font-size: 17px;
+  font-weight: 600;
+  transition: background 0.18s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-/* Icon */
+.icon { font-size: 18px; flex-shrink: 0; }
 
-.icon {
-  font-size: 20px;
-}
-
-/* Hover */
-
-.menu-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Active route */
+.menu-item:hover { background: rgba(255,255,255,0.18); }
 
 .active {
-  background: white;
-  color: #7C3AED;
-  font-weight: 500;
+  background: white !important;
+  color: #7C3AED !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+
+.active .icon { color: #7C3AED; }
