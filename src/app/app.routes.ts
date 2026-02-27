@@ -14,7 +14,7 @@ export const routes: Routes = [
       // ↓ Add canActivate: [moduleGuard] to every module route
       { path: 'diary',     canActivate: [moduleGuard], loadComponent: () => import('../modules/diary/diary.component').then(m => m.DiaryComponent) },
       { path: 'tasks',     canActivate: [moduleGuard], loadComponent: () => import('../modules/tasks/tasks.component').then(m => m.TasksComponent) },
-      { path: 'habits',    canActivate: [moduleGuard], loadComponent: () => import('../modules/habits/habit.component').then(m => m.HabitsComponent) },
+      { path: 'habits',    canActivate: [moduleGuard], loadComponent: () => import('../modules/habits/habits.component').then(m => m.HabitsComponent) },
       { path: 'goals',     canActivate: [moduleGuard], loadComponent: () => import('../modules/goals/goals.component').then(m => m.GoalsComponent) },
       { path: 'food',      canActivate: [moduleGuard], loadComponent: () => import('../modules/food/food.component').then(m => m.FoodComponent) },
       { path: 'fitness',   canActivate: [moduleGuard], loadComponent: () => import('../modules/fitness/fitness.component').then(m => m.FitnessComponent) },

@@ -46,6 +46,7 @@ export interface WeeklyChartPoint {
   calories: number;
   category: FitnessCategory;
   hasWorkout: boolean;
+   categoryDurations?: Partial<Record<FitnessCategory, number>>;
 }
 
 export interface MonthlyChartPoint {

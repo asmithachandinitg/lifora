@@ -17,7 +17,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   allMenu = [
     { name: 'Dashboard', icon: 'dashboard',      route: '/dashboard',  key: 'dashboard'                    },
-    { name: 'Diary',     icon: 'menu_book',       route: '/diary',      key: 'diary'                        },
+    { name: 'Journal',     icon: 'menu_book',       route: '/diary',      key: 'diary'                        },
     { name: 'Tasks',     icon: 'check_circle',    route: '/tasks',      key: 'tasks'                        },
     { name: 'Habits',    icon: 'repeat',          route: '/habits',     key: 'habits'                       },
     { name: 'Goals',     icon: 'flag',            route: '/goals',      key: 'goals'                        },
@@ -27,7 +27,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { name: 'Mood',      icon: 'mood',            route: '/mood',       key: 'mood'                         },
     { name: 'Period',    icon: 'favorite',        route: '/period',     key: 'period',    femaleOnly: true   },
     { name: 'Medicine',  icon: 'medication',      route: '/medicine',   key: 'medicine'                     },
-    { name: 'Expenses',  icon: 'payments',        route: '/expenses',   key: 'expenses'                     },
+    { name: 'Finance',  icon: 'payments',        route: '/expenses',   key: 'expenses'                     },
     { name: 'Travel',    icon: 'flight_takeoff',  route: '/travel',     key: 'travel'                       },
     { name: 'Reading',   icon: 'auto_stories',    route: '/reading',    key: 'reading'                      },
     { name: 'Pregnancy', icon: 'child_care',      route: '/pregnancy',  key: 'pregnancy', femaleOnly: true   },
@@ -39,7 +39,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.buildMenu();
-    // Re-build instantly whenever profile saves
     this.sub = this.authService.user$.subscribe(() => this.buildMenu());
   }
 
@@ -51,13 +50,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     const modules: { key: string; enabled: boolean }[] = user?.modules || [];
 
     this.menu = this.allMenu.filter(item => {
-      // Always show dashboard
       if (item.key === 'dashboard') return true;
 
-      // Hide female-only items from male users
       if ((item as any).femaleOnly && gender === 'male') return false;
 
-      // If user has saved module prefs, respect them
       if (modules.length) {
         const mod = modules.find(m => m.key === item.key);
         return mod ? mod.enabled : true;

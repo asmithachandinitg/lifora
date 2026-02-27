@@ -38,7 +38,7 @@ export class FoodComponent implements OnInit {
   mealColors: Record<MealType, string> = {
     breakfast: '#f59e0b',
     lunch:     '#22c55e',
-    dinner:    '#6366f1',
+    dinner:    '#1416be',
     snack:     '#ec4899'
   };
 

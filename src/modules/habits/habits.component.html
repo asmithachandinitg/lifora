@@ -1,1 +1,371 @@
-<p>habits works!</p>
+<div class="habit-wrapper">
+
+  <!-- HEADER -->
+  <div class="habit-header">
+    <div class="header-left">
+      <h2>
+        <span class="material-icons header-icon">repeat</span>
+        Habit Tracker
+      </h2>
+      <span class="habit-subtitle">Build consistency, one day at a time</span>
+    </div>
+    <button class="add-btn" (click)="openModal()">
+      <span class="material-icons">add</span> New Habit
+    </button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'today'" (click)="activeTab = 'today'">Today</button>
+    <button [class.active]="activeTab === 'calendar'" (click)="activeTab = 'calendar'">Calendar</button>
+    <button [class.active]="activeTab === 'stats'"  (click)="onStatsTabClick()">Stats</button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="empty">
+    <span class="material-icons empty-icon">hourglass_empty</span>
+    <p>Loading habits...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="error" class="empty">
+    <span class="material-icons empty-icon">error_outline</span>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- ─── TODAY TAB ─────────────────────────────────────── -->
+  <div *ngIf="!loading && activeTab === 'today'">
+
+    <!-- Summary bar -->
+    <div class="summary-bar" *ngIf="habits.length">
+      <div class="summary-left">
+        <span class="summary-count">{{ completedToday }}/{{ habits.length }}</span>
+        <span class="summary-label">completed today</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="todayCompletion + '%'"></div>
+        </div>
+        <span class="progress-pct">{{ todayCompletion }}%</span>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!habits.length" class="empty">
+      <span class="material-icons empty-icon">repeat</span>
+      <p>No habits yet. Add your first habit!</p>
+    </div>
+
+    <!-- Grouped habits -->
+    <div *ngFor="let group of groupedHabits" class="category-group">
+
+      <div class="category-header">
+        <span class="material-icons cat-icon" [style.color]="getCatColor(group.category)">
+          {{ getCatIcon(group.category) }}
+        </span>
+        <span class="cat-label">{{ getCatLabel(group.category) }}</span>
+        <span class="cat-count">{{ group.habits.length }}</span>
+      </div>
+
+      <div class="habit-list">
+        <div class="habit-card" *ngFor="let habit of group.habits; trackBy: trackById"
+          [class.completed]="habit.completedToday">
+
+          <div class="habit-left" (click)="toggleHabit(habit)">
+            <div class="habit-check"
+              [style.border-color]="habit.color"
+              [style.background]="habit.completedToday ? habit.color : 'transparent'">
+              <span class="material-icons check-icon" *ngIf="habit.completedToday">check</span>
+            </div>
+            <div class="habit-icon-wrap" [style.background]="habit.color + '18'">
+              <span class="material-icons" [style.color]="habit.color">{{ habit.icon }}</span>
+            </div>
+            <div class="habit-info">
+              <span class="habit-name" [class.done]="habit.completedToday">{{ habit.name }}</span>
+              <span class="habit-desc" *ngIf="habit.description">{{ habit.description }}</span>
+              <span class="habit-freq">{{ habit.frequency }}</span>
+            </div>
+          </div>
+
+          <div class="habit-right">
+            <div class="streak-badge"
+              [style.background]="habit.color + '18'"
+              [style.color]="habit.color">
+              <span class="material-icons">local_fire_department</span>
+              {{ habit.currentStreak }}
+            </div>
+            <div class="completion-rate">{{ habit.completionRate }}%</div>
+            <button class="icon-btn edit" (click)="openEditModal(habit)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="icon-btn delete" (click)="confirmDelete(habit._id!)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CALENDAR TAB ──────────────────────────────────── -->
+  <div *ngIf="!loading && activeTab === 'calendar'">
+
+    <div *ngIf="!habits.length" class="empty">
+      <span class="material-icons empty-icon">calendar_month</span>
+      <p>No habits to show.</p>
+    </div>
+
+    <div *ngIf="habits.length">
+
+      <!-- Habit selector pills -->
+      <div class="habit-selector">
+        <button *ngFor="let h of habits"
+          class="habit-pill"
+          [style.border-color]="selectedHabitForCalendar?._id === h._id ? h.color : '#e5e7eb'"
+          [style.color]="selectedHabitForCalendar?._id === h._id ? h.color : '#6b7280'"
+          [style.background]="selectedHabitForCalendar?._id === h._id ? h.color + '12' : '#fff'"
+          (click)="selectHabitForCalendar(h)">
+          <span class="material-icons" style="font-size:14px">{{ h.icon }}</span>
+          {{ h.name }}
+        </button>
+      </div>
+
+      <!-- Calendar card -->
+      <div *ngIf="selectedHabitForCalendar" class="calendar-card">
+
+        <div class="calendar-header">
+          <div class="cal-habit-info">
+            <span class="material-icons" [style.color]="selectedHabitForCalendar.color">
+              {{ selectedHabitForCalendar.icon }}
+            </span>
+            <span class="cal-habit-name">{{ selectedHabitForCalendar.name }}</span>
+          </div>
+          <div class="cal-stats">
+            <span class="cal-streak">
+              <span class="material-icons">local_fire_department</span>
+              {{ selectedHabitForCalendar.currentStreak }} day streak
+            </span>
+            <span class="cal-best">Best: {{ selectedHabitForCalendar.longestStreak }} days</span>
+          </div>
+        </div>
+
+        <!-- Month nav -->
+        <div class="month-nav">
+          <button class="month-nav-btn" (click)="prevMonth()">
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <span class="month-label">{{ selectedMonthLabel }}</span>
+          <button class="month-nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth">
+            <span class="material-icons">chevron_right</span>
+          </button>
+        </div>
+
+        <!-- Calendar grid -->
+        <div class="cal-grid">
+
+          <!-- Day headers -->
+          <div class="cal-day-header" *ngFor="let d of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">
+            {{ d }}
+          </div>
+
+          <!-- Empty offset cells -->
+          <div *ngFor="let _ of calendarEmptyOffset" class="cal-cell empty-cell"></div>
+
+          <!-- Day cells -->
+          <div *ngFor="let day of getCalendarData(selectedHabitForCalendar)"
+            class="cal-cell"
+            [class.today]="day.isToday"
+            [class.future]="day.isFuture"
+            [class.completed]="day.completed === 1"
+            [style.background]="day.completed === 1 ? selectedHabitForCalendar.color : ''"
+            [style.border-color]="day.isToday ? selectedHabitForCalendar.color : ''">
+            <span class="cal-day-num">{{ day.day }}</span>
+            <span class="material-icons cal-check" *ngIf="day.completed === 1">check</span>
+          </div>
+
+        </div>
+
+        <!-- Legend -->
+        <div class="cal-legend">
+          <span class="cl-item">
+            <span class="cl-dot" [style.background]="selectedHabitForCalendar.color"></span>
+            Completed
+          </span>
+          <span class="cl-item"><span class="cl-dot grey"></span> Missed</span>
+          <span class="cl-item"><span class="cl-dot light"></span> Future</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STATS TAB ──────────────────────────────────────── -->
+  <div *ngIf="!loading && activeTab === 'stats'">
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="material-icons stat-icon purple">repeat</span>
+        <div class="stat-val">{{ habits.length }}</div>
+        <div class="stat-label">Total Habits</div>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon green">check_circle</span>
+        <div class="stat-val">{{ completedToday }}</div>
+        <div class="stat-label">Done Today</div>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon orange">local_fire_department</span>
+        <div class="stat-val">{{ bestStreak }}</div>
+        <div class="stat-label">Best Streak</div>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon blue">trending_up</span>
+        <div class="stat-val">{{ todayCompletion }}%</div>
+        <div class="stat-label">Today's Rate</div>
+      </div>
+    </div>
+    
+    <!-- Per habit breakdown -->
+    <div class="habit-breakdown">
+      <h3 class="breakdown-title">Per Habit Performance</h3>
+      <div class="breakdown-row" *ngFor="let h of habits">
+        <div class="breakdown-left">
+          <span class="material-icons" [style.color]="h.color">{{ h.icon }}</span>
+          <span class="breakdown-name">{{ h.name }}</span>
+        </div>
+        <div class="breakdown-bar-wrap">
+          <div class="breakdown-bar">
+            <div class="breakdown-fill"
+              [style.width]="h.completionRate + '%'"
+              [style.background]="h.color">
+            </div>
+          </div>
+          <span class="breakdown-pct">{{ h.completionRate }}%</span>
+        </div>
+        <div class="breakdown-streak">
+          <span class="material-icons" [style.color]="h.color">local_fire_department</span>
+          {{ h.currentStreak }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── ADD / EDIT MODAL ───────────────────────────────── -->
+  <div class="modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="habit-modal" (click)="$event.stopPropagation()">
+
+      <h3>
+        <span class="material-icons modal-icon">{{ editMode ? 'edit' : 'add_circle' }}</span>
+        {{ editMode ? 'Edit Habit' : 'New Habit' }}
+      </h3>
+
+      <!-- Name -->
+      <div class="form-group">
+        <label class="field-label">
+          <span class="material-icons">title</span> Habit Name
+        </label>
+        <input type="text" [(ngModel)]="form.name" placeholder="e.g. Drink 8 glasses of water" />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="field-label">
+          <span class="material-icons">notes</span> Description
+        </label>
+        <input type="text" [(ngModel)]="form.description" placeholder="Optional description" />
+      </div>
+
+      <!-- Category + Frequency -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="field-label">
+            <span class="material-icons">category</span> Category
+          </label>
+          <select [(ngModel)]="form.category">
+            <option *ngFor="let cat of categories" [value]="cat">{{ getCatLabel(cat) }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">
+            <span class="material-icons">repeat</span> Frequency
+          </label>
+          <select [(ngModel)]="form.frequency">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Color -->
+      <div class="form-group">
+        <label class="field-label">
+          <span class="material-icons">palette</span> Color
+        </label>
+        <div class="color-options">
+          <span *ngFor="let c of ['#8B5CF6','#ef4444','#06b6d4','#f59e0b','#10b981','#ec4899','#6366f1','#14b8a6']"
+            class="color-dot"
+            [class.selected]="form.color === c"
+            [style.background]="c"
+            (click)="form.color = c">
+          </span>
+        </div>
+      </div>
+
+      <!-- Icon -->
+      <div class="form-group">
+        <label class="field-label">
+          <span class="material-icons">emoji_emotions</span> Icon
+        </label>
+        <div class="icon-options">
+          <span *ngFor="let ico of iconOptions"
+            class="icon-opt"
+            [class.selected]="form.icon === ico"
+            [style.color]="form.icon === ico ? form.color : '#9ca3af'"
+            [style.border-color]="form.icon === ico ? form.color : '#e5e7eb'"
+            (click)="form.icon = ico">
+            <span class="material-icons">{{ ico }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label class="field-label">
+          <span class="material-icons">sticky_note_2</span> Notes
+        </label>
+        <input type="text" [(ngModel)]="form.notes" placeholder="Any extra notes" />
+      </div>
+
+      <p class="form-error" *ngIf="formError">{{ formError }}</p>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+        <button class="save-btn" (click)="saveHabit()">
+          <span class="material-icons">save</span>
+          {{ editMode ? 'Update' : 'Save' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── DELETE CONFIRM ────────────────────────────────── -->
+  <div class="modal" *ngIf="showDeleteConfirm">
+    <div class="confirm-modal">
+      <span class="material-icons confirm-icon">delete_forever</span>
+      <h3>Delete Habit?</h3>
+      <p>All completion history for this habit will be permanently deleted.</p>
+      <div class="confirm-actions">
+        <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
+        <button class="yes-btn" (click)="deleteHabit()">
+          <span class="material-icons">delete</span> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-topbar',
   standalone: true,
@@ -21,15 +22,23 @@ export class TopbarComponent {
     private router: Router
   ) { }
 
-  ngOnInit() {
-
+ngOnInit() {
+  if (this.authService.isLoggedIn()) {
+    this.authService.loadUser()
+      .subscribe({
+        next: (user) => {
+          console.log('User loaded:', user);
+          this.user = user;  
+        },
+        error: (err) => {
+          console.error('Error loading user:', err);
+          this.user = this.authService.getUser();
+        }
+      });
+  } else {
     this.user = this.authService.getUser();
-
-    if (!this.user && this.authService.isLoggedIn()) {
-      this.authService.loadUser()
-        .subscribe(user => this.user = user);
-    }
   }
+}
 
   getGreeting() {
     const hour = this.today.getHours();

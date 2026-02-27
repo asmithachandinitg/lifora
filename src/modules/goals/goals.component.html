@@ -19,7 +19,7 @@
       <span class="stat-label">Total</span>
     </div>
     <div class="stat-card stat-inprogress">
-      <span class="material-icons stat-icon" style="color:#A78BFA">pending</span>
+      <span class="material-icons stat-icon" style="color:#0be5f5">pending</span>
       <span class="stat-number">{{ getTotalStats().inProgress }}</span>
       <span class="stat-label">In Progress</span>
     </div>
@@ -43,12 +43,35 @@
       <button [class.active]="activeFilter === 'in-progress'" (click)="setFilter('in-progress')">In Progress</button>
       <button [class.active]="activeFilter === 'completed'" (click)="setFilter('completed')">Completed</button>
     </div>
-    <div class="category-filter">
-      <select [(ngModel)]="activeCategory" (ngModelChange)="setCategoryFilter($event)">
-        <option value="all">All Categories</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
-      </select>
+ <div class="custom-select" (click)="toggleDropdown()">
+
+  <div class="selected">
+    {{ activeCategory | titlecase }}
+    <span class="material-icons arrow">
+      {{ dropdownOpen ? 'expand_less' : 'expand_more' }}
+    </span>
+  </div>
+
+  <div class="options" *ngIf="dropdownOpen">
+
+    <div
+      class="option"
+      [class.active]="activeCategory === 'all'"
+      (click)="selectCategory('all', $event)">
+      All Categories
     </div>
+
+    <div
+      class="option"
+      *ngFor="let cat of categories"
+      [class.active]="activeCategory === cat"
+      (click)="selectCategory(cat, $event)">
+      {{ cat | titlecase }}
+    </div>
+
+  </div>
+
+</div>
   </div>
 
   <!-- EMPTY STATE -->
@@ -73,10 +96,13 @@
       </div>
 
       <!-- Goal Card -->
-      <div class="goal-card" [class.card-completed]="goal.status === 'completed'"
-      [class.card-overdue]="getDaysLeft(goal.deadline) < 0 && goal.status !== 'completed'">
-
-        <!-- Card Top -->
+      <div 
+  class="goal-card"
+  [ngClass]="[
+    'card-' + goal.status,
+    getDaysLeft(goal.deadline) < 0 && goal.status !== 'completed' ? 'card-overdue' : ''
+  ]">
+   <!-- Card Top -->
         <div class="card-top">
           <div class="card-meta">
             <span class="priority-badge" [style.background]="priorityColors[goal.priority] + '20'" [style.color]="priorityColors[goal.priority]">
@@ -106,7 +132,7 @@
         </div>
 
         <!-- Title & Description -->
-        <h3 class="goal-title" [class.strike]="goal.status === 'completed'">{{ goal.title }}</h3>
+        <h3 class="goal-title">{{ goal.title }}</h3>
         <p class="goal-desc">{{ goal.description }}</p>
 
         <!-- Progress Bar -->

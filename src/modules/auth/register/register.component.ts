@@ -41,11 +41,9 @@ constructor(
   private router: Router
 ) {}
 
- registerUser() {
+registerUser() {
 
   this.submitted = true;
-
-
 
   // FORM VALIDATION
   if (
@@ -60,17 +58,14 @@ constructor(
     return;
   }
 
-
-
+  // ✅ CONVERT TO LOWERCASE BEFORE SENDING
   const registerPayload = {
-    firstName: this.firstName,
-    lastName: this.lastName,
-    email: this.email,
-    gender: this.gender,
+    firstName: this.firstName.trim(),
+    lastName: this.lastName.trim(),
+    email: this.email.trim().toLowerCase(),
+    gender: this.gender.toLowerCase(),  // ← LOWERCASE
     password: this.password
   };
-
-
 
   // =========================
   // 1️⃣ REGISTER
@@ -81,40 +76,32 @@ constructor(
 
       next: () => {
         const loginPayload = {
-          email: this.email,
+          email: this.email.trim().toLowerCase(),  // ← LOWERCASE
           password: this.password
         };
-
-
 
         this.auth.login(loginPayload)
           .subscribe({
 
             next: (res: any) => {
-
               // Save token
               this.auth.saveToken(res.token);
 
               // Redirect dashboard
-              this.router.navigate(['/']);
-
+              this.router.navigate(['/dashboard']);
             },
 
             error: err => {
               console.error('Auto login failed', err);
             }
-
           });
-
       },
 
       error: err => {
         console.error('Register failed', err);
         alert(err.error?.message || 'Registration error');
       }
-
     });
-
 }
 
   passwordRules = {

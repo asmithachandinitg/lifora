@@ -14,8 +14,8 @@
   <!-- TABS -->
   <div class="tabs">
     <button [class.active]="activeTab === 'dashboard'" (click)="onTabChange('dashboard')">Dashboard</button>
-    <button [class.active]="activeTab === 'history'"   (click)="onTabChange('history')">History</button>
-    <button [class.active]="activeTab === 'records'"   (click)="onTabChange('records')">PRs</button>
+    <button [class.active]="activeTab === 'history'" (click)="onTabChange('history')">History</button>
+    <button [class.active]="activeTab === 'records'" (click)="onTabChange('records')">PRs</button>
   </div>
 
   <!-- ===================== DASHBOARD ===================== -->
@@ -50,11 +50,6 @@
           <span class="stat-number">{{ thisWeekWorkouts }}</span>
           <span class="stat-label">This Week</span>
         </div>
-        <!-- <div class="stat-card">
-          <span class="material-icons stat-icon" style="color:#06b6d4">directions_walk</span>
-          <span class="stat-number">{{ totalSteps | number }}</span>
-          <span class="stat-label">Total Steps</span>
-        </div> -->
       </div>
 
       <!-- CHARTS -->
@@ -62,8 +57,8 @@
         <div class="chart-header">
           <h3><span class="material-icons">bar_chart</span> Activity Charts</h3>
           <div class="chart-toggle">
-            <button [class.active-toggle]="chartView === 'daily'"   (click)="setChartView('daily')">Daily</button>
-            <button [class.active-toggle]="chartView === 'weekly'"  (click)="setChartView('weekly')">Weekly</button>
+            <button [class.active-toggle]="chartView === 'daily'" (click)="setChartView('daily')">Daily</button>
+            <button [class.active-toggle]="chartView === 'weekly'" (click)="setChartView('weekly')">Weekly</button>
             <button [class.active-toggle]="chartView === 'monthly'" (click)="setChartView('monthly')">Monthly</button>
           </div>
         </div>
@@ -84,6 +79,12 @@
         <div *ngIf="chartView === 'weekly'">
           <div class="chart-sub-label">Last 7 days — duration per day</div>
           <div id="weekly-chart" class="d3-chart-container"></div>
+          <div class="chart-legend">
+            <span *ngFor="let cat of categories" class="legend-item">
+              <span class="legend-dot" [style.background]="getCatColor(cat)"></span>
+              {{ getCatLabel(cat) }}
+            </span>
+          </div>
         </div>
 
         <!-- Monthly -->
@@ -99,9 +100,8 @@
           </div>
           <div id="monthly-chart" class="d3-chart-container"></div>
           <div class="monthly-legend">
-            <span class="ml-item"><span class="ml-dot" style="background:rgba(139,92,246,0.2)"></span> Light</span>
-            <span class="ml-item"><span class="ml-dot" style="background:rgba(139,92,246,0.6)"></span> Moderate</span>
-            <span class="ml-item"><span class="ml-dot" style="background:rgba(139,92,246,0.95)"></span> Intense</span>
+            <span class="ml-item"><span class="ml-dot" style="background:#f9fafb"></span> Future</span>
+            <span class="ml-item"><span class="ml-dot" style="background:#8B5CF6"></span> Workout</span>
             <span class="ml-item"><span class="ml-dot" style="background:#f3f4f6"></span> Rest</span>
           </div>
         </div>
@@ -130,7 +130,8 @@
       <!-- LATEST WORKOUT -->
       <div class="latest-card" *ngIf="sortedEntries[0] as latest">
         <div class="latest-top">
-          <div class="latest-cat-badge" [style.background]="getCatColor(latest.category) + '18'"
+          <div class="latest-cat-badge"
+            [style.background]="getCatColor(latest.category) + '18'"
             [style.color]="getCatColor(latest.category)">
             <span class="material-icons">{{ getCatIcon(latest.category) }}</span>
             {{ getCatLabel(latest.category) }}
@@ -242,7 +243,7 @@
       {{ editMode ? 'Edit Workout' : 'Log Workout' }}
     </h3>
 
-    <!-- Title + Date -->
+    <!-- Title -->
     <div class="form-row">
       <div class="form-group flex2">
         <label>Workout Title</label>
@@ -253,12 +254,14 @@
     <!-- Category -->
     <label class="form-label">Category</label>
     <div class="cat-selector">
-      <div *ngFor="let cat of categories" class="cat-option"
+      <div *ngFor="let cat of categories"
+        class="cat-option"
         [class.selected-cat]="form.category === cat"
         [style.border-color]="form.category === cat ? getCatColor(cat) : 'transparent'"
         [style.background]="form.category === cat ? getCatColor(cat) + '15' : ''"
-        (click)="form.category = cat">
-        <span class="material-icons" [style.color]="form.category === cat ? getCatColor(cat) : '#9ca3af'">
+        (click)="form.category = cat; onFormChange()">
+        <span class="material-icons"
+          [style.color]="form.category === cat ? getCatColor(cat) : '#9ca3af'">
           {{ getCatIcon(cat) }}
         </span>
         <span class="cat-opt-label">{{ getCatLabel(cat) }}</span>
@@ -281,28 +284,17 @@
     <div class="form-row">
       <div class="form-group">
         <label>Duration (min)</label>
-        <input type="number" [(ngModel)]="form.duration" min="1" />
+        <input type="number" [(ngModel)]="form.duration"
+          min="1" (ngModelChange)="onFormChange()" />
       </div>
       <div class="form-group">
-        <label>Workout Calories</label>
+        <label>
+          Calories (kcal)
+          <span class="cal-hint">auto-calculated</span>
+        </label>
         <input type="number" [(ngModel)]="form.caloriesBurned" min="0" />
       </div>
     </div>
-
-    <!-- Steps -->
-    <!-- <div class="form-row">
-      <div class="form-group">
-        <label>Steps Walked Today</label>
-        <input type="number" [(ngModel)]="form.stepsWalked" min="0" />
-      </div>
-      <div class="form-group">
-        <label>Steps Calories (auto)</label>
-        <div class="calc-preview">
-          <span class="calc-val">{{ stepsCaloriesPreview }} kcal</span>
-          <span class="calc-total">Total: {{ totalCaloriesPreview }} kcal</span>
-        </div>
-      </div>
-    </div> -->
 
     <!-- Exercises -->
     <div class="exercises-section">
@@ -316,7 +308,8 @@
       <div class="exercise-item" *ngFor="let ex of form.exercises; let ei = index">
         <div class="ex-header">
           <input class="ex-name-input" placeholder="Exercise name" [(ngModel)]="ex.name" />
-          <button class="remove-ex-btn" (click)="removeExercise(ei)" *ngIf="form.exercises.length > 1">
+          <button class="remove-ex-btn" (click)="removeExercise(ei)"
+            *ngIf="form.exercises.length > 1">
             <span class="material-icons">close</span>
           </button>
         </div>
@@ -324,9 +317,12 @@
         <div class="sets-list">
           <div class="set-row" *ngFor="let set of ex.sets; let si = index">
             <span class="set-num">{{ si + 1 }}</span>
-            <input type="number" placeholder="Reps" [(ngModel)]="set.reps" min="0" class="set-input" />
-            <input type="number" placeholder="kg (opt)" [(ngModel)]="set.weight" min="0" class="set-input" />
-            <button class="remove-set-btn" (click)="removeSet(ex, si)" *ngIf="ex.sets.length > 1">
+            <input type="number" placeholder="Reps" [(ngModel)]="set.reps"
+              min="0" class="set-input" />
+            <input type="number" placeholder="kg (opt)" [(ngModel)]="set.weight"
+              min="0" class="set-input" />
+            <button class="remove-set-btn" (click)="removeSet(ex, si)"
+              *ngIf="ex.sets.length > 1">
               <span class="material-icons">close</span>
             </button>
           </div>
@@ -339,14 +335,16 @@
 
     <!-- Notes -->
     <label class="form-label">Notes</label>
-    <textarea [(ngModel)]="form.notes" placeholder="How was the workout?" rows="2"></textarea>
+    <textarea [(ngModel)]="form.notes"
+      placeholder="How was the workout?" rows="2"></textarea>
 
     <p class="error" *ngIf="formError">{{ formError }}</p>
 
     <div class="modal-actions">
       <button class="cancel-btn" (click)="closeModal()">Cancel</button>
       <button class="save-btn" (click)="saveEntry()">
-        <span class="material-icons">save</span> {{ editMode ? 'Update' : 'Save' }}
+        <span class="material-icons">save</span>
+        {{ editMode ? 'Update' : 'Save' }}
       </button>
     </div>
 

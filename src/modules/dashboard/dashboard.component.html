@@ -1,39 +1,267 @@
-<!-- Welcome -->
-<div class="welcome-card">
-  <h2>Welcome back 💜</h2>
-  <p>{{ user?.firstName | titlecase }} {{ user?.lastName | titlecase }} life dashboard is ready.</p>
-</div>
+<div class="dashboard-wrapper">
 
-<!-- ROW 1 -->
-<div class="widget-flex-row">
+  <!-- LOADING -->
+  <div *ngIf="loading" class="empty">
+    <span class="material-icons empty-icon">hourglass_empty</span>
+    <p>Loading your dashboard...</p>
+  </div>
 
-  <app-widget-card title="Mood" icon="mood">
-    😊 Feeling Happy
-  </app-widget-card>
+  <div *ngIf="!loading">
 
-  <app-widget-card title="Tasks" icon="check_circle">
-    3 pending today
-  </app-widget-card>
+    <!-- ── DATE + QUOTE HERO ─────────────────────────────── -->
+    <div class="hero-section">
+      <div class="hero-left">
+        <span class="today-label">{{ todayLabel }}</span>
+        <div class="quote-block">
+          <span class="material-icons quote-icon">format_quote</span>
+          <p class="quote-text">{{ quote.text }}</p>
+          <span class="quote-author">— {{ quote.author }}</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="habit-ring-wrap">
+          <svg viewBox="0 0 80 80" class="habit-ring">
+            <circle cx="40" cy="40" r="34" fill="none"
+              stroke="#f3f4f6" stroke-width="8"/>
+    <circle cx="40" cy="40" r="34" fill="none"
+  stroke="#f3f4f6" stroke-width="8"/>
+<circle cx="40" cy="40" r="34" fill="none"
+  stroke="#8B5CF6" stroke-width="8"
+  [attr.stroke-dasharray]="2 * 3.14159 * 34"
+  [attr.stroke-dashoffset]="2 * 3.14159 * 34 * (1 - habitsPercent / 100)"
+  stroke-linecap="round"
+  transform="rotate(-90 40 40)"/>
+          </svg>
+          <div class="ring-label">
+            <span class="ring-pct">{{ habitsPercent }}%</span>
+            <span class="ring-sub">habits</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <app-widget-card title="Habits" icon="repeat">
-    🔥 5 day streak
-  </app-widget-card>
+    <!-- ── STAT CARDS ────────────────────────────────────── -->
+    <div class="stats-grid">
 
-</div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap purple">
+          <span class="material-icons">repeat</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">{{ habitsCompleted }}/{{ habitsTotal }}</span>
+          <span class="stat-label">Habits Today</span>
+        </div>
+        <div class="stat-progress">
+          <div class="stat-bar">
+            <div class="stat-fill purple" [style.width]="habitsPercent + '%'"></div>
+          </div>
+        </div>
+      </div>
 
-<!-- ROW 2 -->
-<div class="widget-flex-row">
+      <div class="stat-card">
+        <div class="stat-icon-wrap red">
+          <span class="material-icons">local_fire_department</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">{{ caloriesToday }}</span>
+          <span class="stat-label">Calories Burned</span>
+        </div>
+        <div class="stat-sub">today</div>
+      </div>
 
-  <app-widget-card title="Sleep" icon="bedtime">
-    7h 20m average
-  </app-widget-card>
+      <div class="stat-card">
+        <div class="stat-icon-wrap blue">
+          <span class="material-icons">fitness_center</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">{{ workoutsThisWeek }}</span>
+          <span class="stat-label">Workouts</span>
+        </div>
+        <div class="stat-sub">this week</div>
+      </div>
 
-  <app-widget-card title="Expenses" icon="payments">
-    ₹2,450 this week
-  </app-widget-card>
+      <div class="stat-card">
+        <div class="stat-icon-wrap orange">
+          <span class="material-icons">restaurant</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">{{ foodLoggedToday }}</span>
+          <span class="stat-label">Food Items</span>
+        </div>
+        <div class="stat-sub">logged today</div>
+      </div>
 
-  <app-widget-card title="Reading" icon="auto_stories">
-    12 pages today
-  </app-widget-card>
+      <div class="stat-card">
+        <div class="stat-icon-wrap green">
+          <span class="material-icons">task_alt</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">{{ tasksDueToday }}</span>
+          <span class="stat-label">Tasks Due</span>
+        </div>
+        <div class="stat-sub">today</div>
+      </div>
 
+      <div class="stat-card mood-card">
+        <div class="stat-icon-wrap teal">
+          <span class="material-icons">mood</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val mood-emoji">{{ moodEmoji }}</span>
+          <span class="stat-label">Today's Mood</span>
+        </div>
+        <div class="stat-sub" [style.color]="moodColor">
+          {{ moodToday || 'Not logged' }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── MAIN CONTENT GRID ─────────────────────────────── -->
+    <div class="content-grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="left-col">
+
+        <!-- Today's Habits -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>
+              <span class="material-icons">repeat</span>
+              Today's Habits
+            </h3>
+            <a routerLink="/habits" class="card-link">View all</a>
+          </div>
+
+          <div *ngIf="!todayHabits.length" class="card-empty">
+            <span class="material-icons">repeat</span>
+            <p>No habits yet</p>
+          </div>
+
+          <div class="habit-checklist">
+            <div *ngFor="let h of todayHabits" class="habit-check-row"
+              [class.done]="h.completed">
+              <div class="habit-check-box"
+                [style.border-color]="h.color"
+                [style.background]="h.completed ? h.color : 'transparent'">
+                <span class="material-icons" *ngIf="h.completed">check</span>
+              </div>
+              <div class="habit-icon-sm" [style.background]="h.color + '18'">
+                <span class="material-icons" [style.color]="h.color">{{ h.icon }}</span>
+              </div>
+              <span class="habit-check-name" [class.striked]="h.completed">{{ h.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Tasks -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>
+              <span class="material-icons">task_alt</span>
+              Upcoming Tasks
+            </h3>
+            <a routerLink="/tasks" class="card-link">View all</a>
+          </div>
+
+          <div *ngIf="!upcomingTasks.length" class="card-empty">
+            <span class="material-icons">task_alt</span>
+            <p>No pending tasks</p>
+          </div>
+
+          <div class="task-list">
+            <div *ngFor="let task of upcomingTasks" class="task-row">
+              <div class="task-priority"
+                [style.color]="priorityColor(task.priority)"
+                [style.background]="priorityColor(task.priority) + '18'">
+                <span class="material-icons">{{ priorityIcon(task.priority) }}</span>
+              </div>
+              <div class="task-info">
+                <span class="task-title">{{ task.title }}</span>
+                <span class="task-due">{{ task.dueDate | date:'dd MMM' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+
+        <!-- Recent Activity -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>
+              <span class="material-icons">history</span>
+              Today's Activity
+            </h3>
+          </div>
+
+          <div *ngIf="!recentActivity.length" class="card-empty">
+            <span class="material-icons">history</span>
+            <p>No activity logged yet today</p>
+          </div>
+
+          <div class="activity-feed">
+            <div *ngFor="let act of recentActivity" class="activity-row">
+              <div class="activity-icon" [style.background]="act.color + '18'">
+                <span class="material-icons" [style.color]="act.color">{{ act.icon }}</span>
+              </div>
+              <div class="activity-info">
+                <span class="activity-title">{{ act.title }}</span>
+                <span class="activity-sub" *ngIf="act.subtitle">{{ act.subtitle }}</span>
+              </div>
+              <span class="activity-time" *ngIf="act.time">{{ act.time }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Module Quick Links -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>
+              <span class="material-icons">apps</span>
+              Quick Access
+            </h3>
+          </div>
+          <div class="quick-links">
+            <a routerLink="/food" class="quick-link">
+              <span class="material-icons" style="color:#f59e0b">restaurant</span>
+              <span>Food</span>
+            </a>
+            <a routerLink="/fitness" class="quick-link">
+              <span class="material-icons" style="color:#8B5CF6">fitness_center</span>
+              <span>Fitness</span>
+            </a>
+            <a routerLink="/habits" class="quick-link">
+              <span class="material-icons" style="color:#10b981">repeat</span>
+              <span>Habits</span>
+            </a>
+            <a routerLink="/mood" class="quick-link">
+              <span class="material-icons" style="color:#06b6d4">mood</span>
+              <span>Mood</span>
+            </a>
+            <a routerLink="/tasks" class="quick-link">
+              <span class="material-icons" style="color:#ef4444">task_alt</span>
+              <span>Tasks</span>
+            </a>
+            <a routerLink="/diary" class="quick-link">
+              <span class="material-icons" style="color:#6366f1">menu_book</span>
+              <span>Journal</span>
+            </a>
+            <a routerLink="/sleep" class="quick-link">
+              <span class="material-icons" style="color:#8B5CF6">bedtime</span>
+              <span>Sleep</span>
+            </a>
+            <a routerLink="/expenses" class="quick-link">
+              <span class="material-icons" style="color:#10b981">savings</span>
+              <span>Finance</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>

@@ -6,6 +6,7 @@ import {
   DailyChartPoint, WeeklyChartPoint, MonthlyChartPoint
 } from './fitness.model';
 import { FitnessService } from './fitness.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 declare var d3: any;
 
@@ -31,13 +32,22 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   entries: WorkoutEntry[] = [];
   personalRecords: PersonalRecord[] = [];
 
-  form = this.getEmptyForm();
   formError = '';
   today = new Date().toISOString().split('T')[0];
 
   private lastChartView = '';
   private lastEntriesLen = -1;
   private lastTab = '';
+
+  private userWeight = 70;
+  private userHeight = 170;
+
+  private metMap: Record<FitnessCategory, number> = {
+    cardio:      7.0,
+    strength:    5.0,
+    flexibility: 2.5,
+    sports:      6.0
+  };
 
   categoryConfig: Record<FitnessCategory, { label: string; icon: string; color: string }> = {
     cardio:      { label: 'Cardio',      icon: 'directions_run',    color: '#ef4444' },
@@ -53,14 +63,24 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   monthlyData: MonthlyChartPoint[] = [];
   selectedMonth: Date = new Date();
 
-  constructor(private fitnessService: FitnessService, private el: ElementRef) {}
+  // ── form MUST be after metMap ──────────────────────────────
+  form = this.getEmptyForm();
 
-  ngOnInit() { this.loadWorkouts(); }
+  constructor(
+    private fitnessService: FitnessService,
+    private el: ElementRef,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.loadWorkouts();
+    this.loadUserStats();
+  }
 
   ngAfterViewChecked() {
     const changed = this.chartView !== this.lastChartView ||
-                    this.entries.length !== this.lastEntriesLen ||
-                    this.activeTab !== this.lastTab;
+      this.entries.length !== this.lastEntriesLen ||
+      this.activeTab !== this.lastTab;
     if (this.activeTab === 'dashboard' && changed) {
       this.lastChartView = this.chartView;
       this.lastEntriesLen = this.entries.length;
@@ -69,6 +89,23 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
       setTimeout(() => this.drawChart(), 80);
     }
   }
+
+  // ── User Stats ─────────────────────────────────────────────
+
+  loadUserStats() {
+    this.authService.loadUser().subscribe({
+      next: (user) => {
+        this.userWeight = user?.weight || 70;
+        this.userHeight = user?.height || 170;
+      },
+      error: () => {
+        this.userWeight = 70;
+        this.userHeight = 170;
+      }
+    });
+  }
+
+  // ── Workouts ───────────────────────────────────────────────
 
   loadWorkouts() {
     this.loading = true;
@@ -79,7 +116,11 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
         this.prepareChartData();
         setTimeout(() => this.drawChart(), 150);
       },
-      error: (err) => { console.error(err); this.error = 'Failed to load workouts.'; this.loading = false; }
+      error: (err) => {
+        console.error(err);
+        this.error = 'Failed to load workouts.';
+        this.loading = false;
+      }
     });
   }
 
@@ -123,32 +164,37 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
       .sort((a, b) => a.hour.localeCompare(b.hour));
   }
 
-prepareWeeklyData() {
-  const sorted = [...this.entries].sort((a, b) => b.date.localeCompare(a.date));
-  this.weeklyData = [];
+  prepareWeeklyData() {
+    const sorted = [...this.entries].sort((a, b) => b.date.localeCompare(a.date));
+    this.weeklyData = [];
 
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
 
-    const workouts = sorted.filter(e => e.date.slice(0, 10) === dateStr);
-    const totalDuration = workouts.reduce((sum, w) => sum + w.duration, 0);
-    const totalCalories = workouts.reduce(
-      (sum, w) => sum + (w.caloriesBurned || 0) + (w.stepsCalories || 0),
-      0
-    );
+      const workouts = sorted.filter(e => e.date.slice(0, 10) === dateStr);
+      const totalDuration = workouts.reduce((sum, w) => sum + w.duration, 0);
+      const totalCalories = workouts.reduce(
+        (sum, w) => sum + (w.caloriesBurned || 0) + (w.stepsCalories || 0), 0
+      );
 
-    this.weeklyData.push({
-      date: dateStr,
-      label: d.toLocaleDateString('en', { weekday: 'short' }),
-      duration: totalDuration,
-      calories: totalCalories,
-      category: workouts.length ? workouts[0].category : 'cardio',
-      hasWorkout: workouts.length > 0
-    });
+      const categoryDurations: Partial<Record<FitnessCategory, number>> = {};
+      workouts.forEach(w => {
+        categoryDurations[w.category] = (categoryDurations[w.category] || 0) + w.duration;
+      });
+
+      this.weeklyData.push({
+        date: dateStr,
+        label: d.toLocaleDateString('en', { weekday: 'short' }),
+        duration: totalDuration,
+        calories: totalCalories,
+        category: workouts.length ? workouts[0].category : 'cardio',
+        categoryDurations,
+        hasWorkout: workouts.length > 0
+      });
+    }
   }
-}
 
   prepareMonthlyData() {
     const year = this.selectedMonth.getFullYear();
@@ -156,12 +202,14 @@ prepareWeeklyData() {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const todayStr = this.today;
     this.monthlyData = [];
+
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const found = this.entries.filter(e => e.date.slice(0, 10) === dateStr);
       const d = new Date(year, month, day);
       this.monthlyData.push({
-        date: dateStr, day,
+        date: dateStr,
+        day,
         duration: found.reduce((s, e) => s + e.duration, 0),
         calories: found.reduce((s, e) => s + e.caloriesBurned + (e.stepsCalories || 0), 0),
         hasWorkout: found.length > 0,
@@ -198,47 +246,73 @@ prepareWeeklyData() {
     if (!this.dailyData.length) {
       g.append('text').attr('x', iW / 2).attr('y', iH / 2)
         .attr('text-anchor', 'middle').attr('fill', '#9ca3af').attr('font-size', '14px')
-        .text("No workouts logged today");
+        .text('No workouts logged today');
       return;
     }
 
     const hours = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
-    const x = d3.scaleBand().domain(hours).range([0, iW]).padding(0.2);
-    const maxDur = Math.max(...this.dailyData.map((d: DailyChartPoint) => d.duration), 60);
-    const y = d3.scaleLinear().domain([0, maxDur]).range([iH, 0]);
 
-    // Grid
+    const hourMap: Record<string, Partial<Record<FitnessCategory, number>>> = {};
+    hours.forEach(h => hourMap[h] = {});
+    this.dailyData.forEach((d: DailyChartPoint) => {
+      const h = d.hour.slice(0, 2) + ':00';
+      hourMap[h][d.category] = (hourMap[h][d.category] || 0) + d.duration;
+    });
+
+    const stackData = hours.map(h => ({ hour: h, ...hourMap[h] }));
+    const stack = d3.stack().keys(this.categories)(stackData);
+
+    const x = d3.scaleBand().domain(hours).range([0, iW]).padding(0.2);
+    const maxTotal = Math.max(...stackData.map((d: any) =>
+      this.categories.reduce((s, c) => s + (d[c] || 0), 0)
+    ), 60);
+    const y = d3.scaleLinear().domain([0, maxTotal]).range([iH, 0]);
+
+    const colorMap: Record<FitnessCategory, string> = {
+      cardio:      '#ef4444',
+      strength:    '#8B5CF6',
+      flexibility: '#06b6d4',
+      sports:      '#f59e0b'
+    };
+
     g.append('g').call(d3.axisLeft(y).ticks(4).tickSize(-iW).tickFormat(''))
       .selectAll('line').attr('stroke', '#f3f4f6').attr('stroke-dasharray', '3,3');
     g.selectAll('.domain').remove();
 
-    // X axis - every 3h
     g.append('g').attr('transform', `translate(0,${iH})`)
       .call(d3.axisBottom(x).tickValues(hours.filter((_: any, i: number) => i % 3 === 0)))
       .call((ax: any) => ax.select('.domain').attr('stroke', '#e5e7eb'))
       .selectAll('text').attr('font-size', '11px').attr('fill', '#9ca3af')
-        .attr('transform', 'rotate(-30)').attr('text-anchor', 'end').attr('dy', '0.5em');
+      .attr('transform', 'rotate(-30)').attr('text-anchor', 'end').attr('dy', '0.5em');
 
-    // Y axis
     g.append('g').call(d3.axisLeft(y).ticks(4).tickFormat((d: number) => `${d}m`))
       .call((ax: any) => ax.select('.domain').remove())
       .selectAll('text').attr('font-size', '11px').attr('fill', '#9ca3af');
 
-    // Bars
-    g.selectAll('.bar').data(this.dailyData).enter().append('rect')
-      .attr('x', (d: DailyChartPoint) => x(d.hour) ?? 0)
-      .attr('y', (d: DailyChartPoint) => y(d.duration))
-      .attr('width', x.bandwidth())
-      .attr('height', (d: DailyChartPoint) => iH - y(d.duration))
-      .attr('fill', (d: DailyChartPoint) => this.categoryConfig[d.category].color)
-      .attr('rx', 5).attr('opacity', 0.85);
+    stack.forEach((layer: any) => {
+      const cat = layer.key as FitnessCategory;
+      g.selectAll(`.bar-${cat}`)
+        .data(layer.filter((d: any) => d[1] > d[0]))
+        .enter().append('rect')
+        .attr('x', (d: any) => x(d.data.hour) ?? 0)
+        .attr('y', (d: any) => y(d[1]))
+        .attr('width', x.bandwidth())
+        .attr('height', (d: any) => Math.max(0, y(d[0]) - y(d[1])))
+        .attr('fill', colorMap[cat])
+        .attr('rx', 4)
+        .attr('opacity', 0.85);
+    });
 
-    // Labels
-    g.selectAll('.lbl').data(this.dailyData).enter().append('text')
-      .attr('x', (d: DailyChartPoint) => (x(d.hour) ?? 0) + x.bandwidth() / 2)
-      .attr('y', (d: DailyChartPoint) => y(d.duration) - 5)
-      .attr('text-anchor', 'middle').attr('font-size', '10px').attr('fill', '#6b7280')
-      .text((d: DailyChartPoint) => `${d.duration}m`);
+    stackData.forEach((d: any) => {
+      const total = this.categories.reduce((s, c) => s + (d[c] || 0), 0);
+      if (total > 0) {
+        g.append('text')
+          .attr('x', (x(d.hour) ?? 0) + x.bandwidth() / 2)
+          .attr('y', y(total) - 5)
+          .attr('text-anchor', 'middle').attr('font-size', '10px').attr('fill', '#6b7280')
+          .text(`${total}m`);
+      }
+    });
   }
 
   drawWeeklyChart() {
@@ -247,19 +321,30 @@ prepareWeeklyData() {
     d3.select(container).selectAll('*').remove();
 
     const width = container.clientWidth || 600;
-    const height = 240;
-    const m = { top: 20, right: 20, bottom: 40, left: 50 };
+    const height = 260;
+    const m = { top: 30, right: 20, bottom: 40, left: 50 };
     const iW = width - m.left - m.right;
     const iH = height - m.top - m.bottom;
 
     const svg = d3.select(container).append('svg').attr('width', width).attr('height', height);
     const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
-    const x = d3.scaleBand().domain(this.weeklyData.map((d: WeeklyChartPoint) => d.label)).range([0, iW]).padding(0.35);
+    const x = d3.scaleBand()
+      .domain(this.weeklyData.map((d: WeeklyChartPoint) => d.label))
+      .range([0, iW]).padding(0.35);
+
     const maxDur = Math.max(...this.weeklyData.map((d: WeeklyChartPoint) => d.duration), 60);
     const y = d3.scaleLinear().domain([0, maxDur]).range([iH, 0]);
 
-    g.append('g').call(d3.axisLeft(y).ticks(4).tickSize(-iW).tickFormat(''))
+    const colorMap: Record<FitnessCategory, string> = {
+      cardio:      '#ef4444',
+      strength:    '#8B5CF6',
+      flexibility: '#06b6d4',
+      sports:      '#f59e0b'
+    };
+
+    g.append('g')
+      .call(d3.axisLeft(y).ticks(4).tickSize(-iW).tickFormat(''))
       .selectAll('line').attr('stroke', '#f3f4f6').attr('stroke-dasharray', '3,3');
     g.selectAll('.domain').remove();
 
@@ -268,23 +353,52 @@ prepareWeeklyData() {
       .call((ax: any) => ax.select('.domain').attr('stroke', '#e5e7eb'))
       .selectAll('text').attr('font-size', '12px').attr('fill', '#9ca3af');
 
-    g.append('g').call(d3.axisLeft(y).ticks(4).tickFormat((d: number) => `${d}m`))
+    g.append('g')
+      .call(d3.axisLeft(y).ticks(4).tickFormat((d: number) => `${d}m`))
       .call((ax: any) => ax.select('.domain').remove())
       .selectAll('text').attr('font-size', '11px').attr('fill', '#9ca3af');
 
-    g.selectAll('.bar').data(this.weeklyData).enter().append('rect')
-      .attr('x', (d: WeeklyChartPoint) => x(d.label) ?? 0)
-      .attr('y', (d: WeeklyChartPoint) => d.hasWorkout ? y(d.duration) : iH - 3)
-      .attr('width', x.bandwidth())
-      .attr('height', (d: WeeklyChartPoint) => d.hasWorkout ? iH - y(d.duration) : 3)
-      .attr('fill', (d: WeeklyChartPoint) => d.hasWorkout ? this.categoryConfig[d.category].color : '#e5e7eb')
-      .attr('rx', 6).attr('opacity', 0.85);
+    this.weeklyData.forEach((d: WeeklyChartPoint) => {
+      if (!d.hasWorkout) {
+        g.append('rect')
+          .attr('x', x(d.label) ?? 0)
+          .attr('y', iH - 4)
+          .attr('width', x.bandwidth())
+          .attr('height', 4)
+          .attr('fill', '#e5e7eb')
+          .attr('rx', 4);
+        return;
+      }
 
-    g.selectAll('.lbl').data(this.weeklyData.filter((d: WeeklyChartPoint) => d.hasWorkout)).enter().append('text')
-      .attr('x', (d: WeeklyChartPoint) => (x(d.label) ?? 0) + x.bandwidth() / 2)
-      .attr('y', (d: WeeklyChartPoint) => y(d.duration) - 5)
-      .attr('text-anchor', 'middle').attr('font-size', '11px').attr('fill', '#6b7280')
-      .text((d: WeeklyChartPoint) => `${d.duration}m`);
+      let yOffset = 0;
+      this.categories.forEach((cat: FitnessCategory) => {
+        const dur = d.categoryDurations?.[cat] || 0;
+        if (dur <= 0) return;
+
+        const barHeight = iH - y(dur);
+        const barY = y(d.duration) + yOffset;
+
+        g.append('rect')
+          .attr('x', x(d.label) ?? 0)
+          .attr('y', barY)
+          .attr('width', x.bandwidth())
+          .attr('height', barHeight)
+          .attr('fill', colorMap[cat])
+          .attr('rx', 4)
+          .attr('opacity', 0.88);
+
+        yOffset += barHeight;
+      });
+
+      g.append('text')
+        .attr('x', (x(d.label) ?? 0) + x.bandwidth() / 2)
+        .attr('y', y(d.duration) - 8)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '12px')
+        .attr('font-weight', '700')
+        .attr('fill', '#374151')
+        .text(`${d.duration}m`);
+    });
   }
 
   drawMonthlyChart() {
@@ -303,15 +417,12 @@ prepareWeeklyData() {
     const svg = d3.select(container).append('svg').attr('width', width).attr('height', height);
     const g = svg.append('g').attr('transform', 'translate(20,30)');
 
-    // Weekday headers
-    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach((day, i) => {
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach((day, i) => {
       g.append('text')
         .attr('x', i * (cellSize + gap) + cellSize / 2).attr('y', -12)
         .attr('text-anchor', 'middle').attr('font-size', '11px').attr('fill', '#9ca3af')
         .text(day);
     });
-
-    const maxDur = Math.max(...this.monthlyData.map((m: MonthlyChartPoint) => m.duration), 1);
 
     this.monthlyData.forEach((d: MonthlyChartPoint, idx: number) => {
       const col = (firstWeekday + idx) % 7;
@@ -319,37 +430,31 @@ prepareWeeklyData() {
       const cx = col * (cellSize + gap);
       const cy = row * (cellSize + gap);
 
-      const intensity = d.hasWorkout ? 0.15 + (d.duration / maxDur) * 0.8 : 0;
-      const fill = d.isFuture ? '#f9fafb' : d.hasWorkout ? `rgba(139,92,246,${intensity})` : '#f3f4f6';
+      const fill = d.isFuture ? '#f9fafb' : d.hasWorkout ? '#8B5CF6' : '#f3f4f6';
 
       g.append('rect')
         .attr('x', cx).attr('y', cy)
         .attr('width', cellSize).attr('height', cellSize)
         .attr('rx', 8).attr('fill', fill)
-        .attr('stroke', d.isToday ? '#8B5CF6' : 'transparent')
+        .attr('stroke', d.isToday ? '#6d28d9' : 'transparent')
         .attr('stroke-width', 2);
 
       g.append('text')
         .attr('x', cx + 7).attr('y', cy + 15)
         .attr('font-size', '11px')
         .attr('font-weight', d.isToday ? '700' : '400')
-        .attr('fill', d.isFuture ? '#d1d5db' : d.hasWorkout ? '#4c1d95' : '#9ca3af')
+        .attr('fill', d.hasWorkout ? '#fff' : d.isFuture ? '#d1d5db' : '#9ca3af')
         .text(d.day);
 
       if (d.hasWorkout) {
         g.append('text')
-          .attr('x', cx + cellSize / 2).attr('y', cy + cellSize - 7)
-          .attr('text-anchor', 'middle').attr('font-size', '10px')
-          .attr('fill', '#6d28d9').attr('font-weight', '600')
+          .attr('x', cx + cellSize / 2)
+          .attr('y', cy + cellSize / 2 + 8)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '13px')
+          .attr('font-weight', '700')
+          .attr('fill', '#fff')
           .text(`${d.duration}m`);
-
-        if (d.calories > 0) {
-          g.append('text')
-            .attr('x', cx + cellSize / 2).attr('y', cy + cellSize - 7)
-            .attr('text-anchor', 'middle').attr('font-size', '9px')
-            .attr('fill', '#7c3aed').attr('dy', '-10')
-            .text(`${d.duration}m`);
-        }
       }
     });
   }
@@ -363,7 +468,10 @@ prepareWeeklyData() {
   nextMonth() {
     const next = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 1);
     const now = new Date();
-    if (next.getFullYear() < now.getFullYear() || (next.getFullYear() === now.getFullYear() && next.getMonth() <= now.getMonth())) {
+    if (
+      next.getFullYear() < now.getFullYear() ||
+      (next.getFullYear() === now.getFullYear() && next.getMonth() <= now.getMonth())
+    ) {
       this.selectedMonth = next;
       this.prepareMonthlyData();
       setTimeout(() => this.drawMonthlyChart(), 80);
@@ -377,7 +485,24 @@ prepareWeeklyData() {
   get isCurrentMonth(): boolean {
     const now = new Date();
     return this.selectedMonth.getMonth() === now.getMonth() &&
-           this.selectedMonth.getFullYear() === now.getFullYear();
+      this.selectedMonth.getFullYear() === now.getFullYear();
+  }
+
+  // ── Calories ───────────────────────────────────────────────
+
+  calculateCalories(category: FitnessCategory, durationMinutes: number): number {
+    const met = this.metMap[category];
+    const calories = met * this.userWeight * (durationMinutes / 60);
+    return Math.round(calories);
+  }
+
+  onFormChange() {
+    if (this.form.category && this.form.duration > 0) {
+      this.form.caloriesBurned = this.calculateCalories(
+        this.form.category,
+        this.form.duration
+      );
+    }
   }
 
   // ── Form ───────────────────────────────────────────────────
@@ -387,7 +512,7 @@ prepareWeeklyData() {
       title: '',
       category: 'cardio' as FitnessCategory,
       duration: 30,
-      caloriesBurned: 0,
+      caloriesBurned: this.calculateCalories('cardio', 30),
       workoutTime: new Date().toTimeString().slice(0, 5),
       exercises: [{ name: '', sets: [{ reps: 0, weight: undefined as number | undefined }] }] as Exercise[],
       notes: '',
@@ -452,7 +577,8 @@ prepareWeeklyData() {
           const idx = this.entries.findIndex(e => e._id === this.editingId);
           if (idx > -1) this.entries[idx] = updated;
           this.closeModal();
-          this.prepareChartData(); setTimeout(() => this.drawChart(), 100);
+          this.prepareChartData();
+          setTimeout(() => this.drawChart(), 100);
         },
         error: (err) => { console.error(err); this.formError = 'Failed to update.'; }
       });
@@ -461,7 +587,8 @@ prepareWeeklyData() {
         next: (created) => {
           this.entries.unshift(created);
           this.closeModal();
-          this.prepareChartData(); setTimeout(() => this.drawChart(), 100);
+          this.prepareChartData();
+          setTimeout(() => this.drawChart(), 100);
         },
         error: (err) => { console.error(err); this.formError = 'Failed to save.'; }
       });
@@ -475,8 +602,10 @@ prepareWeeklyData() {
     this.fitnessService.deleteWorkout(this.entryToDelete).subscribe({
       next: () => {
         this.entries = this.entries.filter(e => e._id !== this.entryToDelete);
-        this.showDeleteConfirm = false; this.entryToDelete = null;
-        this.prepareChartData(); setTimeout(() => this.drawChart(), 100);
+        this.showDeleteConfirm = false;
+        this.entryToDelete = null;
+        this.prepareChartData();
+        setTimeout(() => this.drawChart(), 100);
       },
       error: (err) => console.error(err)
     });
@@ -490,7 +619,8 @@ prepareWeeklyData() {
   get avgDuration(): number   { return this.entries.length ? Math.round(this.totalMinutes / this.entries.length) : 0; }
 
   get thisWeekWorkouts(): number {
-    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
     return this.entries.filter(e => new Date(e.date) >= weekAgo).length;
   }
 

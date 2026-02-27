@@ -11,7 +11,7 @@ private userSubject = new BehaviorSubject<any>(this.getUser());
 user$ = this.userSubject.asObservable();
 
   private apiUrl =
-    'http://localhost:5000/api/users';
+    'http://localhost:5000/api/auth';
 
 private user: any = null;
 
@@ -64,7 +64,7 @@ loadUser() {
 
 forgotPassword(email: string) {
   return this.http.post(
-    '/api/users/forgot-password',
+    '/api/auth/forgot-password',
     { email }
   );
 }

@@ -28,6 +28,7 @@ showCompletionModal = false;
 completedGoalTitle = '';
 showReopenConfirm = false;
 goalToReopen: Goal | null = null;
+dropdownOpen = false;
 
   form: {
     title: string;
@@ -71,8 +72,8 @@ goalToReopen: Goal | null = null;
   };
 
   statusColors: Record<GoalStatus, string> = {
-    'not-started': '#9ca3af',
-    'in-progress': '#A78BFA',
+    'not-started': '#d35ab5',
+    'in-progress': '#0be5f5',
     'completed': '#22c55e'
   };
 
@@ -391,5 +392,17 @@ confirmReopen() {
 cancelReopen() {
   this.showReopenConfirm = false;
   this.goalToReopen = null;
+}
+
+
+toggleDropdown() {
+  this.dropdownOpen = !this.dropdownOpen;
+}
+
+selectCategory(cat: GoalCategory | 'all', event: Event) {
+  event.stopPropagation();
+  this.activeCategory = cat;
+  this.setCategoryFilter(cat);
+  this.dropdownOpen = false;
 }
 }
