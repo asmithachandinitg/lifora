@@ -2,26 +2,40 @@
 
   <!-- Logo -->
   <div class="logo">
-    💜 Lifora
+    <span class="logo-icon"></span>
+    <span class="logo-text">Lifora</span>
   </div>
 
-  <!-- Menu -->
+  <!-- Grouped Menu -->
   <nav class="menu">
 
-    <a
-      *ngFor="let item of menu"
-      [routerLink]="item.route"
-      routerLinkActive="active"
-      class="menu-item"
-    >
-      <span class="material-icons icon">
-        {{ item.icon }}
-      </span>
+    <div class="menu-group" *ngFor="let group of menuGroups">
 
-      <span class="label">
-        {{ item.name }}
-      </span>
-    </a>
+      <!-- Group Header -->
+      <div class="group-header" (click)="toggleGroup(group)">
+        <div class="group-header-left">
+          <span class="material-icons group-icon">{{ group.icon }}</span>
+          <span class="group-label">{{ group.group }}</span>
+        </div>
+        <span class="material-icons chevron" [class.rotated]="group.collapsed">
+          expand_more
+        </span>
+      </div>
+
+      <!-- Group Items -->
+      <div class="group-items" [class.collapsed]="group.collapsed">
+        <a
+          *ngFor="let item of group.items"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="menu-item"
+        >
+          <span class="material-icons icon">{{ item.icon }}</span>
+          <span class="label">{{ item.name }}</span>
+        </a>
+      </div>
+
+    </div>
 
   </nav>
 

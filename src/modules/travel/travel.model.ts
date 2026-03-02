@@ -1,21 +1,21 @@
 export type TripStatus = 'planned' | 'ongoing' | 'completed';
 
 export interface PackingItem {
-  _id?: string;
+  _id: string;
   name: string;
   packed: boolean;
   category: string;
 }
 
 export interface ItineraryDay {
-  _id?: string;
+  _id: string;
   date: string;
   title: string;
   activities: string[];
 }
 
 export interface TripExpense {
-  _id?: string;
+  _id: string;
   title: string;
   amount: number;
   category: string;
@@ -23,7 +23,7 @@ export interface TripExpense {
 }
 
 export interface Trip {
-  _id?: string;
+  _id: string;
   name: string;
   destination: string;
   startDate: string;

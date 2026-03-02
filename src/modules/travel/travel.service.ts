@@ -32,4 +32,23 @@ export class TravelService {
   deleteTrip(id: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`, { headers: this.headers() });
   }
+
+  // ── Trip expense endpoints (synced to Finance module) ─────────
+
+  addTripExpense(tripId: string, expense: {
+    title: string; amount: number; category: string; date: string;
+  }): Observable<{ trip: Trip; linkedExpenseId: string }> {
+    return this.http.post<{ trip: Trip; linkedExpenseId: string }>(
+      `${this.baseUrl}/${tripId}/expenses`,
+      expense,
+      { headers: this.headers() }
+    );
+  }
+
+  deleteTripExpense(tripId: string, expId: string): Observable<{ trip: Trip }> {
+    return this.http.delete<{ trip: Trip }>(
+      `${this.baseUrl}/${tripId}/expenses/${expId}`,
+      { headers: this.headers() }
+    );
+  }
 }

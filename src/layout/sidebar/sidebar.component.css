@@ -3,55 +3,143 @@
   flex-direction: column;
   width: 240px;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 16px 10px;
   background: linear-gradient(180deg, #A78BFA 0%, #C4B5FD 100%);
   color: white;
   box-sizing: border-box;
+  scrollbar-width: none;
 }
 
+.sidebar::-webkit-scrollbar { display: none; }
+
+/* ── Logo ─────────────────────────────────── */
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 20px;
   font-weight: 700;
   color: white;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   padding-left: 10px;
   flex-shrink: 0;
 }
 
+.logo-icon { font-size: 22px; }
+.logo-text  { letter-spacing: 0.5px; }
+
+/* ── Menu Container ────────────────────────── */
 .menu {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  gap: 2px;
-  overflow: hidden;
+  gap: 4px;
 }
 
+/* ── Group ─────────────────────────────────── */
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.group-header:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.group-header-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.group-icon {
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.85;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.chevron {
+  font-size: 16px;
+  opacity: 0.7;
+  transition: transform 0.25s ease;
+}
+
+.chevron.rotated {
+  transform: rotate(-90deg);
+}
+
+/* ── Group Items ───────────────────────────── */
+.group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  max-height: 500px;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+  opacity: 1;
+}
+
+.group-items.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* ── Menu Item ─────────────────────────────── */
 .menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 18px;
+  padding: 10px 14px 10px 22px; /* indented under group */
   border-radius: 9px;
   text-decoration: none;
   color: white;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   transition: background 0.18s ease;
-  flex-shrink: 0;
   white-space: nowrap;
   font-family: 'Segoe UI', sans-serif;
 }
 
-.icon { font-size: 18px; flex-shrink: 0; }
+.icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
 
-.menu-item:hover { background: rgba(255,255,255,0.18); }
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
 
-.active {
+/* ── Active State ──────────────────────────── */
+.menu-item.active {
   background: white !important;
   color: #7C3AED !important;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.active .icon { color: #7C3AED; }
+.menu-item.active .icon {
+  color: #7C3AED;
+  opacity: 1;
+}

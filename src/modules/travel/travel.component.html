@@ -158,6 +158,13 @@
           <span class="material-icons">edit</span>
         </button>
         <span class="status-pill">{{ statusConfig[selectedTrip.status].label }}</span>
+        <button class="save-all-btn"
+                [class.has-changes]="hasUnsavedChanges"
+                [disabled]="!hasUnsavedChanges || isSaving"
+                (click)="saveAllChanges()">
+          <span class="material-icons">{{ isSaving ? 'hourglass_top' : 'save' }}</span>
+          {{ isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved' }}
+        </button>
       </div>
     </div>
 
@@ -202,8 +209,28 @@
       <div class="notes-card" *ngIf="!selectedTrip.notes">
         <div class="notes-title"><span class="material-icons">notes</span> Notes & Memories</div>
         <textarea [(ngModel)]="selectedTrip.notes" placeholder="Write your notes, memories, tips..."
-          rows="4" (blur)="saveTrip$()"></textarea>
+          rows="4" (change)="markDirty()"></textarea>
       </div>
+
+      <!-- Journal summary — full entries shown per-day in Itinerary tab -->
+      <div class="journal-summary-card">
+        <div class="journal-summary-left">
+          <span class="material-icons">menu_book</span>
+          <div>
+            <div class="js-title">Trip Journal</div>
+            <div class="js-sub">
+              <ng-container *ngIf="!loadingJournal">
+                {{ totalJournalCount > 0 ? (totalJournalCount + ' entr' + (totalJournalCount === 1 ? 'y' : 'ies') + ' written') : 'No journal entries yet' }}
+              </ng-container>
+              <ng-container *ngIf="loadingJournal">Loading...</ng-container>
+            </div>
+          </div>
+        </div>
+        <button class="write-journal-btn" *ngIf="isTodayInTrip" (click)="writeJournalEntry()">
+          <span class="material-icons">add</span> Write Entry
+        </button>
+      </div>
+
     </div>
 
     <!-- PACKING TAB -->
@@ -258,15 +285,22 @@
 
       <!-- Add day -->
       <div class="add-day-row">
-        <input type="date" [(ngModel)]="newItineraryDay.date" class="day-date-input" />
+        <input type="date"
+               [(ngModel)]="newItineraryDay.date"
+               class="day-date-input"
+               [min]="tripMinDate"
+               [max]="tripMaxDate" />
         <input placeholder="Day title (optional)" [(ngModel)]="newItineraryDay.title" class="day-title-input" />
         <button class="add-day-btn" (click)="addItineraryDay()">
           <span class="material-icons">add</span> Add Day
         </button>
       </div>
+      <div class="date-error" *ngIf="itineraryDateError">
+        <span class="material-icons">error_outline</span> {{ itineraryDateError }}
+      </div>
 
       <div *ngIf="selectedTrip.itinerary.length === 0" class="empty-inline">
-        <span class="material-icons">map</span> No days planned yet.
+        <span class="material-icons">map</span> No days planned yet. Add days between {{ formatDate(tripMinDate) }}{{ tripMaxDate ? ' and ' + formatDate(tripMaxDate) : '' }}.
       </div>
 
       <div class="itinerary-list">
@@ -292,12 +326,40 @@
           </div>
 
           <div class="add-activity-row">
-            <input placeholder="Add activity..." [(ngModel)]="newActivity"
+            <input placeholder="Add activity..." [(ngModel)]="newActivity[day._id]"
               (keyup.enter)="addActivity(day)" class="act-input" />
             <button class="add-act-btn" (click)="addActivity(day)">
               <span class="material-icons">add</span>
             </button>
           </div>
+
+          <!-- Diary entries for this day -->
+          <div class="day-journal-section" *ngIf="!loadingJournal">
+            <div class="day-journal-header">
+              <span class="material-icons">menu_book</span>
+              Journal
+              <span class="day-journal-count" *ngIf="getEntriesForDate(day.date).length > 0">
+                {{ getEntriesForDate(day.date).length }}
+              </span>
+              <button class="day-write-btn" (click)="writeJournalEntry(day.date)">
+                <span class="material-icons">add</span> Write
+              </button>
+            </div>
+            <div *ngIf="getEntriesForDate(day.date).length === 0" class="day-journal-empty">
+              No entries for this day yet.
+            </div>
+            <div class="day-journal-cards" *ngIf="getEntriesForDate(day.date).length > 0">
+              <div class="day-journal-card" *ngFor="let entry of getEntriesForDate(day.date)"
+                   [ngClass]="entry.mood">
+                <span class="material-icons djc-mood">{{ getMoodIcon(entry.mood) }}</span>
+                <div class="djc-body">
+                  <span class="djc-title">{{ entry.title }}</span>
+                  <div class="djc-preview" [innerHTML]="entry.content"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
