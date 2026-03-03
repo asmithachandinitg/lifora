@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { UserProfile, Gender, ModuleToggle } from './profile.model';
 import { ProfileService } from './profile.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { Country, State, City } from 'country-state-city';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { allCountries } from 'country-telephone-data';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgSelectModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -55,22 +58,46 @@ export class ProfileComponent implements OnInit {
 
   genderOptions: { value: Gender; label: string; icon: string }[] = [
     { value: 'female', label: 'Female', icon: '♀' },
-    { value: 'male',   label: 'Male',   icon: '♂' },
-    { value: 'other',  label: 'Other',  icon: '⚧' },
+    { value: 'male', label: 'Male', icon: '♂' },
+    { value: 'other', label: 'Other', icon: '⚧' },
   ];
 
+  countries: any[] = [];
+  states: any[] = [];
+  cities: any[] = [];
+
+  selectedCountry: any;
+  selectedState: any;
+  selectedCity: any;
+
+   countryCodes = allCountries.map(c => ({
+    name: c.name,
+    code: '+' + c.dialCode,
+    iso2: c.iso2
+  }));
+
+selectedCode: any = null;
   constructor(
     private profileService: ProfileService,
     private authService: AuthService
-  ) {}
+  ) { }
 
-  ngOnInit() { this.loadProfile(); }
+  ngOnInit() 
+  { 
+    this.loadProfile(); 
+    this.countries = Country.getAllCountries();
+  }
 
   loadProfile() {
     this.loading = true;
     this.profileService.getProfile().subscribe({
       next: (data) => {
         this.profile = { ...this.emptyProfile(), ...data };
+           if (this.profile.phoneCode) {
+        this.selectedCode = this.countryCodes.find(
+          c => c.code.replace('+', '') === this.profile.phoneCode.replace('+', '').trim()
+        );
+      }
         if (data.modules?.length) {
           this.allModules = this.allModules.map(m => {
             const saved = data.modules!.find(s => s.key === m.key);
@@ -85,7 +112,7 @@ export class ProfileComponent implements OnInit {
 
   emptyProfile(): UserProfile {
     return {
-      firstName: '', lastName: '', email: '', phone: '',
+      firstName: '', lastName: '', email: '', phone: '', phoneCode: '',
       gender: '', dob: '', country: '', state: '', city: '',
       weight: 0, height: 0
     };
@@ -145,7 +172,7 @@ export class ProfileComponent implements OnInit {
   saveProfile() {
     if (!this.profile.firstName.trim()) { this.errorMsg = 'First name is required.'; return; }
     this.saving = true;
-    const payload = { ...this.profile, age: this.calculatedAge, bmi: this.calculatedBMI };
+    const payload = { ...this.profile, phoneCode: this.selectedCode?.code || '', age: this.calculatedAge, bmi: this.calculatedBMI };
     this.profileService.updateProfile(payload).subscribe({
       next: (updated) => {
         this.profile = { ...this.emptyProfile(), ...updated };
@@ -193,4 +220,36 @@ export class ProfileComponent implements OnInit {
   enableAll()  { this.visibleModules.forEach(m => m.enabled = true); }
   disableAll() { this.visibleModules.forEach(m => m.enabled = false); }
   clearMessages() { this.successMsg = ''; this.errorMsg = ''; this.passwordError = ''; this.passwordSuccess = ''; }
+
+  onCountryChange(country: any) {
+  this.selectedCountry = country;
+
+  this.states = State.getStatesOfCountry(country.isoCode);
+  this.cities = [];
+
+  this.profile.country = country.name;
+}
+
+onStateChange(state: any) {
+  this.selectedState = state;
+
+  this.cities = City.getCitiesOfState(
+    this.selectedCountry.isoCode,
+    state.isoCode
+  );
+
+  this.profile.state = state.name;
+}
+
+onCityChange(city: any) {
+  this.selectedCity = city;
+
+  this.profile.city = city.name;
+}
+
+  allowOnlyNumbers(event: any) {
+  const input = event.target;
+  input.value = input.value.replace(/[^0-9]/g, '');
+  this.profile.phone = input.value;
+}
 }

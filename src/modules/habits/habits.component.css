@@ -805,3 +805,65 @@ input:focus, select:focus { border-color: #8B5CF6; background: #fff; }
   .completion-rate     { display: none; }
   .breakdown-left      { min-width: 120px; }
 }
+
+.goal-link-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #f0fdf4, #ede9fe);
+  border: 1px solid #8B5CF633;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.goal-link-banner .material-icons {
+  font-size: 18px;
+  color: #8B5CF6;
+}
+
+.goal-link-banner strong {
+  color: #6d28d9;
+}
+
+.unlink-goal-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.unlink-goal-btn:hover { color: #ef4444; background: #fee2e2; }
+.unlink-goal-btn .material-icons { font-size: 15px; color: inherit; }
+
+/* Goal badge on habit card */
+.goal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ede9fe;
+  color: #7C3AED;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid #c4b5fd;
+  max-width: 120px;
+  overflow: hidden;
+}
+
+.goal-badge .material-icons { font-size: 13px; flex-shrink: 0; }
+
+.goal-badge-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

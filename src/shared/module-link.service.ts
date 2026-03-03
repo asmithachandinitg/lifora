@@ -3,22 +3,34 @@ import { Injectable } from '@angular/core';
 export interface TravelLink {
   tripId:   string;
   tripName: string;
-  date:     string; // ISO date string to pre-fill diary
+  date:     string;
+}
+
+export interface GoalLink {
+  goalId:    string;
+  goalTitle: string;
+  category:  string; 
 }
 
 @Injectable({ providedIn: 'root' })
 export class ModuleLinkService {
-  private pendingTravelLink: TravelLink | null = null;
 
-  /** Called by TravelComponent before navigating to /diary */
-  setTravelLink(link: TravelLink): void {
-    this.pendingTravelLink = link;
+  private pendingTravelLink: TravelLink | null = null;
+  private pendingGoalLink:   GoalLink   | null = null;
+
+  // ── Travel ────────────────────────────────────────────────
+  setTravelLink(link: TravelLink): void  { this.pendingTravelLink = link; }
+  consumeTravelLink(): TravelLink | null {
+    const l = this.pendingTravelLink;
+    this.pendingTravelLink = null;
+    return l;
   }
 
-  /** Called by DiaryComponent on init — consumes and clears the link */
-  consumeTravelLink(): TravelLink | null {
-    const link = this.pendingTravelLink;
-    this.pendingTravelLink = null;
-    return link;
+  // ── Goal → Habit ──────────────────────────────────────────
+  setGoalLink(link: GoalLink): void  { this.pendingGoalLink = link; }
+  consumeGoalLink(): GoalLink | null {
+    const l = this.pendingGoalLink;
+    this.pendingGoalLink = null;
+    return l;
   }
 }

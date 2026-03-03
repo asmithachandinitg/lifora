@@ -1,4 +1,4 @@
-export type GoalStatus = 'not-started' | 'in-progress' | 'completed';
+export type GoalStatus   = 'not-started' | 'in-progress' | 'completed';
 export type GoalPriority = 'high' | 'medium' | 'low';
 export type GoalCategory = 'personal' | 'career' | 'health' | 'finance' | 'education' | 'other';
 
@@ -19,4 +19,5 @@ export interface Goal {
   deadline: string;
   createdAt?: string;
   milestones: Milestone[];
+  linkedHabitIds?: string[]; // ← habits spawned from this goal
 }

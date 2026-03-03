@@ -846,3 +846,31 @@
 .arrow {
   font-size: 18px;
 }
+
+.habit-link-btn {
+  position: relative;
+  color: #8B5CF6 !important;
+  background: #ede9fe !important;
+  border-radius: 8px !important;
+}
+
+.habit-link-btn:hover {
+  background: #8B5CF6 !important;
+  color: white !important;
+}
+
+.habit-link-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #8B5CF6;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

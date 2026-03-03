@@ -18,7 +18,7 @@
   <div class="tabs">
     <button [class.active]="activeTab === 'today'" (click)="activeTab = 'today'">Today</button>
     <button [class.active]="activeTab === 'calendar'" (click)="activeTab = 'calendar'">Calendar</button>
-    <button [class.active]="activeTab === 'stats'"  (click)="onStatsTabClick()">Stats</button>
+    <button [class.active]="activeTab === 'stats'" (click)="onStatsTabClick()">Stats</button>
   </div>
 
   <!-- LOADING -->
@@ -72,8 +72,7 @@
           [class.completed]="habit.completedToday">
 
           <div class="habit-left" (click)="toggleHabit(habit)">
-            <div class="habit-check"
-              [style.border-color]="habit.color"
+            <div class="habit-check" [style.border-color]="habit.color"
               [style.background]="habit.completedToday ? habit.color : 'transparent'">
               <span class="material-icons check-icon" *ngIf="habit.completedToday">check</span>
             </div>
@@ -88,9 +87,11 @@
           </div>
 
           <div class="habit-right">
-            <div class="streak-badge"
-              [style.background]="habit.color + '18'"
-              [style.color]="habit.color">
+            <div class="goal-badge" *ngIf="habit.linkedGoalTitle" [title]="'Goal: ' + habit.linkedGoalTitle">
+              <span class="material-icons">track_changes</span>
+              <span class="goal-badge-text">{{ habit.linkedGoalTitle }}</span>
+            </div>
+            <div class="streak-badge" [style.background]="habit.color + '18'" [style.color]="habit.color">
               <span class="material-icons">local_fire_department</span>
               {{ habit.currentStreak }}
             </div>
@@ -120,8 +121,7 @@
 
       <!-- Habit selector pills -->
       <div class="habit-selector">
-        <button *ngFor="let h of habits"
-          class="habit-pill"
+        <button *ngFor="let h of habits" class="habit-pill"
           [style.border-color]="selectedHabitForCalendar?._id === h._id ? h.color : '#e5e7eb'"
           [style.color]="selectedHabitForCalendar?._id === h._id ? h.color : '#6b7280'"
           [style.background]="selectedHabitForCalendar?._id === h._id ? h.color + '12' : '#fff'"
@@ -173,11 +173,8 @@
           <div *ngFor="let _ of calendarEmptyOffset" class="cal-cell empty-cell"></div>
 
           <!-- Day cells -->
-          <div *ngFor="let day of getCalendarData(selectedHabitForCalendar)"
-            class="cal-cell"
-            [class.today]="day.isToday"
-            [class.future]="day.isFuture"
-            [class.completed]="day.completed === 1"
+          <div *ngFor="let day of getCalendarData(selectedHabitForCalendar)" class="cal-cell"
+            [class.today]="day.isToday" [class.future]="day.isFuture" [class.completed]="day.completed === 1"
             [style.background]="day.completed === 1 ? selectedHabitForCalendar.color : ''"
             [style.border-color]="day.isToday ? selectedHabitForCalendar.color : ''">
             <span class="cal-day-num">{{ day.day }}</span>
@@ -226,7 +223,7 @@
         <div class="stat-label">Today's Rate</div>
       </div>
     </div>
-    
+
     <!-- Per habit breakdown -->
     <div class="habit-breakdown">
       <h3 class="breakdown-title">Per Habit Performance</h3>
@@ -237,9 +234,7 @@
         </div>
         <div class="breakdown-bar-wrap">
           <div class="breakdown-bar">
-            <div class="breakdown-fill"
-              [style.width]="h.completionRate + '%'"
-              [style.background]="h.color">
+            <div class="breakdown-fill" [style.width]="h.completionRate + '%'" [style.background]="h.color">
             </div>
           </div>
           <span class="breakdown-pct">{{ h.completionRate }}%</span>
@@ -307,10 +302,7 @@
         </label>
         <div class="color-options">
           <span *ngFor="let c of ['#8B5CF6','#ef4444','#06b6d4','#f59e0b','#10b981','#ec4899','#6366f1','#14b8a6']"
-            class="color-dot"
-            [class.selected]="form.color === c"
-            [style.background]="c"
-            (click)="form.color = c">
+            class="color-dot" [class.selected]="form.color === c" [style.background]="c" (click)="form.color = c">
           </span>
         </div>
       </div>
@@ -321,12 +313,9 @@
           <span class="material-icons">emoji_emotions</span> Icon
         </label>
         <div class="icon-options">
-          <span *ngFor="let ico of iconOptions"
-            class="icon-opt"
-            [class.selected]="form.icon === ico"
+          <span *ngFor="let ico of iconOptions" class="icon-opt" [class.selected]="form.icon === ico"
             [style.color]="form.icon === ico ? form.color : '#9ca3af'"
-            [style.border-color]="form.icon === ico ? form.color : '#e5e7eb'"
-            (click)="form.icon = ico">
+            [style.border-color]="form.icon === ico ? form.color : '#e5e7eb'" (click)="form.icon = ico">
             <span class="material-icons">{{ ico }}</span>
           </span>
         </div>
@@ -350,6 +339,13 @@
         </button>
       </div>
 
+    </div>
+    <div class="goal-link-banner" *ngIf="linkedGoalTitle">
+      <span class="material-icons">track_changes</span>
+      Building habit for goal: <strong>{{ linkedGoalTitle }}</strong>
+      <button class="unlink-goal-btn" (click)="clearGoalLink()" title="Remove link">
+        <span class="material-icons">close</span>
+      </button>
     </div>
   </div>
 

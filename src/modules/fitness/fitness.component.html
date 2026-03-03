@@ -365,3 +365,47 @@
     </div>
   </div>
 </div>
+
+<div class="modal" *ngIf="showMoodPrompt">
+  <div class="mood-prompt-modal">
+
+    <div class="mpm-header">
+      <span class="material-icons mpm-icon">fitness_center</span>
+      <div>
+        <h3>Great workout! 💪</h3>
+        <p>How do you feel after <strong>{{ postWorkoutTitle }}</strong>?</p>
+      </div>
+    </div>
+
+    <!-- Mood selector -->
+    <div class="mpm-moods">
+      <div *ngFor="let m of moodOptions"
+           class="mpm-option"
+           [class.selected]="postWorkoutMood === m.value"
+           [style.border-color]="postWorkoutMood === m.value ? m.color : '#e5e7eb'"
+           [style.background]="postWorkoutMood === m.value ? m.color + '20' : ''"
+           (click)="selectPostWorkoutMood(m.value)">
+        <span class="mpm-emoji">{{ m.emoji }}</span>
+        <span class="mpm-label">{{ m.label }}</span>
+      </div>
+    </div>
+
+    <!-- Optional note -->
+    <input class="mpm-note"
+           [(ngModel)]="postWorkoutNote"
+           placeholder="Any notes? (optional)"
+           *ngIf="postWorkoutMood" />
+
+    <div class="mpm-actions">
+      <button class="mpm-skip" (click)="skipMoodPrompt()">Skip</button>
+      <button class="mpm-save"
+              [style.background]="getPostWorkoutMoodColor()"
+              [disabled]="!postWorkoutMood"
+              (click)="savePostWorkoutMood()">
+        <span class="material-icons">save</span> Save Mood
+      </button>
+    </div>
+
+  </div>
+</div>
+

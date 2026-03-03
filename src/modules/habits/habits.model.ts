@@ -2,7 +2,7 @@ export type HabitCategory = 'health' | 'fitness' | 'mindfulness' | 'work' | 'per
 export type HabitFrequency = 'daily' | 'weekly' | 'monthly';
 
 export interface HabitCompletion {
-  date: string; 
+  date: string;
   completed: boolean;
   note?: string;
 }
@@ -21,6 +21,10 @@ export interface Habit {
   longestStreak: number;
   notes?: string;
   createdAt?: string;
+
+  // ── Goal link ──────────────────────────────────────────────
+  linkedGoalId?:    string;
+  linkedGoalTitle?: string;
 }
 
 export interface HabitWithStats extends Habit {

@@ -1,5 +1,33 @@
 <div class="expenses-wrapper">
 
+  <!-- BUDGET ALERTS BANNER -->
+  <div class="budget-alerts" *ngIf="budgetAlerts.length > 0">
+    <div *ngFor="let alert of budgetAlerts"
+         class="budget-alert-item"
+         [class.alert-warning]="alert.level === 'warning'"
+         [class.alert-danger]="alert.level === 'danger'">
+      <span class="material-icons ba-icon">
+        {{ alert.level === 'danger' ? 'error' : 'warning' }}
+      </span>
+      <div class="ba-text">
+        <strong>{{ alert.level === 'danger' ? 'Budget Exceeded!' : 'Budget Warning' }}</strong>
+        {{ alert.message }}
+      </div>
+      <div class="ba-bar-wrap">
+        <div class="ba-bar">
+          <div class="ba-fill"
+               [style.width]="(alert.percent > 100 ? 100 : alert.percent) + '%'"
+               [style.background]="alert.level === 'danger' ? '#ef4444' : '#f59e0b'">
+          </div>
+        </div>
+        <span class="ba-pct">{{ alert.percent }}%</span>
+      </div>
+      <button class="ba-close" (click)="dismissAlert(alert.categoryId)">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+  </div>
+
   <!-- TOP TABS -->
   <div class="tabs">
     <button [class.active]="activeTab === 'records'" (click)="activeTab = 'records'">Records</button>
@@ -168,6 +196,32 @@
     </div>
   </div>
 
+  <!-- ===================== ACCOUNTS TAB ===================== -->
+  <div *ngIf="activeTab === 'accounts'" class="accounts-tab">
+    <div class="tab-header">
+      <h3 class="tab-title">Accounts</h3>
+      <button class="add-cat-btn" (click)="openAddAccount()"><span class="material-icons">add</span> Add Account</button>
+    </div>
+
+    <div *ngIf="allAccounts.length === 0" class="empty">No accounts yet</div>
+
+    <div class="account-list">
+      <div class="account-row" *ngFor="let acc of allAccounts; let i = index">
+        <div class="account-left">
+          <div class="account-icon-circle">{{ acc.icon }}</div>
+          <div class="account-info">
+            <span class="account-name">{{ acc.name }}</span>
+            <span class="account-balance" [class.red]="acc.balance < 0">Balance: {{ acc.balance | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="account-actions">
+          <button class="edit-btn" (click)="openEditAccount(acc, i)"><span class="material-icons">edit</span></button>
+          <button class="record-delete-btn" (click)="confirmDeleteAccount(acc, i)"><span class="material-icons">delete</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ===================== ADD RECORD MODAL ===================== -->
@@ -294,34 +348,6 @@
     </div>
   </div>
 </div>
-
-
-<!-- ===================== ACCOUNTS TAB ===================== -->
-<div *ngIf="activeTab === 'accounts'" class="accounts-tab">
-  <div class="tab-header">
-    <h3 class="tab-title">Accounts</h3>
-    <button class="add-cat-btn" (click)="openAddAccount()"><span class="material-icons">add</span> Add Account</button>
-  </div>
-
-  <div *ngIf="allAccounts.length === 0" class="empty">No accounts yet</div>
-
-  <div class="account-list">
-    <div class="account-row" *ngFor="let acc of allAccounts; let i = index">
-      <div class="account-left">
-        <div class="account-icon-circle">{{ acc.icon }}</div>
-        <div class="account-info">
-          <span class="account-name">{{ acc.name }}</span>
-          <span class="account-balance" [class.red]="acc.balance < 0">Balance: {{ acc.balance | number:'1.2-2' }}</span>
-        </div>
-      </div>
-      <div class="account-actions">
-        <button class="edit-btn" (click)="openEditAccount(acc, i)"><span class="material-icons">edit</span></button>
-        <button class="record-delete-btn" (click)="confirmDeleteAccount(acc, i)"><span class="material-icons">delete</span></button>
-      </div>
-    </div>
-  </div>
-</div>
-
 
 <!-- ===================== ADD / EDIT ACCOUNT MODAL ===================== -->
 <div class="modal" *ngIf="showAccountModal">

@@ -6,6 +6,7 @@ import {
   WeeklyStats, MonthlyStats
 } from './habits.model';
 import { HabitService } from './habits.service';
+import { ModuleLinkService } from '../../shared/module-link.service';
 
 declare var d3: any;
 
@@ -62,9 +63,38 @@ export class HabitsComponent implements OnInit, AfterViewChecked {
     'language', 'bolt', 'star', 'local_fire_department', 'psychology'
   ];
 
-  constructor(private habitService: HabitService, private el: ElementRef) {}
+  linkedGoalId:    string | null = null;
+linkedGoalTitle: string | null = null;
 
-  ngOnInit() { this.loadHabits(); }
+  constructor(
+    private habitService: HabitService,
+    private moduleLinkService: ModuleLinkService,
+    private el: ElementRef
+  ) { }
+
+ngOnInit() {
+  this.loadHabits();
+
+  const goalLink = this.moduleLinkService.consumeGoalLink();
+  if (goalLink) {
+    this.linkedGoalId    = goalLink.goalId;
+    this.linkedGoalTitle = goalLink.goalTitle;
+    // Pre-fill form with goal context and open modal
+    this.form = {
+      ...this.getEmptyForm(),
+      category: goalLink.category as HabitCategory,
+    };
+    this.formError = '';
+    this.editMode  = false;
+    this.editingId = null;
+    this.showModal = true;
+  }
+}
+
+clearGoalLink() {
+  this.linkedGoalId    = null;
+  this.linkedGoalTitle = null;
+}
 
 ngAfterViewChecked() {
   const changed = this.activeTab !== this.lastTab || this.habits.length !== this.lastHabitsLen;
@@ -411,8 +441,12 @@ ngAfterViewChecked() {
     this.showModal = true;
   }
 
-  closeModal() { this.showModal = false; this.editMode = false; this.editingId = null; }
-
+closeModal() {
+  this.showModal  = false;
+  this.editMode   = false;
+  this.editingId  = null;
+  this.clearGoalLink(); 
+}
   saveHabit() {
     if (!this.form.name.trim()) { this.formError = 'Habit name is required.'; return; }
 
@@ -423,7 +457,9 @@ ngAfterViewChecked() {
       icon: this.form.icon,
       frequency: this.form.frequency,
       color: this.form.color,
-      notes: this.form.notes
+      notes: this.form.notes,
+        linkedGoalId:    this.linkedGoalId    || undefined,
+  linkedGoalTitle: this.linkedGoalTitle || undefined,
     };
 
     if (this.editMode && this.editingId) {
@@ -437,7 +473,7 @@ ngAfterViewChecked() {
       });
     } else {
       this.habitService.createHabit(payload).subscribe({
-        next: () => { this.loadHabits(); this.closeModal(); },
+        next: () => { this.loadHabits(); this.closeModal(); this.clearGoalLink(); },
         error: () => { this.formError = 'Failed to save.'; }
       });
     }

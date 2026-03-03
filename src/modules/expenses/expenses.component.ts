@@ -61,7 +61,7 @@ export class ExpensesComponent implements OnInit {
 
   // Current month state
   viewDate: Date = new Date();
-
+  budgetAlerts: any[] = [];
   allRecords: Record[] = [];
 
   allCategories: Category[] = [
@@ -248,7 +248,22 @@ export class ExpensesComponent implements OnInit {
   ngOnInit() {
     this.viewDate = new Date();
     this.loadAll();
+     this.loadBudgetAlerts(); 
   }
+
+  loadBudgetAlerts() {
+  this.expenseService.getBudgetStatus().subscribe({
+    next: (statuses) => {
+      // Only show warning and danger level alerts on load
+      this.budgetAlerts = statuses.filter((s: any) => s.level !== 'ok');
+    },
+    error: () => {}
+  });
+}
+
+dismissAlert(categoryId: string) {
+  this.budgetAlerts = this.budgetAlerts.filter(a => a.categoryId !== categoryId);
+}
 
   loadAll() {
     const now = new Date();
@@ -371,35 +386,30 @@ export class ExpensesComponent implements OnInit {
       note: this.recordForm.note,
       datetime: new Date(dateStr)
     };
-
+    
     this.expenseService.createExpense(payload).subscribe({
-      next: (created) => {
-        this.allRecords.unshift(created);
-        // Update local account balance
-        const acc = this.allAccounts.find(a => a.id === this.recordForm.account || a._id === this.recordForm.account);
-        if (acc) {
-          acc.balance = this.recordForm.type === 'expense'
-            ? acc.balance - amount
-            : acc.balance + amount;
-        }
-        this.closeAddRecord();
+  next: (res: any) => {
+    const created = res.expense;
+    this.allRecords.unshift(created);
 
-        // Budget check after adding expense
-        if (payload.type === 'expense') {
-          const cat = this.allCategories.find(c => c.id === payload.category);
-          if (cat && cat.budget > 0) {
-            const spent = this.getCategorySpent(cat.id);
-            const pct = (spent / cat.budget) * 100;
-            if (spent > cat.budget) {
-              this.showSnackMessage(`🚨 Over budget for ${cat.name}! Budget: ${cat.budget}, Spent: ${spent.toFixed(0)}`, 'danger');
-            } else if (pct >= 90) {
-              this.showSnackMessage(`⚠️ Almost out of budget for ${cat.name}! ${(cat.budget - spent).toFixed(0)} remaining`, 'warning');
-            }
-          }
-        }
-      },
-      error: (err) => console.error(err)
-    });
+    // Update local account balance
+    const acc = this.allAccounts.find(a => a.id === this.recordForm.account || a._id === this.recordForm.account);
+    if (acc) {
+      acc.balance = this.recordForm.type === 'expense'
+        ? acc.balance - amount
+        : acc.balance + amount;
+    }
+    this.closeAddRecord();
+
+    // Budget alert from backend
+    if (res.budgetAlert) {
+      const { level, message } = res.budgetAlert;
+      const icon = level === 'danger' ? '🚨' : '⚠️';
+      this.showSnackMessage(`${icon} ${message}`, level);
+    }
+  },
+  error: (err) => console.error(err)
+});
   }
 
   confirmDeleteRecord(record: Record) {

@@ -7,6 +7,7 @@ import {
 } from './fitness.model';
 import { FitnessService } from './fitness.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { MoodService } from '../mood/mood.service';
 
 declare var d3: any;
 
@@ -28,7 +29,10 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   editingId: string | null = null;
   loading = false;
   error = '';
-
+  showMoodPrompt = false;
+  postWorkoutMood = '';
+  postWorkoutNote = '';
+  postWorkoutTitle = '';
   entries: WorkoutEntry[] = [];
   personalRecords: PersonalRecord[] = [];
 
@@ -43,17 +47,17 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   private userHeight = 170;
 
   private metMap: Record<FitnessCategory, number> = {
-    cardio:      7.0,
-    strength:    5.0,
+    cardio: 7.0,
+    strength: 5.0,
     flexibility: 2.5,
-    sports:      6.0
+    sports: 6.0
   };
 
   categoryConfig: Record<FitnessCategory, { label: string; icon: string; color: string }> = {
-    cardio:      { label: 'Cardio',      icon: 'directions_run',    color: '#ef4444' },
-    strength:    { label: 'Strength',    icon: 'fitness_center',    color: '#8B5CF6' },
-    flexibility: { label: 'Flexibility', icon: 'self_improvement',  color: '#06b6d4' },
-    sports:      { label: 'Sports',      icon: 'sports_basketball', color: '#f59e0b' }
+    cardio: { label: 'Cardio', icon: 'directions_run', color: '#ef4444' },
+    strength: { label: 'Strength', icon: 'fitness_center', color: '#8B5CF6' },
+    flexibility: { label: 'Flexibility', icon: 'self_improvement', color: '#06b6d4' },
+    sports: { label: 'Sports', icon: 'sports_basketball', color: '#f59e0b' }
   };
 
   categories: FitnessCategory[] = ['cardio', 'strength', 'flexibility', 'sports'];
@@ -65,12 +69,24 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
 
   // ── form MUST be after metMap ──────────────────────────────
   form = this.getEmptyForm();
+  moodOptions = [
+    { value: 'great', emoji: '😄', label: 'Great', color: '#22c55e' },
+    { value: 'good', emoji: '🙂', label: 'Good', color: '#84cc16' },
+    { value: 'okay', emoji: '😐', label: 'Okay', color: '#f59e0b' },
+    { value: 'sad', emoji: '😢', label: 'Sad', color: '#3b82f6' },
+    { value: 'angry', emoji: '😡', label: 'Angry', color: '#ef4444' },
+  ];
+
+  moodScaleDefaults: Record<string, number> = {
+    great: 9, good: 7, okay: 5, sad: 3, angry: 2
+  };
 
   constructor(
     private fitnessService: FitnessService,
+    private moodService: MoodService,
     private el: ElementRef,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadWorkouts();
@@ -224,8 +240,8 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
 
   drawChart() {
     if (typeof d3 === 'undefined') return;
-    if (this.chartView === 'daily')   this.drawDailyChart();
-    if (this.chartView === 'weekly')  this.drawWeeklyChart();
+    if (this.chartView === 'daily') this.drawDailyChart();
+    if (this.chartView === 'weekly') this.drawWeeklyChart();
     if (this.chartView === 'monthly') this.drawMonthlyChart();
   }
 
@@ -269,10 +285,10 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
     const y = d3.scaleLinear().domain([0, maxTotal]).range([iH, 0]);
 
     const colorMap: Record<FitnessCategory, string> = {
-      cardio:      '#ef4444',
-      strength:    '#8B5CF6',
+      cardio: '#ef4444',
+      strength: '#8B5CF6',
       flexibility: '#06b6d4',
-      sports:      '#f59e0b'
+      sports: '#f59e0b'
     };
 
     g.append('g').call(d3.axisLeft(y).ticks(4).tickSize(-iW).tickFormat(''))
@@ -337,10 +353,10 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
     const y = d3.scaleLinear().domain([0, maxDur]).range([iH, 0]);
 
     const colorMap: Record<FitnessCategory, string> = {
-      cardio:      '#ef4444',
-      strength:    '#8B5CF6',
+      cardio: '#ef4444',
+      strength: '#8B5CF6',
       flexibility: '#06b6d4',
-      sports:      '#f59e0b'
+      sports: '#f59e0b'
     };
 
     g.append('g')
@@ -589,6 +605,10 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
           this.closeModal();
           this.prepareChartData();
           setTimeout(() => this.drawChart(), 100);
+          this.postWorkoutTitle = created.title;
+          this.postWorkoutMood = '';
+          this.postWorkoutNote = '';
+          this.showMoodPrompt = true;
         },
         error: (err) => { console.error(err); this.formError = 'Failed to save.'; }
       });
@@ -615,8 +635,8 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
 
   get totalWorkouts(): number { return this.entries.length; }
   get totalCalories(): number { return this.entries.reduce((s, e) => s + e.caloriesBurned + (e.stepsCalories || 0), 0); }
-  get totalMinutes(): number  { return this.entries.reduce((s, e) => s + e.duration, 0); }
-  get avgDuration(): number   { return this.entries.length ? Math.round(this.totalMinutes / this.entries.length) : 0; }
+  get totalMinutes(): number { return this.entries.reduce((s, e) => s + e.duration, 0); }
+  get avgDuration(): number { return this.entries.length ? Math.round(this.totalMinutes / this.entries.length) : 0; }
 
   get thisWeekWorkouts(): number {
     const weekAgo = new Date();
@@ -637,7 +657,7 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   }
 
   getCatColor(cat: FitnessCategory): string { return this.categoryConfig[cat].color; }
-  getCatIcon(cat: FitnessCategory): string  { return this.categoryConfig[cat].icon; }
+  getCatIcon(cat: FitnessCategory): string { return this.categoryConfig[cat].icon; }
   getCatLabel(cat: FitnessCategory): string { return this.categoryConfig[cat].label; }
 
   formatSets(exercise: Exercise): string {
@@ -647,4 +667,33 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   }
 
   trackById(_: number, e: WorkoutEntry) { return e._id; }
+
+  selectPostWorkoutMood(value: string) {
+    this.postWorkoutMood = value;
+  }
+
+  getPostWorkoutMoodColor(): string {
+    return this.moodOptions.find(m => m.value === this.postWorkoutMood)?.color || '#8B5CF6';
+  }
+
+  savePostWorkoutMood() {
+    if (!this.postWorkoutMood) { this.showMoodPrompt = false; return; }
+
+    const scale = this.moodScaleDefaults[this.postWorkoutMood] || 5;
+    const note = this.postWorkoutNote || `After workout: ${this.postWorkoutTitle}`;
+
+    this.moodService.createMood({
+      mood: this.postWorkoutMood,
+      scale,
+      note,
+      datetime: new Date()
+    }).subscribe({
+      next: () => { this.showMoodPrompt = false; },
+      error: () => { this.showMoodPrompt = false; }
+    });
+  }
+
+  skipMoodPrompt() {
+    this.showMoodPrompt = false;
+  }
 }

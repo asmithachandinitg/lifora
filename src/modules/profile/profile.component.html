@@ -21,7 +21,7 @@
 
       <div class="avatar-section">
         <div class="avatar-circle">
-          <img *ngIf="profile.profilePhoto" [src]="profile.profilePhoto" alt="avatar"/>
+          <img *ngIf="profile.profilePhoto" [src]="profile.profilePhoto" alt="avatar" />
           <span *ngIf="!profile.profilePhoto" class="avatar-initials">{{ avatarInitials }}</span>
         </div>
         <div class="avatar-name">{{ profile.firstName }} {{ profile.lastName }}</div>
@@ -114,45 +114,96 @@
         <div class="form-row">
           <div class="form-group">
             <label>First Name</label>
-            <input type="text" [(ngModel)]="profile.firstName" placeholder="First name"/>
+            <input type="text" [(ngModel)]="profile.firstName" placeholder="First name" />
           </div>
           <div class="form-group">
             <label>Last Name</label>
-            <input type="text" [(ngModel)]="profile.lastName" placeholder="Last name"/>
+            <input type="text" [(ngModel)]="profile.lastName" placeholder="Last name" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Email</label>
-            <input type="email" [(ngModel)]="profile.email" placeholder="Email address"/>
+            <input type="email" [(ngModel)]="profile.email" placeholder="Email address" />
           </div>
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input type="tel" [(ngModel)]="profile.phone" placeholder="+91 9999999999"/>
-          </div>
+        <!-- <div class="form-group">
+  <label>Mobile Number</label>
+
+  <div class="phone-input-wrapper">
+
+<ng-select
+  [items]="countryCodes"
+  bindLabel="code"
+  [(ngModel)]="selectedCode"
+  [searchable]="true"
+>
+  <ng-template ng-option-tmp let-item="item">
+    {{ item.name }} ({{ item.code }})
+  </ng-template>
+</ng-select>
+
+    <input
+      type="text"
+      [(ngModel)]="profile.phone"
+      placeholder="Enter phone number"
+      maxlength="10"
+      (input)="allowOnlyNumbers($event)"
+      class="phone-input"
+    />
+
+  </div>
+</div> -->
+
+<div class="form-group">
+  <label>Mobile Number</label>
+  <div class="phone-container">
+<ng-select
+  class="country-code"
+  [items]="countryCodes"
+  bindLabel="name"
+  [(ngModel)]="selectedCode"
+  [searchable]="true"
+  [clearable]="false"
+  appendTo="body"
+>
+  <ng-template ng-option-tmp let-item="item">
+    {{ item.name }} (+{{ item.code }})
+  </ng-template>
+
+  <ng-template ng-label-tmp let-item="item">
+    {{ item?.code }}
+  </ng-template>
+</ng-select>
+
+    <input
+      type="text"
+      class="phone-input"
+      placeholder="Enter phone number"
+      [(ngModel)]="profile.phone"
+      (input)="allowOnlyNumbers($event)"
+    />
+
+  </div>
+</div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Date of Birth</label>
-            <input type="date" [(ngModel)]="profile.dob"/>
+            <input type="date" [(ngModel)]="profile.dob" />
           </div>
           <div class="form-group">
             <label>Age <span class="auto-label">(auto-calculated)</span></label>
-            <input type="number" [value]="calculatedAge" disabled class="disabled-input"/>
+            <input type="number" [value]="calculatedAge" disabled class="disabled-input" />
           </div>
         </div>
 
         <div class="form-group-full">
           <label>Gender</label>
           <div class="gender-selector">
-            <div
-              *ngFor="let g of genderOptions"
-              class="gender-option"
-              [class.selected-gender]="profile.gender === g.value"
-              (click)="profile.gender = g.value"
-            >
+            <div *ngFor="let g of genderOptions" class="gender-option"
+              [class.selected-gender]="profile.gender === g.value" (click)="profile.gender = g.value">
               <span class="gender-symbol">{{ g.icon }}</span>
               <span class="gender-label">{{ g.label }}</span>
             </div>
@@ -165,7 +216,7 @@
 
         <div class="section-label" style="margin-top:8px"><span class="material-icons">location_on</span> Location</div>
 
-        <div class="form-row">
+        <!-- <div class="form-row">
           <div class="form-group">
             <label>Country</label>
             <input type="text" [(ngModel)]="profile.country" placeholder="e.g. India"/>
@@ -179,6 +230,31 @@
           <div class="form-group">
             <label>City</label>
             <input type="text" [(ngModel)]="profile.city" placeholder="e.g. Bangalore"/>
+          </div>
+        </div> -->
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Country</label>
+            <ng-select [items]="countries" bindLabel="name" placeholder="Search or select country"
+              [(ngModel)]="selectedCountry" (change)="onCountryChange($event)" [searchable]="true">
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label>State / Province</label>
+            <ng-select [items]="states" bindLabel="name" placeholder="Search or select State/Province"
+              [(ngModel)]="selectedState" (change)="onStateChange($event)" [searchable]="true" [clearable]="true"
+              [disabled]="!selectedCountry">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <ng-select [items]="cities" bindLabel="name" placeholder="Search or select city" [(ngModel)]="selectedCity"
+              (change)="onCityChange($event)" [searchable]="true" [clearable]="true" [disabled]="!selectedState">
+            </ng-select>
           </div>
         </div>
 
@@ -199,11 +275,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>Weight <span class="unit-label">(kg)</span></label>
-            <input type="number" min="0" [(ngModel)]="profile.weight" placeholder="e.g. 65"/>
+            <input type="number" min="0" [(ngModel)]="profile.weight" placeholder="e.g. 65" />
           </div>
           <div class="form-group">
             <label>Height <span class="unit-label">(cm)</span></label>
-            <input type="number" min="0" [(ngModel)]="profile.height" placeholder="e.g. 165"/>
+            <input type="number" min="0" [(ngModel)]="profile.height" placeholder="e.g. 165" />
           </div>
         </div>
 
@@ -215,8 +291,7 @@
           <div class="bmi-right">
             <div class="bmi-category" [style.color]="bmiCategory.color">{{ bmiCategory.label }}</div>
             <div class="bmi-bar-track">
-              <div class="bmi-bar-fill"
-                [style.background]="bmiCategory.color"
+              <div class="bmi-bar-fill" [style.background]="bmiCategory.color"
                 [style.width.%]="Math.min((calculatedBMI / 40) * 100, 100)">
               </div>
             </div>
@@ -259,13 +334,8 @@
         </p>
 
         <div class="modules-grid">
-          <div
-            class="module-card"
-            *ngFor="let mod of visibleModules"
-            [class.module-enabled]="mod.enabled"
-            [class.module-disabled]="!mod.enabled"
-            (click)="toggleModule(mod)"
-          >
+          <div class="module-card" *ngFor="let mod of visibleModules" [class.module-enabled]="mod.enabled"
+            [class.module-disabled]="!mod.enabled" (click)="toggleModule(mod)">
             <div class="module-icon-wrap" [class.icon-enabled]="mod.enabled">
               <span class="material-icons">{{ mod.icon }}</span>
             </div>
@@ -300,7 +370,8 @@
         <div class="form-group-full">
           <label>Current Password</label>
           <div class="pwd-wrap">
-            <input [type]="showCurrentPwd ? 'text' : 'password'" [(ngModel)]="currentPassword" placeholder="Enter current password"/>
+            <input [type]="showCurrentPwd ? 'text' : 'password'" [(ngModel)]="currentPassword"
+              placeholder="Enter current password" />
             <span class="material-icons pwd-eye" (click)="showCurrentPwd = !showCurrentPwd">
               {{ showCurrentPwd ? 'visibility_off' : 'visibility' }}
             </span>
@@ -310,7 +381,8 @@
         <div class="form-group-full">
           <label>New Password</label>
           <div class="pwd-wrap">
-            <input [type]="showNewPwd ? 'text' : 'password'" [(ngModel)]="newPassword" placeholder="Minimum 6 characters"/>
+            <input [type]="showNewPwd ? 'text' : 'password'" [(ngModel)]="newPassword"
+              placeholder="Minimum 6 characters" />
             <span class="material-icons pwd-eye" (click)="showNewPwd = !showNewPwd">
               {{ showNewPwd ? 'visibility_off' : 'visibility' }}
             </span>
@@ -333,7 +405,8 @@
         <div class="form-group-full">
           <label>Confirm New Password</label>
           <div class="pwd-wrap">
-            <input [type]="showConfirmPwd ? 'text' : 'password'" [(ngModel)]="confirmPassword" placeholder="Repeat new password"/>
+            <input [type]="showConfirmPwd ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+              placeholder="Repeat new password" />
             <span class="material-icons pwd-eye" (click)="showConfirmPwd = !showConfirmPwd">
               {{ showConfirmPwd ? 'visibility_off' : 'visibility' }}
             </span>

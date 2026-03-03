@@ -20,9 +20,9 @@ export class ExpenseService {
   getExpenses(): Observable<any[]> {
     return this.http.get<any[]>(this.base, this.headers());
   }
-  createExpense(data: any): Observable<any> {
-    return this.http.post<any>(this.base, data, this.headers());
-  }
+createExpense(data: any): Observable<{ expense: any; budgetAlert: any }> {
+  return this.http.post<{ expense: any; budgetAlert: any }>(this.base, data, this.headers());
+}
   updateExpense(id: string, data: any): Observable<any> {
     return this.http.put<any>(`${this.base}/${id}`, data, this.headers());
   }
@@ -68,4 +68,9 @@ export class ExpenseService {
   deleteCategory(id: string): Observable<any> {
     return this.http.delete<any>(`${this.base}/categories/${id}`, this.headers());
   }
+  getBudgetStatus(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.base}/budgets/status`, this.headers());
+}
+
+
 }

@@ -13,6 +13,7 @@ export interface UserProfile {
   lastName: string;
   email: string;
   phone: string;
+  phoneCode: string;
   gender: Gender;
   dob: string;
   age?: number;
@@ -27,3 +28,5 @@ export interface UserProfile {
   createdAt?: string;
   updatedAt?: string;
 }
+
+

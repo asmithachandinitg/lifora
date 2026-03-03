@@ -960,3 +960,121 @@
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .chart-toggle button { padding: 5px 8px; font-size: 12px; }
 }
+
+.mood-prompt-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: slideUp 0.3s ease;
+}
+
+.mpm-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.mpm-icon {
+  font-size: 32px;
+  color: #8B5CF6;
+}
+
+.mpm-header h3 {
+  margin: 0 0 2px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.mpm-header p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.mpm-moods {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.mpm-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: 0.2s;
+  min-width: 64px;
+}
+
+.mpm-option:hover { transform: translateY(-2px); }
+.mpm-option.selected { transform: translateY(-3px); }
+
+.mpm-emoji { font-size: 26px; }
+
+.mpm-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.mpm-note {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.2s;
+}
+
+.mpm-note:focus { border-color: #8B5CF6; }
+
+.mpm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.mpm-skip {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mpm-skip:hover { background: #e5e7eb; }
+
+.mpm-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mpm-save:disabled { opacity: 0.4; cursor: default; }
+.mpm-save .material-icons { font-size: 16px; }

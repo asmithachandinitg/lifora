@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Goal, GoalStatus, GoalPriority, GoalCategory, Milestone } from './goals.model';
 import { GoalsService } from './goals.service';
+import { Router } from '@angular/router';
+import { ModuleLinkService } from '../../shared/module-link.service';
 
 @Component({
   selector: 'app-goals',
@@ -83,7 +85,18 @@ dropdownOpen = false;
     'completed': 'Completed'
   };
 
-  constructor(private goalsService: GoalsService) {}
+  goalToHabitCategory: Record<string, string> = {
+  personal:  'personal',
+  career:    'work',
+  health:    'health',
+  finance:   'finance',
+  education: 'learning',
+  other:     'personal'
+};
+
+  constructor(private goalsService: GoalsService,
+    private moduleLinkService: ModuleLinkService,
+    private router: Router) { }
 
   ngOnInit() {
     this.loadGoals();
@@ -404,5 +417,19 @@ selectCategory(cat: GoalCategory | 'all', event: Event) {
   this.activeCategory = cat;
   this.setCategoryFilter(cat);
   this.dropdownOpen = false;
+}
+
+createHabitFromGoal(goal: Goal, event: Event) {
+  event.stopPropagation();
+  this.moduleLinkService.setGoalLink({
+    goalId:    goal._id!,
+    goalTitle: goal.title,
+    category:  this.goalToHabitCategory[goal.category] || 'personal'
+  });
+  this.router.navigate(['/habits']);
+}
+
+getLinkedHabitCount(goal: Goal): number {
+  return goal.linkedHabitIds?.length || 0;
 }
 }
