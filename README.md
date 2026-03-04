@@ -1,142 +1,138 @@
-# 🌸 Lifora – Personal Life Management App
+# lifora
 
-Lifora is a modular full-stack personal life management application built with Angular.  
-It brings multiple life trackers into one unified platform to help manage productivity, health, finances, and personal growth.
+Personal life management app built with Angular. One place to track everything — health, habits, finances, journaling, travel, and more.
+
+Backend: [github.com/asmithachandinitg/lifora-backend](https://github.com/asmithachandinitg/lifora-backend)
 
 ---
 
-## ✨ Modules
+## What's inside
 
-Lifora currently includes:
-
-### 📊 Productivity
+### Productivity
 - Dashboard
 - Tasks
 - Habits
 - Goals
 
-### 🏥 Health
-- Food Tracker
+### Health
 - Fitness Tracker
+- Food Tracker
 - Sleep Tracker
 - Mood Tracker
 - Period Tracker
+- Pregnancy Tracker
 - Medicine Tracker
 
-### 💰 Finance
+### Finance
 - Expenses Tracker
 
-### 📚 Growth & Lifestyle
-- Diary / Journal
+### Personal
+- Diary / Journal (rich text with Quill)
 - Reading Tracker
-- Knowledge Tracker
-- Vision Board
+- Profile
+- Settings
+
+### Lifestyle
 - Travel
-- Relationships
 
-More modules will be added as the product evolves.
-
----
-
-## 🚀 Features
-
-- Modular feature-based architecture
-- Rich text journaling with Quill editor
-- Mood-based dynamic UI styling
-- Custom confirmation modals
-- Date-based sorting
-- Responsive grid layout
-- Local draft auto-save
-- REST API integration
+More modules will be added over time.
 
 ---
 
-## 🛠 Tech Stack
+## Tech
 
-### Frontend
-- Angular (Standalone Components)
-- TypeScript
-- Angular Forms
-- ngx-quill
-- Responsive CSS
+- **Angular** (standalone components)
+- **TypeScript**
+- **Angular Forms**
+- **ngx-quill** — rich text editor for the journal
+- **CSS** — custom styles per component, no UI library
 
-### Backend (Separate Repository)
-- Node.js
-- Express.js
-- MongoDB
-- REST API Architecture
+Communicates with the backend via Angular's HttpClient.
 
 ---
 
-## 📂 Project Structure
+## Running locally
 
-```
-lifora/
-│
-├── src/
-│   ├── app/
-│   │   ├── diary/
-│   │   ├── tasks/
-│   │   ├── habits/
-│   │   ├── goals/
-│   │   ├── expenses/
-│   │   └── ...
-│   │
-│   └── services/
-│
-├── angular.json
-├── package.json
-└── README.md
-```
-
----
-
-## ⚙️ Installation
-
-Clone the repository:
+You'll need Node.js and the Angular CLI installed.
 
 ```bash
 git clone https://github.com/asmithachandinitg/lifora.git
 cd lifora
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Run the development server:
-
-```bash
 ng serve
 ```
 
-Open in browser:
+Open `http://localhost:4200` in your browser.
+
+Make sure the backend is running on `http://localhost:5000` for API calls to work.
+
+---
+
+## Project structure
 
 ```
-http://localhost:4200
+lifora/
+├── src/
+│   ├── app/                   # root app component
+│   ├── core/                  # core services, guards, interceptors
+│   ├── layout/                # shared layout (navbar, sidebar, etc.)
+│   ├── modules/               # feature modules
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   ├── diary/
+│   │   ├── expenses/
+│   │   ├── fitness/
+│   │   │   ├── fitness.component.ts
+│   │   │   ├── fitness.component.html
+│   │   │   ├── fitness.component.css
+│   │   │   ├── fitness.model.ts
+│   │   │   └── fitness.service.ts
+│   │   ├── food/
+│   │   ├── goals/
+│   │   ├── habits/
+│   │   ├── medicine/
+│   │   ├── mood/
+│   │   ├── period/
+│   │   ├── pregnancy/
+│   │   ├── profile/
+│   │   ├── reading/
+│   │   ├── settings/
+│   │   ├── sleep/
+│   │   ├── tasks/
+│   │   └── travel/
+│   ├── shared/                # shared components and utilities
+│   ├── types/                 # TypeScript type definitions
+│   │   └── country-telephone-data.d.ts
+│   ├── index.html
+│   ├── main.ts
+│   └── styles.css
+├── angular.json
+├── tsconfig.json
+└── package.json
 ```
 
----
-
-## 🔮 Future Enhancements
-
-- Authentication & User Profiles
-- Analytics Dashboard
-- Dark Mode
-- Cloud Deployment
-- PWA Support
-- Data Visualization
+Each module follows the same pattern — a component (`.ts`, `.html`, `.css`), a model (`.model.ts`), and a service (`.service.ts`) that handles the API calls.
 
 ---
 
-## 👩‍💻 Author
+## Build
 
-Asmitha Chandini T G  
+```bash
+ng build
+```
+
+Output goes to `dist/`.
 
 ---
 
-## 📌 Purpose
+## Notes
 
-This project is being developed as a scalable personal life management system and portfolio application.
+- This is actively being developed — some modules may be more complete than others
+- Auth module exists in the frontend but full login/register flow may still be in progress
+- This is a portfolio project
+
+---
+
+## Author
+
+Asmitha Chandini T G
