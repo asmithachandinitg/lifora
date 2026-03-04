@@ -1,0 +1,265 @@
+<!-- src/modules/knowledge/knowledge.component.html -->
+<div class="knowledge-wrapper">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1><span class="material-icons">psychology</span> Knowledge Base</h1>
+      <p>Everything you've learned, in one place.</p>
+    </div>
+    <button class="btn-primary" (click)="openAdd()">
+      <span class="material-icons">add</span> Add Entry
+    </button>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-pill">
+      <span class="material-icons">library_books</span>
+      <span>{{ totalEntries }} entries</span>
+    </div>
+    <div class="stat-pill">
+      <span class="material-icons">label</span>
+      <span>{{ totalTags }} unique tags</span>
+    </div>
+  </div>
+
+  <!-- SEARCH + FILTERS -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        placeholder="Search title, notes, tags, source..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="applyFilters()"
+      />
+    </div>
+
+    <div class="filter-chips">
+      <button
+        *ngFor="let cat of categories"
+        class="chip"
+        [class.active]="activeCategory === cat.value"
+        (click)="activeCategory = cat.value; applyFilters()"
+      >
+        <span class="material-icons" [style.color]="cat.color">{{ cat.icon }}</span>
+        {{ cat.label }}
+      </button>
+    </div>
+
+    <div class="source-tabs">
+      <button
+        class="source-tab"
+        [class.active]="activeSource === 'all'"
+        (click)="activeSource = 'all'; applyFilters()"
+      >All</button>
+      <button
+        *ngFor="let s of sourceTypes"
+        class="source-tab"
+        [class.active]="activeSource === s.value"
+        (click)="activeSource = s.value; applyFilters()"
+      >
+        <span class="material-icons">{{ s.icon }}</span>
+        {{ s.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="empty-state">
+    <span class="material-icons">hourglass_empty</span>
+    <p>Loading...</p>
+  </div>
+
+  <!-- EMPTY -->
+  <div *ngIf="!loading && !filtered.length" class="empty-state">
+    <span class="material-icons">psychology</span>
+    <p>No entries found. Start adding what you learn!</p>
+    <button class="btn-primary" (click)="openAdd()">Add your first entry</button>
+  </div>
+
+  <!-- ENTRIES GRID -->
+  <div class="entries-grid" *ngIf="!loading && filtered.length">
+    <div class="entry-card" *ngFor="let entry of filtered">
+
+      <!-- CARD HEADER -->
+      <div class="card-top">
+        <div class="cat-badge" [style.background]="getCategoryConfig(entry.category).color + '18'" [style.color]="getCategoryConfig(entry.category).color">
+          <span class="material-icons">{{ getCategoryConfig(entry.category).icon }}</span>
+          {{ getCategoryConfig(entry.category).label }}
+        </div>
+        <div class="source-badge">
+          <span class="material-icons">{{ getSourceConfig(entry.sourceType).icon }}</span>
+          {{ getSourceConfig(entry.sourceType).label }}
+        </div>
+      </div>
+
+      <!-- TITLE + SOURCE -->
+      <h3 class="entry-title">{{ entry.title }}</h3>
+      <p class="entry-source" *ngIf="entry.source">{{ entry.source }}</p>
+
+      <!-- RATING -->
+      <div class="rating" *ngIf="entry.rating">
+        <span *ngFor="let s of stars(entry.rating); let i = index"
+          class="material-icons star"
+          [class.filled]="i < entry.rating!">
+          star
+        </span>
+      </div>
+
+      <!-- NOTES -->
+      <p class="entry-notes" *ngIf="entry.notes">{{ entry.notes }}</p>
+
+      <!-- KEY TAKEAWAYS -->
+      <ul class="takeaways" *ngIf="entry.keyTakeaways?.length">
+        <li *ngFor="let t of entry.keyTakeaways">{{ t }}</li>
+      </ul>
+
+      <!-- TAGS -->
+      <div class="tags" *ngIf="entry.tags?.length">
+        <span class="tag" *ngFor="let tag of entry.tags">#{{ tag }}</span>
+      </div>
+
+      <!-- CARD FOOTER -->
+      <div class="card-footer">
+        <span class="entry-date">{{ entry.date | date:'dd MMM yyyy' }}</span>
+        <div class="card-actions">
+          <button class="icon-btn edit" (click)="openEdit(entry)">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="icon-btn delete" (click)="confirmDelete(entry._id!)">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT FORM MODAL -->
+  <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingId ? 'Edit Entry' : 'New Entry' }}</h2>
+        <button class="close-btn" (click)="closeForm()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- TITLE -->
+        <div class="field">
+          <label>Title *</label>
+          <input [(ngModel)]="form.title" placeholder="What did you learn?" />
+        </div>
+
+        <!-- CATEGORY + SOURCE TYPE -->
+        <div class="field-row">
+          <div class="field">
+            <label>Category</label>
+            <select [(ngModel)]="form.category">
+              <option *ngFor="let c of categories.slice(1)" [value]="c.value">{{ c.label }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Source Type</label>
+            <select [(ngModel)]="form.sourceType">
+              <option *ngFor="let s of sourceTypes" [value]="s.value">{{ s.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- SOURCE NAME -->
+        <div class="field">
+          <label>Source Name</label>
+          <input [(ngModel)]="form.source" placeholder="e.g. Atomic Habits, Coursera, YouTube..." />
+        </div>
+
+        <!-- DATE + RATING -->
+        <div class="field-row">
+          <div class="field">
+            <label>Date</label>
+            <input type="date" [(ngModel)]="form.date" />
+          </div>
+          <div class="field">
+            <label>Rating (1–5)</label>
+            <div class="star-input">
+              <span
+                *ngFor="let s of [1,2,3,4,5]"
+                class="material-icons star-btn"
+                [class.filled]="form.rating !== null && s <= form.rating!"
+                (click)="form.rating = s"
+              >star</span>
+              <span class="clear-rating" *ngIf="form.rating" (click)="form.rating = null">✕</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="field">
+          <label>Notes</label>
+          <textarea [(ngModel)]="form.notes" rows="4" placeholder="Your thoughts, summary, key ideas..."></textarea>
+        </div>
+
+        <!-- KEY TAKEAWAYS -->
+        <div class="field">
+          <label>Key Takeaways</label>
+          <div class="takeaway-inputs">
+            <div class="takeaway-row" *ngFor="let t of form.keyTakeaways; let i = index; trackBy: trackTakeaway">
+              <input
+                [(ngModel)]="form.keyTakeaways![i]"
+                placeholder="Takeaway {{ i + 1 }}"
+              />
+              <button class="remove-btn" (click)="removeTakeaway(i)">
+                <span class="material-icons">remove_circle</span>
+              </button>
+            </div>
+            <button class="add-takeaway-btn" (click)="addTakeaway()">
+              <span class="material-icons">add_circle</span> Add takeaway
+            </button>
+          </div>
+        </div>
+
+        <!-- TAGS -->
+        <div class="field">
+          <label>Tags</label>
+          <div class="tag-input-wrap">
+            <div class="tag-pills">
+              <span class="tag" *ngFor="let tag of form.tags">
+                #{{ tag }}
+                <span class="remove-tag" (click)="removeTag(tag)">×</span>
+              </span>
+            </div>
+            <input
+              [(ngModel)]="tagInput"
+              placeholder="Type a tag and press Enter"
+              (keydown)="onTagKeydown($event)"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeForm()">Cancel</button>
+        <button class="btn-primary" (click)="save()">
+          {{ editingId ? 'Update' : 'Save Entry' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div class="modal-overlay" *ngIf="confirmDeleteId" (click)="cancelDelete()">
+    <div class="confirm-modal" (click)="$event.stopPropagation()">
+      <span class="material-icons confirm-icon">delete_forever</span>
+      <h3>Delete this entry?</h3>
+      <p>This can't be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-danger" (click)="delete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+</div>

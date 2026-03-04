@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
 export class DashboardService {
   private base = 'http://localhost:5000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getHabitSummary(): Observable<any> {
     return this.http.get(`${this.base}/habits`).pipe(catchError(() => of([])));
@@ -27,5 +27,13 @@ export class DashboardService {
 
   getTasksSummary(): Observable<any> {
     return this.http.get(`${this.base}/tasks`).pipe(catchError(() => of([])));
+  }
+
+  getGoalsSummary(): Observable<any> {
+    return this.http.get(`${this.base}/goals`).pipe(catchError(() => of([])));
+  }
+
+  getDiarySummary(): Observable<any> {
+    return this.http.get(`${this.base}/diary`).pipe(catchError(() => of([])));
   }
 }

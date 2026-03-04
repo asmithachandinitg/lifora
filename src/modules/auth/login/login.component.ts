@@ -1,8 +1,15 @@
+// src/modules/auth/login/login.component.ts
+// Changes from original:
+// - uses LoadingService instead of local `loading` boolean
+// - button is disabled while request is in flight
+// - no other logic changed
+
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +17,6 @@ import { AuthService } from '../../../core/auth/auth.service';
   imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
-
 })
 export class LoginComponent {
 
@@ -18,21 +24,19 @@ export class LoginComponent {
   password = '';
   submitted = false;
   showPassword = false;
-  emailPattern =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   loginError = '';
-  loading = false;
   showForgot = false;
   forgotEmail = '';
   forgotMsg = '';
 
   constructor(
     private auth: AuthService,
-    private router: Router
-  ) { }
+    private router: Router,
+    public loading: LoadingService  // public so template can access loading$
+  ) {}
 
   loginUser() {
-
     this.submitted = true;
     this.loginError = '';
 
@@ -44,42 +48,23 @@ export class LoginComponent {
       return;
     }
 
-    const payload = {
-      email: this.email,
-      password: this.password
-    };
-
-    this.auth.login(payload)
+    this.auth.login({ email: this.email, password: this.password })
       .subscribe({
-
         next: (res: any) => {
-
           this.auth.saveToken(res.token);
-
-          this.auth.loadUser()
-            .subscribe(() => {
-              this.router.navigate(['/']);
-            });
-
+          this.auth.loadUser().subscribe(() => {
+            this.router.navigate(['/']);
+          });
         },
-
         error: err => {
-
           this.loginError =
-            err?.error?.message ||
-            'Invalid email or password';
-
-          setTimeout(() => {
-            this.loginError = '';
-          }, 5000);
-
+            err?.error?.message || 'Invalid email or password';
+          setTimeout(() => { this.loginError = ''; }, 5000);
         }
-
       });
   }
 
   clearError() {
     this.loginError = '';
   }
-
 }

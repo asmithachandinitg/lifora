@@ -8,6 +8,37 @@
     </button>
   </div>
 
+  <div class="view-tabs" *ngIf="!showForm">
+    <button class="view-tab" [class.active]="activeView === 'entries'" (click)="switchView('entries')">
+      <span class="material-icons">grid_view</span> Entries
+    </button>
+    <button class="view-tab" [class.active]="activeView === 'insights'" (click)="switchView('insights')">
+      <span class="material-icons">insights</span> Mood Insights
+    </button>
+  </div>
+
+  <div *ngIf="!showForm && activeView === 'entries'">
+
+    <div class="search-bar">
+      <span class="material-icons search-icon">search</span>
+      <input type="text" placeholder="Search entries by title, content, mood..." [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()" class="search-input" />
+      <button class="clear-search-btn" *ngIf="searchQuery" (click)="clearSearch()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="search-result-count" *ngIf="searchQuery">
+      {{ filteredEntries.length }} result{{ filteredEntries.length !== 1 ? 's' : '' }} for "{{ searchQuery }}"
+    </div>
+
+    <div class="diary-empty" *ngIf="filteredEntries.length === 0 && searchQuery">
+      <span class="material-icons">search_off</span>
+      <p>No entries match "{{ searchQuery }}"</p>
+    </div>
+
+  </div>
+
   <!-- FORM -->
   <div class="entry-form" *ngIf="showForm" [ngClass]="mood">
 
@@ -24,15 +55,14 @@
     <div class="field">
       <label>Title <span class="required">*</span></label>
       <input class="title-input" placeholder="Entry Title" [(ngModel)]="title"
-             [ngClass]="{ 'invalid': submitted && !title }" />
+        [ngClass]="{ 'invalid': submitted && !title }" />
       <div class="error" *ngIf="submitted && !title">Title is required</div>
     </div>
 
     <!-- DATE -->
     <div class="field">
       <label>Date <span class="required">*</span></label>
-      <input type="date" [(ngModel)]="entryDate"
-             [ngClass]="{ 'invalid': submitted && !entryDate }" />
+      <input type="date" [(ngModel)]="entryDate" [ngClass]="{ 'invalid': submitted && !entryDate }" />
       <div class="error" *ngIf="submitted && !entryDate">Date is required</div>
     </div>
 
@@ -63,8 +93,7 @@
     <div class="field">
       <label>Content <span class="required">*</span></label>
       <quill-editor [(ngModel)]="content" [modules]="quillModules" class="editor"
-                    [ngClass]="{ 'invalid': submitted && isContentEmpty() }"
-                    (onContentChanged)="onContentChange()"></quill-editor>
+        [ngClass]="{ 'invalid': submitted && isContentEmpty() }" (onContentChanged)="onContentChange()"></quill-editor>
       <div class="error" *ngIf="submitted && isContentEmpty()">Content is required</div>
     </div>
 
@@ -76,10 +105,7 @@
 
   <!-- ENTRIES LIST -->
   <div class="entries" *ngIf="!showForm">
-    <div class="entry-card"
-         *ngFor="let entry of entries"
-         [ngClass]="entry.mood"
-         (click)="editEntry(entry)">
+    <div class="entry-card" *ngFor="let entry of filteredEntries" [ngClass]="entry.mood" (click)="editEntry(entry)">
 
       <div class="delete-wrapper">
         <button class="delete-btn" (click)="openDeleteModal(entry._id); $event.stopPropagation()">
@@ -96,12 +122,87 @@
 
       <!-- ✈ Travel link badge on card -->
       <div class="travel-badge" *ngIf="entry.linkedTripName"
-           (click)="goToTravel(entry.linkedTripId); $event.stopPropagation()">
+        (click)="goToTravel(entry.linkedTripId); $event.stopPropagation()">
         <span class="material-icons">flight_takeoff</span>
         {{ entry.linkedTripName }}
       </div>
 
       <div class="preview" [innerHTML]="entry.content"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!showForm && activeView === 'insights'" class="insights-view">
+
+    <div class="diary-empty" *ngIf="entries.length === 0">
+      <span class="material-icons">insights</span>
+      <p>No entries yet to analyze</p>
+    </div>
+<br>
+    <div *ngIf="entries.length > 0">
+
+      <!-- Mood Frequency Breakdown -->
+      <div class="mood-insight-card">
+        <div class="mic-header">
+          <span class="material-icons" style="color:#8B5CF6">pie_chart</span>
+          <h3>Overall Mood Distribution</h3>
+          <span class="mic-badge">{{ entries.length }} entries</span>
+        </div>
+        <div class="mood-breakdown">
+          <div *ngFor="let m of moodCounts" class="mood-breakdown-row">
+            <span class="mbd-emoji">{{ m.emoji }}</span>
+            <span class="mbd-label">{{ m.mood | titlecase }}</span>
+            <div class="mbd-bar-track">
+              <div class="mbd-bar-fill" [style.width]="m.pct + '%'" [style.background]="m.color"></div>
+            </div>
+            <span class="mbd-pct" [style.color]="m.color">{{ m.pct }}%</span>
+            <span class="mbd-count">({{ m.count }})</span>
+          </div>
+        </div>
+      </div>
+<br>
+      <!-- Mood Timeline -->
+      <div class="mood-insight-card" *ngIf="moodChartData.length > 0">
+        <div class="mic-header">
+          <span class="material-icons" style="color:#6366f1">timeline</span>
+          <h3>Mood Timeline</h3>
+          <span class="mic-badge">last {{ moodChartData.length }} entries</span>
+        </div>
+        <div class="mood-timeline">
+          <div *ngFor="let point of moodChartData" class="timeline-point">
+            <div class="tl-bar-wrap">
+              <div class="tl-bar" [style.height]="getBarHeight(point.mood) + '%'" [style.background]="point.color"
+                [title]="point.mood + ' — ' + formatChartDate(point.date)">
+              </div>
+            </div>
+            <span class="tl-emoji">{{ point.emoji }}</span>
+            <span class="tl-date">{{ formatChartDate(point.date) }}</span>
+          </div>
+        </div>
+        <div class="tl-legend">
+          <div *ngFor="let m of moodCounts" class="tl-legend-item">
+            <span class="tl-dot" [style.background]="m.color"></span>
+            <span>{{ m.emoji }} {{ m.mood | titlecase }}</span>
+          </div>
+        </div>
+      </div>
+<br>
+      <!-- Quick Stats -->
+      <div class="mood-stats-row">
+        <div class="mood-stat-card">
+          <span class="msc-val">{{ entries.length }}</span>
+          <span class="msc-label">Total Entries</span>
+        </div>
+        <div class="mood-stat-card" *ngIf="moodCounts[0]">
+          <span class="msc-val">{{ moodCounts[0].emoji }}</span>
+          <span class="msc-label">Most Common Mood</span>
+          <span class="msc-sub" [style.color]="moodCounts[0].color">{{ moodCounts[0].mood | titlecase }}</span>
+        </div>
+        <div class="mood-stat-card">
+          <span class="msc-val">{{ moodCounts.length }}</span>
+          <span class="msc-label">Moods Expressed</span>
+        </div>
+      </div>
+
     </div>
   </div>
 

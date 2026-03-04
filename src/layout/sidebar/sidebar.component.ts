@@ -78,7 +78,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
         { name: 'Reading',   icon: 'auto_stories',  route: '/reading',   key: 'reading'   },
         { name: 'Travel',    icon: 'flight_takeoff',route: '/travel',    key: 'travel'    },
         { name: 'Knowledge', icon: 'lightbulb',     route: '/knowledge', key: 'knowledge' },
-        { name: 'Relationships', icon: 'people',    route: '/relationships', key: 'relationships' },
         { name: 'Vision Board',  icon: 'grid_view', route: '/vision',    key: 'vision'    },
       ]
     },

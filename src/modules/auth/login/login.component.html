@@ -1,131 +1,69 @@
-<div class="auth-page">
+<!-- src/modules/auth/login/login.component.html -->
+<!-- Only change from original: button shows spinner and is disabled while loading -->
 
+<div class="auth-page">
   <div class="auth-card">
 
     <h2>Login 💜</h2>
 
-<div
-  class="form-error"
-  *ngIf="loginError"
->
-  {{ loginError }} ❌
-</div>
+    <div class="form-error" *ngIf="loginError">
+      {{ loginError }} ❌
+    </div>
 
-
-    <!-- ===================== -->
     <!-- EMAIL -->
-    <!-- ===================== -->
-
     <div class="field">
-
-      <small
-        class="error-text"
-        *ngIf="!email && submitted"
-      >
+      <small class="error-text" *ngIf="!email && submitted">
         Enter email
       </small>
-
-      <small
-        class="error-text"
-        *ngIf="
-          email &&
-          !emailPattern.test(email)
-        "
-      >
+      <small class="error-text" *ngIf="email && !emailPattern.test(email)">
         Invalid email format
       </small>
-
       <input
         placeholder="Email Address *"
         [(ngModel)]="email"
         type="email"
-        [class.error]="
-          (!email && submitted) ||
-          (email &&
-           !emailPattern.test(email))
-        "
+        [class.error]="(!email && submitted) || (email && !emailPattern.test(email))"
         (ngModelChange)="clearError()"
       />
-
     </div>
 
-
-
-    <!-- ===================== -->
     <!-- PASSWORD -->
-    <!-- ===================== -->
-
     <div class="field">
-
-      <small
-        class="error-text"
-        *ngIf="!password && submitted"
-      >
+      <small class="error-text" *ngIf="!password && submitted">
         Enter password
       </small>
-
       <div class="input-wrapper">
-
         <input
-          [type]="
-            showPassword
-              ? 'text'
-              : 'password'
-          "
+          [type]="showPassword ? 'text' : 'password'"
           placeholder="Password *"
           [(ngModel)]="password"
-          [class.error]="
-            !password && submitted
-          "
+          [class.error]="!password && submitted"
           (ngModelChange)="clearError()"
         />
-
-        <span
-          class="material-icons eye"
-          (click)="
-            showPassword =
-            !showPassword
-          "
-        >
-          {{ showPassword
-             ? 'visibility'
-             : 'visibility_off' }}
+        <span class="material-icons eye" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'visibility' : 'visibility_off' }}
         </span>
-
       </div>
-
     </div>
 
-
-
-    <!-- ===================== -->
-    <!-- LOGIN BUTTON -->
-    <!-- ===================== -->
-
-    <button (click)="loginUser()">
-      Login
+    <!-- LOGIN BUTTON — disabled + spinner while loading -->
+    <button
+      (click)="loginUser()"
+      [disabled]="loading.loading$ | async"
+      [class.btn-loading]="loading.loading$ | async"
+    >
+      <span *ngIf="!(loading.loading$ | async)">Login</span>
+      <span *ngIf="loading.loading$ | async" class="btn-spinner"></span>
     </button>
 
-
-
-    <!-- ===================== -->
-    <!-- REGISTER LINK -->
-    <!-- ===================== -->
-
     <small>
-      Don’t have an account?
-      <a routerLink="/register">
-        Register
-      </a>
+      Don't have an account?
+      <a routerLink="/register">Register</a>
     </small>
 
     <small class="forgot-link">
-  <a>
-    Forgot Password?
-  </a>
-</small>
+      <a>Forgot Password?</a>
+    </small>
 
   </div>
-
-
 </div>

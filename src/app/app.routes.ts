@@ -26,6 +26,8 @@ export const routes: Routes = [
       { path: 'travel',    canActivate: [moduleGuard], loadComponent: () => import('../modules/travel/travel.component').then(m => m.TravelComponent) },
       { path: 'reading',   canActivate: [moduleGuard], loadComponent: () => import('../modules/reading/reading.component').then(m => m.ReadingComponent) },
       { path: 'pregnancy', canActivate: [moduleGuard], loadComponent: () => import('../modules/pregnancy/pregnancy.component').then(m => m.PregnancyComponent) },
+      { path: 'knowledge',   canActivate: [moduleGuard], loadComponent: () => import('../modules/knowledge/knowledge.component').then(m => m.KnowledgeComponent) },
+      { path: 'vision', canActivate: [moduleGuard], loadComponent: () => import('../modules/visionboard/visionboard.component').then(m => m.VisionboardComponent) },
 
       { path: 'profile',   loadComponent: () => import('../modules/profile/profile.component').then(m => m.ProfileComponent) },
       { path: 'settings',  loadComponent: () => import('../modules/settings/settings.component').then(m => m.SettingsComponent) },

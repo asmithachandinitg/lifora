@@ -39,8 +39,24 @@ export class DiaryComponent implements OnInit {
     ]
   };
 
+    filteredEntries: any[] = [];
+  searchQuery      = '';
+  activeView: 'entries' | 'insights' = 'entries';
   showDeleteModal = false;
   deleteId: string | null = null;
+
+   moodChartData: { date: string; mood: string; emoji: string; color: string }[] = [];
+  moodCounts:    { mood: string; emoji: string; color: string; count: number; pct: number }[] = [];
+
+  moodEmojis: Record<string, string> = {
+    happy: '😄', excited: '🤩', neutral: '😐', sad: '😢', angry: '😡'
+  };
+
+  moodColorMap: Record<string, string> = {
+    happy: '#22c55e', excited: '#f59e0b', neutral: '#6b7280', sad: '#3b82f6', angry: '#ef4444'
+  };
+
+  moodOrder: Record<string, number> = { happy: 5, excited: 4, neutral: 3, sad: 2, angry: 1 };
 
   constructor(
     private diaryService: DiaryService,
@@ -82,6 +98,8 @@ export class DiaryComponent implements OnInit {
       this.entries = [...res].sort(
         (a, b) => new Date(a.entryDate).getTime() - new Date(b.entryDate).getTime()
       );
+          this.applySearch();
+    this.buildMoodChart();
     });
   }
 
@@ -219,5 +237,56 @@ export class DiaryComponent implements OnInit {
   @HostListener('document:keydown.escape')
   handleEscape() {
     if (this.showDeleteModal) this.closeDeleteModal();
+  }
+
+  switchView(v: 'entries' | 'insights') { this.activeView = v; }
+
+  onSearchChange() { this.applySearch(); }
+
+  applySearch() {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) { this.filteredEntries = [...this.entries]; return; }
+    this.filteredEntries = this.entries.filter(e =>
+      e.title?.toLowerCase().includes(q)         ||
+      e.content?.toLowerCase().includes(q)       ||
+      e.mood?.toLowerCase().includes(q)          ||
+      e.linkedTripName?.toLowerCase().includes(q)
+    );
+  }
+
+  clearSearch() { this.searchQuery = ''; this.applySearch(); }
+
+  buildMoodChart() {
+    // Timeline — last 30 entries sorted oldest→newest
+    const sorted = [...this.entries]
+      .sort((a, b) => new Date(a.entryDate).getTime() - new Date(b.entryDate).getTime())
+      .slice(-30);
+
+    this.moodChartData = sorted.map(e => ({
+      date:  e.entryDate?.slice(0, 10) || '',
+      mood:  e.mood,
+      emoji: this.moodEmojis[e.mood]    || '😐',
+      color: this.moodColorMap[e.mood]  || '#6b7280',
+    }));
+
+    // Frequency breakdown
+    const counts: Record<string, number> = {};
+    this.entries.forEach(e => { if (e.mood) counts[e.mood] = (counts[e.mood] || 0) + 1; });
+    const total = this.entries.length || 1;
+    this.moodCounts = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([mood, count]) => ({
+        mood, emoji: this.moodEmojis[mood] || '😐',
+        color: this.moodColorMap[mood]      || '#6b7280',
+        count, pct: Math.round((count / total) * 100)
+      }));
+  }
+
+  getBarHeight(mood: string): number {
+    return ((this.moodOrder[mood] || 3) / 5) * 100;
+  }
+
+  formatChartDate(d: string): string {
+    return new Date(d).toLocaleDateString('en', { day: 'numeric', month: 'short' });
   }
 }

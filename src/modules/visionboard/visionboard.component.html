@@ -1,0 +1,252 @@
+<!-- src/modules/visionboard/visionboard.component.html -->
+<div class="vision-wrapper">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1><span class="material-icons">auto_awesome</span> Vision Board</h1>
+      <p>Visualise your dreams. Make them real.</p>
+    </div>
+    <button class="btn-primary" (click)="openAdd()">
+      <span class="material-icons">add</span> Add Goal
+    </button>
+  </div>
+
+  <!-- PROGRESS BANNER -->
+  <div class="progress-banner" *ngIf="totalGoals > 0">
+    <div class="progress-info">
+      <span class="progress-label">{{ achievedGoals }} of {{ totalGoals }} goals achieved</span>
+      <span class="progress-pct">{{ progressPct }}%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" [style.width]="progressPct + '%'"></div>
+    </div>
+  </div>
+
+  <!-- CATEGORY FILTER -->
+  <div class="category-tabs">
+    <button
+      *ngFor="let cat of categories"
+      class="cat-tab"
+      [class.active]="activeCategory === cat.value"
+      (click)="activeCategory = cat.value; applyFilters()"
+    >
+      <span class="material-icons" [style.color]="activeCategory === cat.value ? '#fff' : cat.color">
+        {{ cat.icon }}
+      </span>
+      {{ cat.label }}
+    </button>
+  </div>
+
+  <!-- SHOW ACHIEVED TOGGLE -->
+  <div class="toggle-row">
+    <label class="toggle-label">
+      <input type="checkbox" [(ngModel)]="showAchieved" (change)="applyFilters()" />
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+      Show achieved goals
+    </label>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="empty-state">
+    <span class="material-icons">hourglass_empty</span>
+    <p>Loading your vision board...</p>
+  </div>
+
+  <!-- EMPTY -->
+  <div *ngIf="!loading && !filtered.length" class="empty-state">
+    <span class="material-icons">auto_awesome</span>
+    <p>Your vision board is empty. Add your first goal!</p>
+    <button class="btn-primary" (click)="openAdd()">Add a goal</button>
+  </div>
+
+  <!-- BOARD GRID (mood board layout) -->
+  <div class="board-grid" *ngIf="!loading && filtered.length">
+    <div
+      class="vision-card"
+      *ngFor="let item of filtered"
+      [class.achieved]="item.achieved"
+      (click)="openPreview(item)"
+    >
+      <!-- IMAGE -->
+      <div class="card-image"
+        [style.background]="item.imageUrl ? 'none' : getCategoryConfig(item.category).gradient"
+      >
+        <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.title" />
+        <span *ngIf="!item.imageUrl" class="material-icons card-icon-fallback">
+          {{ getCategoryConfig(item.category).icon }}
+        </span>
+
+        <!-- ACHIEVED OVERLAY -->
+        <div class="achieved-overlay" *ngIf="item.achieved">
+          <span class="material-icons">verified</span>
+          <span>Achieved!</span>
+        </div>
+
+        <!-- CATEGORY BADGE -->
+        <div class="category-badge" [style.background]="getCategoryConfig(item.category).gradient">
+          {{ getCategoryConfig(item.category).label }}
+        </div>
+      </div>
+
+      <!-- CARD BODY -->
+      <div class="card-body">
+        <h3 class="vision-title">{{ item.title }}</h3>
+        <p class="vision-desc" *ngIf="item.description">{{ item.description }}</p>
+        <p class="vision-affirmation" *ngIf="item.affirmation">"{{ item.affirmation }}"</p>
+        <div class="card-meta" *ngIf="item.targetDate">
+          <span class="material-icons">event</span>
+          {{ item.targetDate | date:'MMM yyyy' }}
+        </div>
+      </div>
+
+      <!-- CARD ACTIONS (stop propagation so preview doesn't open) -->
+      <div class="card-actions" (click)="$event.stopPropagation()">
+        <button
+          class="action-btn achieve"
+          *ngIf="!item.achieved"
+          (click)="markAchieved(item)"
+          title="Mark as achieved"
+        >
+          <span class="material-icons">verified</span>
+        </button>
+        <button class="action-btn edit" (click)="openEdit(item)" title="Edit">
+          <span class="material-icons">edit</span>
+        </button>
+        <button class="action-btn delete" (click)="confirmDelete(item._id!)" title="Delete">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW MODAL -->
+  <div class="modal-overlay" *ngIf="previewItem" (click)="closePreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closePreview()">
+        <span class="material-icons">close</span>
+      </button>
+
+      <div class="preview-image"
+        [style.background]="previewItem.imageUrl ? 'none' : getCategoryConfig(previewItem.category).gradient"
+      >
+        <img *ngIf="previewItem.imageUrl" [src]="previewItem.imageUrl" [alt]="previewItem.title" />
+        <span *ngIf="!previewItem.imageUrl" class="material-icons preview-icon-fallback">
+          {{ getCategoryConfig(previewItem.category).icon }}
+        </span>
+      </div>
+
+      <div class="preview-body">
+        <div class="preview-cat-badge"
+          [style.background]="getCategoryConfig(previewItem.category).gradient"
+        >
+          {{ getCategoryConfig(previewItem.category).label }}
+        </div>
+        <h2>{{ previewItem.title }}</h2>
+        <p class="preview-desc" *ngIf="previewItem.description">{{ previewItem.description }}</p>
+        <p class="preview-affirmation" *ngIf="previewItem.affirmation">"{{ previewItem.affirmation }}"</p>
+        <div class="preview-meta">
+          <span *ngIf="previewItem.targetDate">
+            <span class="material-icons">event</span>
+            Target: {{ previewItem.targetDate | date:'MMMM yyyy' }}
+          </span>
+          <span *ngIf="previewItem.achieved" class="achieved-chip">
+            <span class="material-icons">verified</span>
+            Achieved {{ previewItem.achievedDate | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-primary" *ngIf="!previewItem.achieved" (click)="markAchieved(previewItem); closePreview()">
+            <span class="material-icons">verified</span> Mark Achieved
+          </button>
+          <button class="btn-secondary" (click)="openEdit(previewItem); closePreview()">
+            <span class="material-icons">edit</span> Edit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT FORM MODAL -->
+  <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingId ? 'Edit Goal' : 'New Goal' }}</h2>
+        <button class="close-btn" (click)="closeForm()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="field">
+          <label>Title *</label>
+          <input [(ngModel)]="form.title" placeholder="What do you want to achieve?" />
+        </div>
+
+        <div class="field">
+          <label>Category *</label>
+          <div class="cat-selector">
+            <button
+              *ngFor="let cat of formCategories"
+              class="cat-select-btn"
+              [class.active]="form.category === cat.value"
+              [style.--cat-color]="cat.color"
+              (click)="form.category = cat.value"
+            >
+              <span class="material-icons" [style.color]="cat.color">{{ cat.icon }}</span>
+              {{ cat.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <textarea [(ngModel)]="form.description" rows="3" placeholder="Describe this goal..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Affirmation</label>
+          <input [(ngModel)]="form.affirmation" placeholder='e.g. "I am building my dream career every day"' />
+        </div>
+
+        <div class="field">
+          <label>Image URL (optional)</label>
+          <input [(ngModel)]="form.imageUrl" placeholder="Paste an image URL to visualise this goal" />
+          <div class="image-preview" *ngIf="form.imageUrl">
+            <img [src]="form.imageUrl" alt="preview" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Target Date</label>
+          <input type="month" [(ngModel)]="form.targetDate" />
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeForm()">Cancel</button>
+        <button class="btn-primary" (click)="save()">
+          {{ editingId ? 'Update Goal' : 'Add to Board' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div class="modal-overlay" *ngIf="confirmDeleteId" (click)="cancelDelete()">
+    <div class="confirm-modal" (click)="$event.stopPropagation()">
+      <span class="material-icons confirm-icon">delete_forever</span>
+      <h3>Remove this goal?</h3>
+      <p>This can't be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-danger" (click)="delete()">Remove</button>
+      </div>
+    </div>
+  </div>
+
+</div>
