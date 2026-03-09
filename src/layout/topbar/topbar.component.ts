@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
+import { NotificationComponent } from '../../modules/notification/notification.component';
 
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NotificationComponent],
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.css']
 })

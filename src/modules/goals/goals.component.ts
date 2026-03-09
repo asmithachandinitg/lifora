@@ -356,7 +356,7 @@ syncStatusAndProgress() {
 
   getProgressColor(progress: number): string {
     if (progress >= 80) return '#22c55e';
-    if (progress >= 50) return '#A78BFA';
+    if (progress >= 50) return 'var(--primary-light)';
     if (progress >= 25) return '#f59e0b';
     return '#e5e7eb';
   }

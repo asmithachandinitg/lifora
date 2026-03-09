@@ -1,9 +1,16 @@
 <div class="sidebar">
 
   <!-- Logo -->
-  <div class="logo">
-    <span class="logo-icon"></span>
-    <span class="logo-text">Lifora</span>
+  <div class="logo-section">
+    <div class="logo">
+      <div class="logo-icon-wrap">
+        <span class="material-icons">auto_awesome</span>
+      </div>
+      <div class="logo-text-wrap">
+        <span class="logo-text">Lifora</span>
+        <span class="logo-tagline">Your life, organised</span>
+      </div>
+    </div>
   </div>
 
   <!-- Grouped Menu -->
@@ -28,8 +35,7 @@
           *ngFor="let item of group.items"
           [routerLink]="item.route"
           routerLinkActive="active"
-          class="menu-item"
-        >
+          class="menu-item">
           <span class="material-icons icon">{{ item.icon }}</span>
           <span class="label">{{ item.name }}</span>
         </a>
@@ -38,5 +44,10 @@
     </div>
 
   </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <span class="sidebar-version">LIFORA v1.0</span>
+  </div>
 
 </div>

@@ -15,3 +15,25 @@
   <app-root></app-root>
 </body>
 </html>
+
+<script>
+  const theme = localStorage.getItem('lifora_theme') || 'lavender';
+  const themes = {
+    lavender: { primary: '#8B5CF6', light: '#A78BFA',  lighter: '#C4B5FD' },
+    blue:     { primary: '#3b82f6', light: '#60a5fa',  lighter: '#93c5fd' },
+    green:    { primary: '#10b981', light: '#34d399',  lighter: '#6ee7b7' },
+    rose:     { primary: '#f43f5e', light: '#fb7185',  lighter: '#fda4af' },
+    orange:   { primary: '#f97316', light: '#fb923c',  lighter: '#fdba74' },
+    teal:     { primary: '#06b6d4', light: '#22d3ee',  lighter: '#67e8f9' },
+    dark:     { primary: '#8B5CF6', light: '#A78BFA',  lighter: '#C4B5FD' },
+  };
+  const t = themes[theme] || themes.lavender;
+  const r = document.documentElement;
+  r.style.setProperty('--primary',          t.primary);
+  r.style.setProperty('--primary-light',    t.light);
+  r.style.setProperty('--primary-lighter',  t.lighter);
+  r.style.setProperty('--primary-gradient', `linear-gradient(90deg, ${t.light}, ${t.primary})`);
+  r.style.setProperty('--primary-soft',     t.primary + '18');
+  r.style.setProperty('--primary-border',   t.primary + '44');
+  if (theme === 'dark') document.body?.classList.add('dark-mode');
+</script>

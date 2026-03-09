@@ -8,6 +8,7 @@ import {
 import { FitnessService } from './fitness.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { MoodService } from '../mood/mood.service';
+import { ExportService } from '../../core/services/export.service';
 
 declare var d3: any;
 
@@ -66,6 +67,7 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
   weeklyData: WeeklyChartPoint[] = [];
   monthlyData: MonthlyChartPoint[] = [];
   selectedMonth: Date = new Date();
+  showExportMenu = false;
 
   // ── form MUST be after metMap ──────────────────────────────
   form = this.getEmptyForm();
@@ -85,7 +87,8 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
     private fitnessService: FitnessService,
     private moodService: MoodService,
     private el: ElementRef,
-    private authService: AuthService
+    private authService: AuthService,
+    private exportService: ExportService
   ) { }
 
   ngOnInit() {
@@ -695,5 +698,14 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
 
   skipMoodPrompt() {
     this.showMoodPrompt = false;
+  }
+
+    toggleExportMenu() {
+    this.showExportMenu = !this.showExportMenu;
+  }
+
+  exportFitnessCSV() {
+    this.exportService.exportFitnessCSV(this.entries as any[]);
+    this.showExportMenu = false;
   }
 }

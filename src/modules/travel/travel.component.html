@@ -16,7 +16,7 @@
     <!-- Stats -->
     <div class="stats-row" *ngIf="trips.length > 0">
       <div class="stat-card">
-        <span class="material-icons stat-icon" style="color:#8B5CF6">luggage</span>
+        <span class="material-icons stat-icon" style="color:var(--primary)">luggage</span>
         <span class="stat-number">{{ trips.length }}</span>
         <span class="stat-label">Total Trips</span>
       </div>
@@ -26,7 +26,7 @@
         <span class="stat-label">Ongoing</span>
       </div>
       <div class="stat-card">
-        <span class="material-icons stat-icon" style="color:#8B5CF6">event</span>
+        <span class="material-icons stat-icon" style="color:var(--primary)">event</span>
         <span class="stat-number">{{ upcomingTrips.length }}</span>
         <span class="stat-label">Upcoming</span>
       </div>
@@ -182,7 +182,7 @@
     <div *ngIf="detailTab === 'overview'" class="overview-section">
       <div class="overview-grid">
         <div class="ov-card">
-          <span class="material-icons ov-icon" style="color:#8B5CF6">inventory_2</span>
+          <span class="material-icons ov-icon" style="color:var(--primary)">inventory_2</span>
           <span class="ov-val">{{ packedCount }}/{{ totalPacking }}</span>
           <span class="ov-label">Items Packed</span>
         </div>

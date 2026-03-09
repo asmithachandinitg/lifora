@@ -1,95 +1,54 @@
 <div class="topbar">
 
-  <!-- Left -->
+  <!-- Left: Greeting + Date -->
   <div class="left">
-
     <div class="greeting">
-      {{ getGreeting() }} {{ user?.firstName | titlecase }} {{ user?.lastName | titlecase }}
+      {{ getGreeting() }}, {{ user?.firstName | titlecase }} 👋
     </div>
-
-    <div class="date">
-      {{ today | date:'EEEE, MMMM d' }}
-    </div>
-
+    <div class="date">{{ today | date:'EEEE, MMMM d' }}</div>
   </div>
 
-  <!-- Right -->
+  <!-- Right: Actions + Avatar -->
   <div class="right">
 
-    <!-- Future search -->
-    <span class="material-icons icon">
-      search
-    </span>
+    <!-- Notifications -->
+    <!-- <button class="icon-btn">
+      <span class="material-icons">notifications_none</span>
+    </button> -->
+<app-notification></app-notification>
 
-    <!-- Future notifications -->
-    <span class="material-icons icon">
-      notifications
-    </span>
+    <!-- Avatar + Dropdown -->
+    <div class="avatar-wrapper" (click)="toggleMenu()">
 
-    <!-- Avatar -->
-    <!-- <div class="avatar">
-      {{ user?.firstName?.charAt(0).toUpperCase() }}
-    </div>
+      <div class="avatar">
+        <span class="material-icons">account_circle</span>
+      </div>
 
-    <button (click)="logout()" class="logout-btn">
-  Logout
-</button> -->
+      <span class="status-dot"></span>
 
+      <!-- Dropdown -->
+      <div class="dropdown" *ngIf="menuOpen">
 
-<div class="avatar-wrapper" (click)="toggleMenu()">
+        <div class="dropdown-item" (click)="goProfile()">
+          <span class="material-icons item-icon">person_outline</span>
+          Profile
+        </div>
 
-  <!-- Avatar Icon Circle -->
-  <div class="avatar">
+        <div class="dropdown-item" (click)="goSettings()">
+          <span class="material-icons item-icon">settings</span>
+          Settings
+        </div>
 
-    <span class="material-icons">
-      account_circle
-    </span>
+        <div class="dropdown-divider"></div>
 
-  </div>
+        <div class="dropdown-item danger" (click)="logout()">
+          <span class="material-icons item-icon">logout</span>
+          Logout
+        </div>
 
-  <!-- Online Status Icon -->
-  <span class="status-icon material-icons">
-    circle
-  </span>
-
-  <!-- Dropdown -->
-  <div
-    class="dropdown"
-    *ngIf="menuOpen"
-  >
-
-    <div class="dropdown-item" (click)="goProfile()">
-
-      <span class="material-icons item-icon">
-        person
-      </span>
-
-      Profile
+      </div>
 
     </div>
-    <div class="dropdown-item" (click)="goSettings()">
-
-      <span class="material-icons item-icon">
-        settings
-      </span>
-
-      Settings
-
-    </div>
-    <div class="dropdown-item" (click)="logout()">
-
-      <span class="material-icons item-icon">
-        logout
-      </span>
-
-      Logout
-
-    </div>
-
-  </div>
-
-</div>
-
 
   </div>
 

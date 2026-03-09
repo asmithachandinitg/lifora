@@ -1,0 +1,79 @@
+/* ================================================
+   LIFORA DARK MODE — add this to your global styles.css
+   ================================================
+   
+   How it works:
+   - ThemeService sets data-theme="dark" or data-theme="light" on <html>
+   - These CSS variables automatically update all colors
+   - Add var(--bg-primary) etc. to your components instead of hardcoded colors
+   ================================================ */
+
+/* LIGHT MODE (default) */
+:root,
+[data-theme="light"] {
+  --bg-primary:      #ffffff;
+  --bg-secondary:    #f5f7fb;
+  --bg-card:         #ffffff;
+  --bg-hover:        #f9fafb;
+  --bg-input:        #ffffff;
+
+  --text-primary:    #111827;
+  --text-secondary:  #374151;
+  --text-muted:      #6b7280;
+  --text-faint:      #9ca3af;
+
+  --border:          #e5e7eb;
+  --border-light:    #f3f4f6;
+
+  --accent:          var(--primary);
+  --accent-light:    #f5f3ff;
+  --accent-mid:      #ede9fe;
+
+  --shadow-sm:       0 2px 8px rgba(0,0,0,0.05);
+  --shadow-md:       0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:       0 10px 30px rgba(0,0,0,0.12);
+
+  --danger:          #ef4444;
+  --success:         #10b981;
+  --warning:         #f59e0b;
+}
+
+/* DARK MODE */
+[data-theme="dark"] {
+  --bg-primary:      #0f0f13;
+  --bg-secondary:    #1a1a24;
+  --bg-card:         #1e1e2e;
+  --bg-hover:        #25253a;
+  --bg-input:        #252535;
+
+  --text-primary:    #f3f4f6;
+  --text-secondary:  #d1d5db;
+  --text-muted:      #9ca3af;
+  --text-faint:      #6b7280;
+
+  --border:          #2e2e45;
+  --border-light:    #252538;
+
+  --accent:          var(--primary-light);
+  --accent-light:    #1e1b35;
+  --accent-mid:      #2d2550;
+
+  --shadow-sm:       0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:       0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:       0 10px 30px rgba(0,0,0,0.5);
+
+  --danger:          #f87171;
+  --success:         #34d399;
+  --warning:         #fbbf24;
+}
+
+/* ── GLOBAL TRANSITIONS ── */
+*, *::before, *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+}
+
+/* ── BASE OVERRIDES ── */
+body {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}

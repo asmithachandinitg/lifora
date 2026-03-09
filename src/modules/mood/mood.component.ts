@@ -203,7 +203,7 @@ export class MoodComponent implements OnInit {
   }
 
   getSelectedColor(): string {
-    return this.moods.find(m => m.value === this.moodForm.mood)?.color || '#A78BFA';
+    return this.moods.find(m => m.value === this.moodForm.mood)?.color || 'var(--primary-light)';
   }
 
   saveMood() {

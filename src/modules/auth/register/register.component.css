@@ -22,7 +22,7 @@
 }
 
 .auth-card p {
-    color: #6B7280;
+    color: var(--text-muted);
     margin-bottom: 22px;
 }
 
@@ -41,7 +41,7 @@ button {
     padding: 12px;
     border: none;
     border-radius: 12px;
-    background: #A78BFA;
+    background: var(--primary-light);
     color: white;
     font-weight: 600;
     cursor: pointer;
@@ -56,7 +56,7 @@ button:hover {
 small {
     display: block;
     margin-top: 14px;
-    color: #6B7280;
+    color: var(--text-muted);
 }
 
 a {
@@ -128,7 +128,7 @@ select {
     top: 50%;
     transform: translateY(-50%);
     font-size: 20px;
-    color: #9CA3AF;
+    color: var(--text-sub);
     cursor: pointer;
 }
 
@@ -162,7 +162,7 @@ select {
 input:focus,
 select:focus {
     outline: none;
-    border-color: #A78BFA;
+    border-color: var(--primary-light);
     box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
 }
 
@@ -209,7 +209,7 @@ input {
   top: 50%;
   transform: translateY(-50%);
   font-size: 20px;
-  color: #9CA3AF;
+  color: var(--text-sub);
   cursor: pointer;
 }
 
@@ -266,7 +266,7 @@ input {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #6B7280;
+  color: var(--text-muted);
 }
 
 
@@ -354,7 +354,7 @@ input {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #6B7280;
+  color: var(--text-muted);
 }
 
 .rules div.valid {

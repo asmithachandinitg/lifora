@@ -1,0 +1,17 @@
+<div class="theme-picker">
+  <p class="tp-label">App Theme</p>
+  <div class="tp-grid">
+    <ng-container *ngFor="let t of themeService.themes">
+      <button
+        *ngIf="!t.dark"
+        class="tp-swatch"
+        [class.active]="themeService.currentThemeId === t.id"
+        [title]="t.label"
+        (click)="select(t.id)">
+        <span class="tp-dot" [style.background]="t.primary"></span>
+        <span class="tp-name">{{ t.label }}</span>
+        <span class="material-icons tp-check" *ngIf="themeService.currentThemeId === t.id">check</span>
+      </button>
+    </ng-container>
+  </div>
+</div>

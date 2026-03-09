@@ -1,15 +1,26 @@
 <div class="fitness-wrapper">
 
   <!-- HEADER -->
-  <div class="fitness-header">
-    <div class="header-left">
-      <h2><span class="material-icons header-icon">fitness_center</span> Fitness Tracker</h2>
-      <span class="fitness-subtitle">Stay consistent, stay strong</span>
-    </div>
-    <button class="add-btn" (click)="openModal()">
+<div class="fitness-header">
+  <div class="header-left">
+    <h2><span class="material-icons header-icon">fitness_center</span> Fitness Tracker</h2>
+    <span class="fitness-subtitle">Stay consistent, stay strong</span>
+  </div>
+  <div class="header-actions">
+        <button class="add-btn" (click)="openModal()">
       <span class="material-icons">add</span> Log Workout
     </button>
+    <button class="add-btn" (click)="toggleExportMenu()">
+      <span class="material-icons">download</span> Export
+    </button>
+    <div class="export-dropdown" *ngIf="showExportMenu">
+      <button (click)="exportFitnessCSV()">
+        <span class="material-icons">table_chart</span>
+        Download Workout CSV
+      </button>
+    </div>
   </div>
+</div>
 
   <!-- TABS -->
   <div class="tabs">
@@ -31,7 +42,7 @@
       <!-- STATS -->
       <div class="stats-row">
         <div class="stat-card">
-          <span class="material-icons stat-icon" style="color:#8B5CF6">event_available</span>
+          <span class="material-icons stat-icon" style="color:var(--primary)">event_available</span>
           <span class="stat-number">{{ totalWorkouts }}</span>
           <span class="stat-label">Total Workouts</span>
         </div>

@@ -11,16 +11,16 @@
   vertical-align: middle;
 }
 
-.header-icon { font-size: 26px; color: #8B5CF6; margin-right: 6px; }
+.header-icon { font-size: 26px; color: var(--primary); margin-right: 6px; }
 .stat-icon { font-size: 28px; margin-bottom: 4px; }
 .badge-icon { font-size: 13px; margin-right: 3px; }
 .days-icon { font-size: 13px; margin-right: 3px; }
 .dot-icon { font-size: 20px; color: white; }
-.deadline-icon { font-size: 15px; color: #9ca3af; margin-right: 5px; }
+.deadline-icon { font-size: 15px; color: var(--text-sub); margin-right: 5px; }
 .expand-icon { font-size: 18px; margin-right: 4px; }
 .milestone-check { font-size: 18px; flex-shrink: 0; }
 .empty-icon { font-size: 56px; color: #d1d5db; display: block; margin-bottom: 12px; }
-.modal-title-icon { font-size: 22px; margin-right: 6px; color: #8B5CF6; }
+.modal-title-icon { font-size: 22px; margin-right: 6px; color: var(--primary); }
 .confirm-icon { font-size: 48px; color: #ef4444; display: block; margin-bottom: 10px; }
 
 .goals-wrapper {
@@ -44,18 +44,18 @@
   font-size: 24px;
   font-weight: 700;
   margin: 0;
-  color: #111827;
+  color: var(--text);
 }
 
 .goals-subtitle {
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--text-sub);
   display: block;
   margin-top: 2px;
 }
 
 .add-goal-btn {
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
   color: white;
   border: none;
   padding: 10px 20px;
@@ -101,12 +101,12 @@
 .stat-number {
   font-size: 26px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
 }
 
 .stat-label {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-sub);
   font-weight: 500;
 }
 
@@ -138,15 +138,15 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   transition: 0.2s;
   white-space: nowrap;
 }
 
 .status-tabs button.active {
   background: white;
-  color: #8B5CF6;              /* brand purple */
-  border: 2px solid #8B5CF6;   /* purple border */
+  color: var(--primary);              /* brand purple */
+  border: 2px solid var(--primary);   /* purple border */
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15);
 }
@@ -154,7 +154,7 @@
 .category-filter select {
   padding: 10px 14px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   font-size: 13px;
   font-family: 'Segoe UI', sans-serif;
   color: #374151;
@@ -165,7 +165,7 @@
 }
 
 .category-filter select:focus {
-  border-color: #A78BFA;
+  border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
 }
 
@@ -173,7 +173,7 @@
 .empty {
   text-align: center;
   margin-top: 60px;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .empty-emoji {
@@ -284,7 +284,7 @@
 }
 
 .category-badge {
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   color: #374151;
 }
 
@@ -318,24 +318,24 @@
   line-height: 1;
 }
 
-.icon-btn:hover { background: #f3f4f6; }
+.icon-btn:hover { background: var(--bg-secondary); }
 
 /* Goal Title & Desc */
 .goal-title {
   font-size: 17px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 6px 0;
 }
 
 .goal-title.strike {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .goal-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 16px 0;
   line-height: 1.5;
 }
@@ -354,7 +354,7 @@
 
 .progress-label {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-sub);
   font-weight: 500;
 }
 
@@ -365,7 +365,7 @@
 
 .progress-track {
   height: 8px;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -386,7 +386,7 @@
 
 .deadline-label {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .deadline-val {
@@ -398,11 +398,11 @@
 /* Expand button */
 .expand-btn {
   background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 7px 14px;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   transition: 0.2s;
   width: 100%;
@@ -414,12 +414,12 @@
 }
 
 .expand-btn:hover {
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   color: #374151;
 }
 
 .milestone-count {
-  color: #A78BFA;
+  color: var(--primary-light);
   font-weight: 600;
   margin-left: 4px;
 }
@@ -434,7 +434,7 @@
 
 .no-milestones {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-sub);
   text-align: center;
   padding: 10px;
 }
@@ -452,7 +452,7 @@
 }
 
 .milestone-item:hover {
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border-color: #e5e7eb;
 }
 
@@ -471,7 +471,7 @@
 
 .milestone-done .milestone-title {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 /* ===== MODAL ===== */
@@ -509,7 +509,7 @@
   font-size: 20px;
   font-weight: 700;
   text-align: center;
-  color: #111827;
+  color: var(--text);
 }
 
 .form-group {
@@ -530,12 +530,12 @@
 .form-group select {
   padding: 10px 14px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   font-size: 14px;
   font-family: 'Segoe UI', sans-serif;
   outline: none;
   transition: 0.2s;
-  color: #111827;
+  color: var(--text);
   width: 100%;
   box-sizing: border-box;
 }
@@ -543,7 +543,7 @@
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: #A78BFA;
+  border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
 }
 
@@ -574,7 +574,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #8B5CF6;
+  background: var(--primary);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
@@ -589,7 +589,7 @@
 .milestones-header label { margin: 0; }
 
 .add-milestone-btn {
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border: none;
   border-radius: 8px;
   padding: 5px 12px;
@@ -615,7 +615,7 @@
   flex: 1;
   padding: 9px 12px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   font-size: 13px;
   font-family: 'Segoe UI', sans-serif;
   outline: none;
@@ -623,7 +623,7 @@
 }
 
 .milestone-input-row input:focus {
-  border-color: #A78BFA;
+  border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
 }
 
@@ -656,7 +656,7 @@
   padding: 12px;
   border-radius: 12px;
   border: none;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   color: #374151;
   font-weight: 500;
   cursor: pointer;
@@ -671,7 +671,7 @@
   padding: 12px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -706,12 +706,12 @@
   font-size: 17px;
   font-weight: 600;
   margin: 0 0 6px 0;
-  color: #111827;
+  color: var(--text);
 }
 
 .confirm-modal p {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-sub);
   margin: 0 0 22px 0;
 }
 
@@ -739,7 +739,7 @@
 .yes-btn:hover { transform: translateY(-1px); }
 
 .no-btn {
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border: none;
   padding: 10px 24px;
   border-radius: 10px;
@@ -805,7 +805,7 @@
 .selected {
   color: white;
   border: none;
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
   border-radius: 12px;
   padding: 10px 14px;
   cursor: pointer;
@@ -834,12 +834,12 @@
 }
 
 .option:hover {
-  background: #F3E8FF;
-  color: #8B5CF6;
+  background: var(--primary-lighter);
+  color: var(--primary);
 }
 
 .option.active {
-  background: #8B5CF6;
+  background: var(--primary);
   color: white;
 }
 
@@ -849,13 +849,13 @@
 
 .habit-link-btn {
   position: relative;
-  color: #8B5CF6 !important;
+  color: var(--primary) !important;
   background: #ede9fe !important;
   border-radius: 8px !important;
 }
 
 .habit-link-btn:hover {
-  background: #8B5CF6 !important;
+  background: var(--primary) !important;
   color: white !important;
 }
 
@@ -863,7 +863,7 @@
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #8B5CF6;
+  background: var(--primary);
   color: white;
   font-size: 10px;
   font-weight: 700;

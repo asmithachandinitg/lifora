@@ -66,8 +66,20 @@
     </div>
 
     <div class="records-action-row">
-      <button class="add-record-btn" (click)="openAddRecord()"><span class="material-icons">add</span> Add Record</button>
-    </div>
+  <button class="add-record-btn" (click)="openAddRecord()">
+    <span class="material-icons">add</span> Add Record
+  </button>
+  <button class="add-record-btn" (click)="toggleExportMenu()">
+    <span class="material-icons">download</span> Export
+  </button>
+  <div class="export-dropdown" *ngIf="showExportMenu">
+    <button (click)="exportCSV()">
+      <span class="material-icons">table_chart</span>
+      Download CSV ({{ currentMonthLabel }})
+    </button>
+  </div>
+</div>
+
 
     <div *ngIf="groupedRecords.length === 0" class="empty">No records for this month</div>
 

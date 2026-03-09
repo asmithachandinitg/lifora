@@ -18,3 +18,40 @@ html, body {
   background: #f5f7fb;
   font-family: 'Segoe UI', sans-serif;
 }
+
+:root {
+  --primary:          #8B5CF6;
+  --primary-light:    #A78BFA;
+  --primary-lighter:  #C4B5FD;
+  --primary-gradient: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  --primary-soft:     rgba(139, 92, 246, 0.09);
+  --primary-border:   rgba(139, 92, 246, 0.27);
+
+  --bg:           #f3f4f6;
+  --bg-secondary: #f9fafb;
+  --card-bg:      #ffffff;
+  --card-shadow:  0 2px 10px rgba(0,0,0,0.05);
+  --border:       #e5e7eb;
+
+  --text:       #111827;
+  --text-muted: #6b7280;
+  --text-sub:   #9ca3af;
+  --text-white: #ffffff;
+
+  --input-bg:     #ffffff;
+  --input-border: #e5e7eb;
+}
+
+/* Dark mode base overrides */
+body.dark-mode {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--text) !important;
+}

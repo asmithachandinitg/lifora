@@ -54,6 +54,8 @@ export class ProfileComponent implements OnInit {
     { key: 'travel',    label: 'Travel',     icon: 'flight_takeoff', enabled: true },
     { key: 'reading',   label: 'Reading',    icon: 'auto_stories',   enabled: true },
     { key: 'pregnancy', label: 'Pregnancy',  icon: 'child_care',     enabled: true },
+    { key: 'knowledge',  label: 'Knowledge', icon: 'lightbulb', enabled: true },
+
   ];
 
   genderOptions: { value: Gender; label: string; icon: string }[] = [

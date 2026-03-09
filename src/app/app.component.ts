@@ -3,7 +3,6 @@ import { RouterOutlet } from '@angular/router';
 import { ToastComponent } from '../core/auth/toast.component';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 
-
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, SpinnerComponent, ToastComponent],

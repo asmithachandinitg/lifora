@@ -26,18 +26,18 @@
   font-size: 24px;
   font-weight: 700;
   margin: 0;
-  color: #111827;
+  color: var(--text);
 }
 
 .mood-subtitle {
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--text-sub);
   display: block;
   margin-top: 2px;
 }
 
 .log-mood-btn {
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
   color: white;
   border: none;
   padding: 10px 20px;
@@ -59,7 +59,7 @@
 /* TABS */
 .tabs {
   display: flex;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border-radius: 14px;
   padding: 5px;
   margin-bottom: 24px;
@@ -75,13 +75,13 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   transition: 0.2s;
 }
 
 .tabs button.active {
   background: white;
-  color: #111827;
+  color: var(--text);
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
@@ -90,7 +90,7 @@
 .empty {
   text-align: center;
   margin-top: 60px;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .empty-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
@@ -135,17 +135,17 @@
 .mood-label {
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
 }
 
 .mood-time {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .mood-note {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: 4px;
   font-style: italic;
 }
@@ -163,12 +163,12 @@
 .scale-number {
   font-size: 28px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
 }
 
 .scale-label {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .delete-mood-btn {
@@ -209,7 +209,7 @@
 
 .nav-btn {
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -223,9 +223,9 @@
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: #A78BFA;
+  background: var(--primary-light);
   color: white;
-  border-color: #A78BFA;
+  border-color: var(--primary-light);
 }
 
 .nav-btn.disabled, .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
@@ -233,7 +233,7 @@
 .month-label {
   font-size: 17px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
   min-width: 160px;
   text-align: center;
 }
@@ -253,7 +253,7 @@
   text-align: center;
   font-size: 12px;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-sub);
   padding: 6px 0;
   text-transform: uppercase;
 }
@@ -275,9 +275,9 @@
 
 .empty-cell { background: transparent !important; }
 
-.today-cell {
-  box-shadow: 0 0 0 2px #A78BFA;
-}
+/* .today-cell {
+  box-shadow: 0 0 0 2px var(--primary-light);
+} */
 
 .cal-day-num {
   font-size: 13px;
@@ -324,7 +324,7 @@
   margin-bottom: 20px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   background: white;
-  border-left: 6px solid #A78BFA;
+  border-left: 6px solid var(--primary-light);
 }
 
 .avg-great { border-left-color: #22c55e; background: linear-gradient(135deg, #f0fdf4, white); }
@@ -336,9 +336,9 @@
 .avg-emoji { font-size: 52px; }
 
 .avg-info { display: flex; flex-direction: column; gap: 4px; }
-.avg-label { font-size: 13px; color: #9ca3af; font-weight: 500; }
-.avg-score { font-size: 32px; font-weight: 700; color: #111827; }
-.avg-desc { font-size: 14px; color: #6b7280; }
+.avg-label { font-size: 13px; color: var(--text-sub); font-weight: 500; }
+.avg-score { font-size: 32px; font-weight: 700; color: var(--text); }
+.avg-desc { font-size: 14px; color: var(--text-muted); }
 
 .frequency-section, .trend-section {
   background: white;
@@ -352,7 +352,7 @@
   margin: 0 0 18px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
 }
 
 .freq-item {
@@ -376,7 +376,7 @@
 .freq-bar-track {
   flex: 1;
   height: 10px;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -388,7 +388,7 @@
 }
 
 .freq-count { font-size: 13px; font-weight: 600; color: #374151; width: 30px; text-align: right; }
-.freq-pct { font-size: 12px; color: #9ca3af; width: 36px; text-align: right; }
+.freq-pct { font-size: 12px; color: var(--text-sub); width: 36px; text-align: right; }
 
 /* Trend bars */
 .trend-bars {
@@ -422,7 +422,7 @@
   transition: height 0.5s ease;
 }
 
-.trend-day { font-size: 11px; color: #9ca3af; }
+.trend-day { font-size: 11px; color: var(--text-sub); }
 .trend-emoji { font-size: 16px; }
 
 /* MODAL */
@@ -487,7 +487,7 @@
 .option-label {
   font-size: 11px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .selected-mood {
@@ -508,7 +508,7 @@
   font-weight: 500;
 }
 
-.scale-val { font-weight: 700; color: #111827; }
+.scale-val { font-weight: 700; color: var(--text); }
 
 .mood-slider {
   width: 100%;
@@ -516,7 +516,6 @@
   border-radius: 6px;
   outline: none;
   cursor: pointer;
-  -webkit-appearance: none;
   background: #e5e7eb;
 }
 
@@ -525,7 +524,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #8B5CF6;
+  background: var(--primary);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
@@ -534,14 +533,14 @@
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 /* Textarea */
 .mood-modal textarea {
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   font-size: 14px;
   resize: none;
   outline: none;
@@ -552,7 +551,7 @@
 }
 
 .mood-modal textarea:focus {
-  border-color: #A78BFA;
+  border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
 }
 
@@ -565,14 +564,14 @@
   flex: 1;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   font-size: 14px;
   outline: none;
   transition: 0.2s;
 }
 
 .datetime-row input:focus {
-  border-color: #A78BFA;
+  border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
 }
 
@@ -589,7 +588,7 @@
   padding: 12px;
   border-radius: 12px;
   border: none;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   color: #374151;
   font-weight: 500;
   cursor: pointer;
@@ -603,7 +602,7 @@
   padding: 12px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -657,7 +656,7 @@
 }
 
 .no-btn {
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border: none;
   padding: 10px 24px;
   border-radius: 10px;

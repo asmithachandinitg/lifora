@@ -33,8 +33,6 @@ export class DashboardComponent implements OnInit {
   loading = true;
   today = new Date();
   todayStr = new Date().toISOString().split('T')[0];
-
-  // ── Stats ──────────────────────────────────────────────────
   habitsCompleted = 0;
   habitsTotal = 0;
   caloriesToday = 0;
@@ -43,7 +41,6 @@ export class DashboardComponent implements OnInit {
   workoutsThisWeek = 0;
   foodLoggedToday = 0;
 
-  // ── Raw data kept for insights ─────────────────────────────
   private rawHabits: any[] = [];
   private rawWorkouts: any[] = [];
   private rawMoods: any[] = [];
@@ -51,21 +48,12 @@ export class DashboardComponent implements OnInit {
   private rawGoals: any[] = [];
   private rawDiary: any[] = [];
 
-  // ── Insights ───────────────────────────────────────────────
   insights: DailyInsight[] = [];
   weeklyInsights: WeeklyInsight[] = [];
   weekLabel = '';
-
-  // ── Today's Habits ─────────────────────────────────────────
   todayHabits: { name: string; icon: string; color: string; completed: boolean }[] = [];
-
-  // ── Recent Activity ────────────────────────────────────────
   recentActivity: RecentActivity[] = [];
-
-  // ── Upcoming Tasks ─────────────────────────────────────────
   upcomingTasks: UpcomingTask[] = [];
-
-  // ── Quote ──────────────────────────────────────────────────
   quote = { text: '', author: '' };
 
   private quotes = [
@@ -96,7 +84,6 @@ export class DashboardComponent implements OnInit {
     neutral: { icon: '😐', color: '#6b7280', label: 'Neutral' },
   };
 
-
   constructor(private dashboardService: DashboardService) { }
 
   ngOnInit() {
@@ -122,23 +109,18 @@ export class DashboardComponent implements OnInit {
       diary: this.dashboardService.getDiarySummary(),
     }).subscribe({
       next: ({ habits, workouts, food, mood, tasks, goals, diary }) => {
-        // store raw data for insights
         this.rawHabits = habits || [];
         this.rawWorkouts = workouts || [];
         this.rawMoods = mood || [];
         this.rawTasks = tasks || [];
         this.rawGoals = goals || [];
         this.rawDiary = diary || [];
-
-        // your existing processors — unchanged
         this.processHabits(habits);
         this.processWorkouts(workouts);
         this.processFood(food);
         this.processMood(mood);
         this.processTasks(tasks);
         this.buildRecentActivity(habits, workouts, food, mood);
-
-        // new
         this.generateInsights();
         this.generateWeeklyInsights();
         this.loading = false;
@@ -154,8 +136,6 @@ export class DashboardComponent implements OnInit {
     const fmt = (d: Date) => d.toLocaleDateString('en', { day: 'numeric', month: 'short' });
     this.weekLabel = `${fmt(start)} – ${fmt(end)}`;
   }
-
-  // ── Processors ─────────────────────────────────────────────
 
   processHabits(habits: any[]) {
     if (!habits?.length) return;
@@ -177,9 +157,7 @@ export class DashboardComponent implements OnInit {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const weekAgoStr = weekAgo.toISOString().split('T')[0];
-
     this.workoutsThisWeek = workouts.filter(w => w.date?.slice(0, 10) >= weekAgoStr).length;
-
     const todayWorkouts = workouts.filter(w => w.date?.slice(0, 10) === this.todayStr);
     this.caloriesToday = todayWorkouts.reduce((s: number, w: any) => s + (w.caloriesBurned || 0), 0);
   }
@@ -261,8 +239,6 @@ export class DashboardComponent implements OnInit {
     this.recentActivity = activity;
   }
 
-  // ── Daily Insights Generator ───────────────────────────────
-
   generateInsights() {
     const list: DailyInsight[] = [];
 
@@ -271,7 +247,7 @@ export class DashboardComponent implements OnInit {
         list.push({ icon: 'emoji_events', color: '#10b981', bg: '#f0fdf4', message: `🎉 All ${this.habitsTotal} habits done today! Perfect day!`, priority: 1 });
       } else {
         const left = this.habitsTotal - this.habitsCompleted;
-        list.push({ icon: 'repeat', color: '#8B5CF6', bg: '#f5f3ff', message: `You have ${left} habit${left > 1 ? 's' : ''} left to complete today`, priority: 2 });
+        list.push({ icon: 'repeat', color: '#564d79', bg: '#f5f3ff', message: `You have ${left} habit${left > 1 ? 's' : ''} left to complete today`, priority: 2 });
       }
     }
 
@@ -315,8 +291,6 @@ export class DashboardComponent implements OnInit {
     this.insights = list.sort((a, b) => a.priority - b.priority).slice(0, 5);
   }
 
-  // ── Helpers ────────────────────────────────────────────────
-
   get habitsPercent(): number {
     if (!this.habitsTotal) return 0;
     return Math.round((this.habitsCompleted / this.habitsTotal) * 100);
@@ -359,8 +333,6 @@ export class DashboardComponent implements OnInit {
     }
 
     const items: WeeklyInsight[] = [];
-
-    // Habit rate
     if (this.rawHabits.length > 0) {
       let possible = 0, done = 0;
       weekDates.forEach(date => {
@@ -368,15 +340,13 @@ export class DashboardComponent implements OnInit {
         done += this.rawHabits.filter(h => h.completions?.some((c: any) => c.date === date && c.completed)).length;
       });
       const pct = possible > 0 ? Math.round((done / possible) * 100) : 0;
-      items.push({ label: 'Habit Rate', value: `${pct}%`, icon: 'repeat', color: '#8B5CF6', bg: '#f5f3ff', sub: `${done}/${possible} check-ins` });
+      items.push({ label: 'Habit Rate', value: `${pct}%`, icon: 'repeat', color: '#564d79', bg: '#f5f3ff', sub: `${done}/${possible} check-ins` });
     }
 
-    // Workouts
     const weekW = this.rawWorkouts.filter(w => weekDates.includes(w.date?.slice(0, 10)));
     const weekCal = weekW.reduce((s: number, w: any) => s + (w.caloriesBurned || 0), 0);
     items.push({ label: 'Workouts', value: `${weekW.length}`, icon: 'fitness_center', color: '#ef4444', bg: '#fef2f2', sub: weekCal > 0 ? `${weekCal} kcal burned` : 'this week' });
 
-    // Dominant mood
     const weekMoods = this.rawMoods.filter(m => weekDates.includes(m.datetime?.slice(0, 10)));
     if (weekMoods.length > 0) {
       const counts: Record<string, number> = {};
@@ -386,18 +356,15 @@ export class DashboardComponent implements OnInit {
       items.push({ label: 'Mood Trend', value: cfg.icon, icon: 'mood', color: cfg.color, bg: cfg.color + '18', sub: `${cfg.label} (${weekMoods.length} logs)` });
     }
 
-    // Diary entries
     const weekDiary = this.rawDiary.filter(e => weekDates.includes(e.entryDate?.slice(0, 10)));
     items.push({ label: 'Journal', value: `${weekDiary.length}`, icon: 'menu_book', color: '#6366f1', bg: '#eef2ff', sub: `${weekDiary.length} entries this week` });
 
-    // Goals avg progress
     const active = this.rawGoals.filter(g => g.status === 'in-progress');
     if (active.length > 0) {
       const avg = Math.round(active.reduce((s: number, g: any) => s + (g.progress || 0), 0) / active.length);
       items.push({ label: 'Goals', value: `${avg}%`, icon: 'track_changes', color: '#f59e0b', bg: '#fffbeb', sub: `avg across ${active.length} active` });
     }
 
-    // Best streak
     const best = Math.max(...this.rawHabits.map(h => h.currentStreak || 0), 0);
     if (best > 0) {
       const sh = this.rawHabits.find(h => h.currentStreak === best);

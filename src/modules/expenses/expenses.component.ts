@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from './expenses.service';
+import { ExportService } from '../../core/services/export.service';
 
 interface Category {
   id: string;
@@ -54,7 +55,8 @@ interface CategoryStat {
 export class ExpensesComponent implements OnInit {
 
   constructor(
-    private expenseService: ExpenseService
+    private expenseService: ExpenseService,
+      private exportService: ExportService
   ) { }
 
   activeTab = 'records';
@@ -63,7 +65,8 @@ export class ExpensesComponent implements OnInit {
   viewDate: Date = new Date();
   budgetAlerts: any[] = [];
   allRecords: Record[] = [];
-
+  showExportMenu = false;
+  exportingPDF   = false;
   allCategories: Category[] = [
     { id: 'food', name: 'Food & Dining', icon: '🍔', type: 'expense', budget: 0 },
     { id: 'transport', name: 'Transport', icon: '🚗', type: 'expense', budget: 0 },
@@ -82,7 +85,7 @@ export class ExpensesComponent implements OnInit {
   categoryColors: string[] = [
     '#f97316', '#3b82f6', '#ec4899', '#22c55e',
     '#a855f7', '#eab308', '#06b6d4', '#14b8a6',
-    '#f43f5e', '#8b5cf6', '#10b981', '#9ca3af'
+    '#f43f5e', '#8B5CF6', '#10b981', '#9ca3af'
   ];
 
   availableIcons = [
@@ -668,5 +671,18 @@ dismissAlert(categoryId: string) {
 
   calcPercent() {
     this.calcDisplay = (parseFloat(this.calcDisplay) / 100).toString();
+  }
+
+  toggleExportMenu() {
+    this.showExportMenu = !this.showExportMenu;
+  }
+
+  exportCSV() {
+    this.exportService.exportFinanceCSV(
+      this.monthRecords as any[],
+      this.allCategories,
+      this.currentMonthLabel
+    );
+    this.showExportMenu = false;
   }
 }

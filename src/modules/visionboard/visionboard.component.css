@@ -24,11 +24,11 @@
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0 0 4px;
-  color: #111827;
+  color: var(--text);
 }
 
-.header-left h1 .material-icons { color: #8B5CF6; font-size: 1.8rem; }
-.header-left p { color: #6b7280; font-size: 0.9rem; margin: 0; }
+.header-left h1 .material-icons { color: var(--primary); font-size: 1.8rem; }
+.header-left p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
 
 /* ── PROGRESS BANNER ─────────────────────────────────────── */
 .progress-banner {
@@ -46,7 +46,7 @@
 }
 
 .progress-label { font-size: 0.88rem; font-weight: 600; color: #374151; }
-.progress-pct { font-size: 1rem; font-weight: 800; color: #8B5CF6; }
+.progress-pct { font-size: 1rem; font-weight: 800; color: var(--primary); }
 
 .progress-track {
   height: 8px;
@@ -57,7 +57,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #8B5CF6, #6366f1);
+  background: linear-gradient(90deg, var(--primary), #6366f1);
   border-radius: 999px;
   transition: width 0.6s ease;
 }
@@ -76,7 +76,7 @@
   gap: 5px;
   padding: 7px 14px;
   border-radius: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   background: #fff;
   font-size: 0.82rem;
   font-weight: 500;
@@ -86,11 +86,11 @@
 }
 
 .cat-tab .material-icons { font-size: 0.95rem; }
-.cat-tab:hover { border-color: #8B5CF6; }
+.cat-tab:hover { border-color: var(--primary); }
 .cat-tab.active {
-  background: #8B5CF6;
+  background: var(--primary);
   color: #fff;
-  border-color: #8B5CF6;
+  border-color: var(--primary);
 }
 
 /* ── TOGGLE ──────────────────────────────────────────────── */
@@ -103,7 +103,7 @@
   align-items: center;
   gap: 10px;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   user-select: none;
 }
@@ -120,7 +120,7 @@
   flex-shrink: 0;
 }
 
-.toggle-label input:checked + .toggle-track { background: #8B5CF6; }
+.toggle-label input:checked + .toggle-track { background: var(--primary); }
 
 .toggle-thumb {
   position: absolute;
@@ -142,7 +142,7 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #9ca3af;
+  color: var(--text-sub);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -247,14 +247,14 @@
 .vision-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
   line-height: 1.4;
 }
 
 .vision-desc {
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
   display: -webkit-box;
@@ -265,7 +265,7 @@
 
 .vision-affirmation {
   font-size: 0.8rem;
-  color: #8B5CF6;
+  color: var(--primary);
   font-style: italic;
   margin: 0;
 }
@@ -275,7 +275,7 @@
   align-items: center;
   gap: 4px;
   font-size: 0.78rem;
-  color: #9ca3af;
+  color: var(--text-sub);
 }
 
 .card-meta .material-icons { font-size: 0.9rem; }
@@ -304,8 +304,8 @@
 .action-btn .material-icons { font-size: 0.95rem; }
 .action-btn.achieve { background: #f0fdf4; color: #10b981; }
 .action-btn.achieve:hover { background: #10b981; color: #fff; }
-.action-btn.edit { background: #f5f3ff; color: #8B5CF6; }
-.action-btn.edit:hover { background: #8B5CF6; color: #fff; }
+.action-btn.edit { background: #f5f3ff; color: var(--primary); }
+.action-btn.edit:hover { background: var(--primary); color: #fff; }
 .action-btn.delete { background: #fef2f2; color: #ef4444; }
 .action-btn.delete:hover { background: #ef4444; color: #fff; }
 
@@ -374,16 +374,16 @@
   width: fit-content;
 }
 
-.preview-body h2 { font-size: 1.3rem; margin: 0; color: #111827; }
-.preview-desc { font-size: 0.9rem; color: #6b7280; margin: 0; line-height: 1.6; }
-.preview-affirmation { font-size: 0.9rem; color: #8B5CF6; font-style: italic; margin: 0; }
+.preview-body h2 { font-size: 1.3rem; margin: 0; color: var(--text); }
+.preview-desc { font-size: 0.9rem; color: var(--text-muted); margin: 0; line-height: 1.6; }
+.preview-affirmation { font-size: 0.9rem; color: var(--primary); font-style: italic; margin: 0; }
 
 .preview-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .preview-meta span {
@@ -442,14 +442,14 @@
   height: 32px;
   border-radius: 8px;
   border: none;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.close-btn .material-icons { font-size: 1.1rem; color: #6b7280; }
+.close-btn .material-icons { font-size: 1.1rem; color: var(--text-muted); }
 
 .modal-body {
   padding: 20px 24px;
@@ -467,10 +467,10 @@
 .field input,
 .field textarea {
   padding: 10px 14px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9rem;
-  color: #111827;
+  color: var(--text);
   outline: none;
   font-family: 'Inter', sans-serif;
   transition: border-color 0.2s;
@@ -478,7 +478,7 @@
 
 .field input:focus,
 .field textarea:focus {
-  border-color: #8B5CF6;
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(139,92,246,0.08);
 }
 
@@ -508,9 +508,9 @@
 .cat-select-btn .material-icons { font-size: 0.95rem; }
 
 .cat-select-btn.active {
-  border-color: var(--cat-color, #8B5CF6);
-  background: color-mix(in srgb, var(--cat-color, #8B5CF6) 10%, white);
-  color: var(--cat-color, #8B5CF6);
+  border-color: var(--cat-color, var(--primary));
+  background: color-mix(in srgb, var(--cat-color, var(--primary)) 10%, white);
+  color: var(--cat-color, var(--primary));
   font-weight: 600;
 }
 
@@ -552,7 +552,7 @@
 
 .confirm-icon { font-size: 2.5rem; color: #ef4444; }
 .confirm-modal h3 { margin: 0; font-size: 1.1rem; }
-.confirm-modal p { color: #6b7280; font-size: 0.88rem; margin: 0; }
+.confirm-modal p { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
 .confirm-actions { display: flex; gap: 10px; margin-top: 12px; }
 
 /* ── BUTTONS ─────────────────────────────────────────────── */
@@ -561,7 +561,7 @@
   align-items: center;
   gap: 6px;
   padding: 10px 20px;
-  background: #8B5CF6;
+  background: var(--primary);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -576,7 +576,7 @@
 
 .btn-secondary {
   padding: 10px 20px;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   color: #374151;
   border: none;
   border-radius: 10px;

@@ -1,0 +1,57 @@
+.theme-picker { padding: 4px 0; }
+
+.tp-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tp-swatch {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: 0.2s;
+  position: relative;
+}
+
+.tp-swatch:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.tp-swatch.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.tp-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tp-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tp-check {
+  font-size: 14px;
+  color: var(--primary);
+}

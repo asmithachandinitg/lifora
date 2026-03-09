@@ -55,7 +55,7 @@
 
 .content {
   font-size: 13px;
-  color: #6B7280;
+  color: var(--text-muted);
 }
 
 :host {

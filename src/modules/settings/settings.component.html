@@ -1,1 +1,252 @@
-<p>settings works!</p>
+<div class="settings-page">
+
+  <!-- PAGE HEADER -->
+  <div class="settings-header">
+    <h2><span class="material-icons">settings</span> Settings</h2>
+  </div>
+
+  <div class="settings-layout">
+
+    <!-- SIDEBAR NAV -->
+    <div class="settings-nav">
+      <button class="nav-item" [class.active]="activeSection === 'appearance'" (click)="setSection('appearance')">
+        <span class="material-icons">palette</span>
+        <span>Appearance</span>
+      </button>
+      <button class="nav-item" [class.active]="activeSection === 'account'" (click)="setSection('account')">
+        <span class="material-icons">person</span>
+        <span>Account</span>
+      </button>
+      <button class="nav-item" [class.active]="activeSection === 'data'" (click)="setSection('data')">
+        <span class="material-icons">database</span>
+        <span>Data & Export</span>
+      </button>
+      <button class="nav-item" [class.active]="activeSection === 'about'" (click)="setSection('about')">
+        <span class="material-icons">info</span>
+        <span>About</span>
+      </button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="settings-content">
+
+      <div *ngIf="activeSection === 'appearance'">
+
+        <div class="section-title">
+          <span class="material-icons">palette</span>
+          Appearance
+        </div>
+
+        <div class="settings-card">
+          <div class="card-label">
+            <span class="material-icons">color_lens</span>
+            <div>
+              <p class="label-title">App Theme</p>
+              <p class="label-sub">Choose an accent color for the entire app</p>
+            </div>
+          </div>
+          <app-theme-picker></app-theme-picker>
+        </div>
+
+        <!-- <div class="settings-card">
+          <div class="card-label">
+            <span class="material-icons">dark_mode</span>
+            <div>
+              <p class="label-title">Dark Mode</p>
+              <p class="label-sub">Switch to a dark interface to reduce eye strain</p>
+            </div>
+          </div>
+          <div class="theme-quick-row">
+            <button class="quick-theme-btn" [class.active]="!themeService.isDark" (click)="themeService.toggleDark()">
+              <span class="material-icons">light_mode</span> Light
+            </button>
+            <button class="quick-theme-btn" [class.active]="themeService.isDark" (click)="themeService.toggleDark()">
+              <span class="material-icons">dark_mode</span> Dark
+            </button>
+          </div>
+        </div> -->
+      </div>
+
+      <!-- ── ACCOUNT ────────────────────────────────────── -->
+      <div *ngIf="activeSection === 'account'">
+
+        <div class="section-title">
+          <span class="material-icons">person</span>
+          Account
+        </div>
+
+        <!-- User card -->
+        <div class="settings-card user-card">
+          <div class="user-avatar">{{ userInitial }}</div>
+          <div class="user-info">
+            <p class="user-name">{{ userName }}</p>
+            <p class="user-email">{{ user?.email }}</p>
+          </div>
+          <button class="outline-btn" (click)="goProfile()">
+            <span class="material-icons">edit</span> Edit Profile
+          </button>
+        </div>
+
+        <!-- Notifications -->
+        <div class="settings-card">
+          <div class="card-label">
+            <span class="material-icons">notifications</span>
+            <div>
+              <p class="label-title">Notifications</p>
+              <p class="label-sub">Manage what reminders you receive</p>
+            </div>
+          </div>
+          <div class="toggle-list">
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-label">Habit reminders</p>
+                <p class="toggle-sub">Remind me to complete daily habits</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifHabits">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-label">Task due alerts</p>
+                <p class="toggle-sub">Alert for tasks due today</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifTasks">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-label">Mood check-in</p>
+                <p class="toggle-sub">Daily prompt to log your mood</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifMood">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-label">Weekly summary</p>
+                <p class="toggle-sub">Get a weekly progress report</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifWeekly">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="settings-card danger-zone">
+          <div class="card-label">
+            <span class="material-icons" style="color:#ef4444">logout</span>
+            <div>
+              <p class="label-title">Session</p>
+              <p class="label-sub">Log out of your Lifora account</p>
+            </div>
+          </div>
+          <button class="danger-btn" (click)="logout()">
+            <span class="material-icons">logout</span> Logout
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ── DATA & EXPORT ──────────────────────────────── -->
+      <div *ngIf="activeSection === 'data'">
+
+        <div class="section-title">
+          <span class="material-icons">database</span>
+          Data & Export
+        </div>
+
+        <div class="settings-card">
+          <div class="card-label">
+            <span class="material-icons">backup</span>
+            <div>
+              <p class="label-title">Full Data Backup</p>
+              <p class="label-sub">Download all your Lifora data as a JSON file</p>
+            </div>
+          </div>
+          <button class="primary-btn" (click)="downloadBackup()" [disabled]="exportingBackup">
+            <span class="material-icons">{{ backupDone ? 'check_circle' : 'download' }}</span>
+            {{ exportingBackup ? 'Preparing...' : backupDone ? 'Downloaded!' : 'Download Backup' }}
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-label">
+            <span class="material-icons">info</span>
+            <div>
+              <p class="label-title">Module Exports</p>
+              <p class="label-sub">CSV exports for Finance and Fitness are available inside each module via the Export
+                button</p>
+            </div>
+          </div>
+          <div class="module-export-links">
+            <a class="module-link" routerLink="/expenses">
+              <span class="material-icons">savings</span> Finance
+            </a>
+            <a class="module-link" routerLink="/fitness">
+              <span class="material-icons">fitness_center</span> Fitness
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── ABOUT ──────────────────────────────────────── -->
+      <div *ngIf="activeSection === 'about'">
+
+        <div class="section-title">
+          <span class="material-icons">info</span>
+          About
+        </div>
+
+        <div class="settings-card about-card">
+          <div class="about-logo">
+            <span class="material-icons">auto_awesome</span>
+          </div>
+          <h3 class="about-name">Lifora</h3>
+          <p class="about-tagline">Your personal life management app</p>
+          <div class="about-version">Version 1.0.0</div>
+        </div>
+
+        <div class="settings-card">
+          <div class="about-list">
+            <div class="about-row">
+              <span class="material-icons">fitness_center</span>
+              <span>Fitness & Workout Tracker</span>
+            </div>
+            <div class="about-row">
+              <span class="material-icons">repeat</span>
+              <span>Habit Builder</span>
+            </div>
+            <div class="about-row">
+              <span class="material-icons">savings</span>
+              <span>Finance & Budget Manager</span>
+            </div>
+            <div class="about-row">
+              <span class="material-icons">menu_book</span>
+              <span>Personal Diary</span>
+            </div>
+            <div class="about-row">
+              <span class="material-icons">mood</span>
+              <span>Mood Tracker</span>
+            </div>
+            <div class="about-row">
+              <span class="material-icons">track_changes</span>
+              <span>Goals & Progress</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

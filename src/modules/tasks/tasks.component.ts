@@ -239,13 +239,13 @@ export class TasksComponent {
   }
 
   loadTags() {
-  this.taskService.getTags().subscribe({
-    next: (tags) => {
-      this.existingTags = tags;
-    },
-    error: (err) => {
-      console.error('Tag fetch error:', err);
-    }
-  });
-}
+    this.taskService.getTags().subscribe({
+      next: (tags) => {
+        this.existingTags = tags;
+      },
+      error: (err) => {
+        console.error('Tag fetch error:', err);
+      }
+    });
+  }
 }
