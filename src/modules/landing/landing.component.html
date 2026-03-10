@@ -1,0 +1,329 @@
+<!-- NAV -->
+<nav>
+ <a routerLink="/" class="nav-logo">
+  <img src="lifora-logo.svg" alt="Lifora" class="nav-logo-img">
+  Lifora
+</a>
+  <ul class="nav-links">
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a routerLink="/login"    class="btn-ghost">Sign in</a>
+    <a routerLink="/register" class="btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="bubbles">
+    <div class="bubble b1"><span class="b-icon">💪</span> Fitness</div>
+    <div class="bubble b2"><span class="b-icon">💰</span> Finance</div>
+    <div class="bubble b3"><span class="b-icon">📔</span> Journal</div>
+    <div class="bubble b4"><span class="b-icon">😴</span> Sleep</div>
+    <div class="bubble b5"><span class="b-icon">🎯</span> Goals</div>
+    <div class="bubble b6"><span class="b-icon">💊</span> Medicine</div>
+    <div class="bubble b7"><span class="b-icon">✈️</span> Travel</div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      18 modules · One beautiful app
+    </div>
+
+    <h1>
+      Your entire life,<br>
+      <span class="highlight grad">beautifully organised</span>
+    </h1>
+
+    <p class="hero-sub">
+      Lifora brings together fitness, finance, habits, goals, mood, travel and more —
+      into one joyful app that actually makes you want to track your life.
+    </p>
+
+    <div class="hero-actions">
+      <a routerLink="/register" class="btn-hero">🚀 Start for free</a>
+      <a href="#modules"        class="btn-hero-outline">🧩 See all modules</a>
+    </div>
+
+    <p class="hero-note">No credit card · <span>100% free</span> · Built with ❤️</p>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num"><span>18</span></div>
+    <div class="stat-label">Life modules</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num"><span>100%</span></div>
+    <div class="stat-label">Data privacy</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num"><span>1</span></div>
+    <div class="stat-label">App for everything</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num"><span>∞</span></div>
+    <div class="stat-label">Possibilities</div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<section class="modules-section" id="modules">
+  <div class="modules-header reveal">
+    <div class="section-tag">🧩 Everything you need</div>
+    <h2 class="section-title">18 modules for every part of your life</h2>
+    <p class="section-sub">From morning habits to bedtime routines — Lifora covers every dimension of your daily life.</p>
+  </div>
+
+  <div class="modules-grid">
+    <div
+      class="module-card reveal"
+      *ngFor="let m of modules; let i = index"
+      [style.--mc-color]="m.color"
+      [style.animation-delay]="(i * 0.05) + 's'">
+      <div class="mc-icon" [style.background]="m.color">{{ m.icon }}</div>
+      <div class="mc-name">{{ m.name }}</div>
+      <div class="mc-desc">{{ m.desc }}</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div>
+      <div class="section-tag reveal">🗺️ How it works</div>
+      <h2 class="section-title reveal">Simple to start,<br>powerful to use</h2>
+      <p class="section-sub reveal" style="margin-bottom: 48px">
+        No complicated setup. Sign up, pick your modules, and start building a life you're proud of.
+      </p>
+
+      <div class="how-steps">
+        <div class="how-step reveal" *ngFor="let s of steps">
+          <div class="step-num">{{ s.num }}</div>
+          <div class="step-text">
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.desc }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App mockup -->
+    <div class="how-visual reveal">
+      <div class="mock-topbar">
+        <span class="mock-logo">Lifora</span>
+        <div class="mock-dots">
+          <div class="mock-dot"></div>
+          <div class="mock-dot"></div>
+          <div class="mock-dot"></div>
+        </div>
+      </div>
+      <div class="mock-greeting">Good Morning, Alex 👋</div>
+      <div class="mock-cards">
+        <div class="mock-card mc-a">
+          <div class="mock-card-icon">✅</div>
+          <div class="mock-card-title">Tasks Today</div>
+          <div class="mock-card-val">4/7</div>
+          <div class="mock-bar-track"><div class="mock-bar-fill" style="width:57%; background: linear-gradient(90deg, #ff6b6b, #ff9b9b)"></div></div>
+        </div>
+        <div class="mock-card mc-b">
+          <div class="mock-card-icon">🔥</div>
+          <div class="mock-card-title">Habit Streak</div>
+          <div class="mock-card-val">21 days</div>
+          <div class="mock-bar-track"><div class="mock-bar-fill" style="width:85%; background: linear-gradient(90deg, #6bcb77, #9ef0a8)"></div></div>
+        </div>
+        <div class="mock-card mc-c">
+          <div class="mock-card-icon">💰</div>
+          <div class="mock-card-title">Budget Used</div>
+          <div class="mock-card-val">68%</div>
+          <div class="mock-bar-track"><div class="mock-bar-fill" style="width:68%; background: linear-gradient(90deg, #4d96ff, #93c5fd)"></div></div>
+        </div>
+        <div class="mock-card mc-d">
+          <div class="mock-card-icon">🎯</div>
+          <div class="mock-card-title">Goal Progress</div>
+          <div class="mock-card-val">3 active</div>
+          <div class="mock-bar-track"><div class="mock-bar-fill" style="width:45%; background: linear-gradient(90deg, #ffd93d, #ffe97d)"></div></div>
+        </div>
+      </div>
+      <div class="mock-insight">
+        <div class="mock-insight-label">Daily Insight</div>
+        <div class="mock-insight-text">You've completed <strong>85%</strong> of your habits this week — your best week yet! 🎉</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="features-header reveal">
+    <div class="section-tag feature-tag">⚡ What makes it special</div>
+    <h2 class="section-title" style="color: white">Thoughtfully built,<br>delightfully designed</h2>
+    <p class="section-sub" style="color: rgba(255,255,255,0.5); margin: 0 auto">
+      Not just another tracker. Lifora is a holistic life companion that connects your data across modules.
+    </p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card reveal" *ngFor="let f of features; let i = index" [style.animation-delay]="(i * 0.1) + 's'">
+      <div class="feature-icon" [style.background]="f.color">{{ f.icon }}</div>
+      <h3>{{ f.title }}</h3>
+      <p>{{ f.desc }}</p>
+    </div>
+
+    <!-- Export card spans 2 cols -->
+    <div class="feature-card big reveal">
+      <div class="feature-inner">
+        <div>
+          <div class="feature-icon" style="background: rgba(199,125,255,0.15)">📊</div>
+          <h3>Your data, your story</h3>
+          <p>Export Finance as CSV, Fitness as spreadsheet, or download a complete JSON backup. Your life, in your hands.</p>
+        </div>
+        <div class="export-grid">
+          <div class="export-badge" style="color: #ffd93d">CSV<span>Finance & Fitness</span></div>
+          <div class="export-badge" style="color: #6bcb77">JSON<span>Full backup</span></div>
+          <div class="export-badge" style="color: #ff6b6b">PDF<span>Monthly report</span></div>
+          <div class="export-badge" style="color: #4d96ff">🔒<span>Secure & private</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <p class="quote-text reveal">
+    "Stop juggling 10 different apps.<br>
+    <em>One app. Your whole life.</em>"
+  </p>
+  <p class="quote-author reveal">— The idea behind Lifora</p>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-blob cta-blob-1"></div>
+  <div class="cta-blob cta-blob-2"></div>
+  <div class="cta-content">
+    <div class="section-tag cta-tag reveal">🚀 Ready to start?</div>
+    <h2 class="section-title reveal" style="color:white">Start organising your life<br>today — it's free</h2>
+    <p class="section-sub reveal" style="color:rgba(255,255,255,0.6); margin: 0 auto 40px">
+      Join Lifora and take control of every corner of your life. No subscriptions, no limits.
+    </p>
+    <div class="reveal">
+      <a routerLink="/register" class="btn-cta">Create free account</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+
+    <!-- Brand col -->
+    <div class="footer-brand">
+     <div class="footer-logo">
+  <img src="lifora-logo.svg" alt="Lifora" class="footer-logo-img">
+  Lifora
+</div>
+      <p class="footer-tagline">Your entire life, beautifully organised. One app for habits, health, finance, travel and everything in between.</p>
+      <div class="footer-badges">
+        <span class="f-badge">🔒 Private & secure</span>
+        <span class="f-badge">⚡ Always free</span>
+      </div>
+    </div>
+
+    <!-- Modules col -->
+    <div class="footer-col">
+      <h4 class="footer-col-title">Modules</h4>
+      <ul>
+        <li><a href="#">📔 Daily Journal</a></li>
+        <li><a href="#">✅ Tasks & To-dos</a></li>
+        <li><a href="#">🔁 Habit Tracker</a></li>
+        <li><a href="#">🎯 Goals & Milestones</a></li>
+        <li><a href="#">💪 Fitness Tracker</a></li>
+        <li><a href="#">💰 Finance & Budgets</a></li>
+        <li><a href="#">✈️ Travel Planner</a></li>
+        <li><a href="#">😴 Sleep Tracker</a></li>
+      </ul>
+    </div>
+
+    <!-- Health col -->
+    <div class="footer-col">
+      <h4 class="footer-col-title">Health & Wellness</h4>
+      <ul>
+        <li><a href="#">😊 Mood Tracker</a></li>
+        <li><a href="#">💊 Medicine Reminders</a></li>
+        <li><a href="#">🩸 Period Tracker</a></li>
+        <li><a href="#">🤰 Pregnancy Journey</a></li>
+        <li><a href="#">🍽️ Food & Nutrition</a></li>
+        <li><a href="#">📚 Reading List</a></li>
+        <li><a href="#">💡 Knowledge Base</a></li>
+        <li><a href="#">🧠 Vision Board</a></li>
+      </ul>
+    </div>
+
+    <!-- Product col -->
+    <div class="footer-col">
+      <h4 class="footer-col-title">Product</h4>
+      <ul>
+        <li><a routerLink="/register">Get Started Free</a></li>
+        <li><a routerLink="/login">Sign In</a></li>
+        <!-- <li><a href="#">Changelog</a></li>
+        <li><a href="#">Roadmap</a></li> -->
+        <li><a href="#">Flutter App <span class="coming-soon">Soon</span></a></li>
+      </ul>
+
+      <h4 class="footer-col-title" style="margin-top: 28px">Legal</h4>
+      <ul>
+        <li><a routerLink="/privacy">Privacy Policy</a></li>
+        <li><a routerLink="/terms">Terms of Service</a></li>
+        <li><a href="mailto:asmithachandinitg@email.com">Contact Us</a></li>
+        <div class="footer-socials">
+  <!-- GitHub -->
+  <a href="https://github.com/asmithachandinitg" target="_blank" class="social-btn" title="GitHub">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+  </a>
+
+  <!-- LinkedIn -->
+  <a href="https://linkedin.com/in/asmitha-chandini-tg" target="_blank" class="social-btn" title="LinkedIn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+  </a>
+
+  <!-- Naukri -->
+  <a href="https://www.naukri.com/mnjuser/profile?id=&altresid" target="_blank" class="social-btn" title="Naukri">
+    <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor"><path d="M27 9h-4V7a3 3 0 0 0-3-3h-8a3 3 0 0 0-3 3v2H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1zm-16-2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2h-10V7zm6 12v-4h2v4h-2zm-2 0h-8v-4h8v4zm4 0v-4h8v4h-8z"/></svg>
+  </a>
+
+  <!-- Portfolio -->
+<a href="https://portfolio-asmitha.vercel.app/" target="_blank" class="social-btn" title="Portfolio">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+</a>
+</div>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-left">
+      Built with ❤️ by a solo developer · © 2026 Lifora · All rights reserved
+    </div>
+    <div class="footer-bottom-right">
+      <span class="tech-badge">Angular</span>
+      <span class="tech-badge">Node.js</span>
+      <span class="tech-badge">MongoDB</span>
+      <span class="tech-badge">Flutter soon</span>
+    </div>
+  </div>
+</footer>
+

@@ -33,7 +33,7 @@ export class LoginComponent {
   constructor(
     private auth: AuthService,
     private router: Router,
-    public loading: LoadingService  // public so template can access loading$
+    public loading: LoadingService 
   ) {}
 
   loginUser() {
@@ -53,7 +53,7 @@ export class LoginComponent {
         next: (res: any) => {
           this.auth.saveToken(res.token);
           this.auth.loadUser().subscribe(() => {
-            this.router.navigate(['/']);
+            this.router.navigate(['/dashboard']);
           });
         },
         error: err => {

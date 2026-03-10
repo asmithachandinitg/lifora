@@ -17,9 +17,9 @@ export const appConfig: ApplicationConfig = {
 
     provideHttpClient(
       withInterceptors([
-        authInterceptor,    // 1. attach JWT token
-        loadingInterceptor, // 2. show/hide global spinner
-        errorInterceptor,   // 3. handle errors and show toasts
+        authInterceptor,    
+        loadingInterceptor, 
+        errorInterceptor,   
       ])
     ),
 

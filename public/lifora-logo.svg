@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#2d1b4e"/>
+    </linearGradient>
+    <linearGradient id="p1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b6b"/>
+      <stop offset="100%" stop-color="#ff8e53"/>
+    </linearGradient>
+    <linearGradient id="p2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd93d"/>
+      <stop offset="100%" stop-color="#ff9f43"/>
+    </linearGradient>
+    <linearGradient id="p3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6bcb77"/>
+      <stop offset="100%" stop-color="#4ecdc4"/>
+    </linearGradient>
+    <linearGradient id="p4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4d96ff"/>
+      <stop offset="100%" stop-color="#45b7d1"/>
+    </linearGradient>
+    <linearGradient id="p5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c77dff"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="p6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6fd8"/>
+      <stop offset="100%" stop-color="#ff6b6b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#ffd93d" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="46" fill="url(#bg)"/>
+
+  <!-- Subtle rings -->
+  <circle cx="100" cy="100" r="72" fill="none" stroke="white" stroke-width="0.5" opacity="0.08"/>
+  <circle cx="100" cy="100" r="52" fill="none" stroke="white" stroke-width="0.5" opacity="0.06"/>
+
+  <!-- 6 petals representing 6 life dimensions -->
+  <g transform="translate(100,100) rotate(0)">
+    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p1)" opacity="0.93" filter="url(#softglow)"/>
+  </g>
+  <g transform="translate(100,100) rotate(60)">
+    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p2)" opacity="0.93" filter="url(#softglow)"/>
+  </g>
+  <g transform="translate(100,100) rotate(120)">
+    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p3)" opacity="0.93" filter="url(#softglow)"/>
+  </g>
+  <g transform="translate(100,100) rotate(180)">
+    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p4)" opacity="0.93" filter="url(#softglow)"/>
+  </g>
+  <g transform="translate(100,100) rotate(240)">
+    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p5)" opacity="0.93" filter="url(#softglow)"/>
+  </g>
+  <g transform="translate(100,100) rotate(300)">
+    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p6)" opacity="0.93" filter="url(#softglow)"/>
+  </g>
+
+  <!-- Center glow -->
+  <circle cx="100" cy="100" r="18" fill="url(#glow)" opacity="0.85"/>
+  <circle cx="100" cy="100" r="7" fill="white"/>
+
+  <!-- Sparkle dots between petals -->
+  <circle cx="100" cy="63"  r="2.5" fill="white" opacity="0.55"/>
+  <circle cx="129" cy="81"  r="2.5" fill="white" opacity="0.55"/>
+  <circle cx="129" cy="119" r="2.5" fill="white" opacity="0.55"/>
+  <circle cx="100" cy="137" r="2.5" fill="white" opacity="0.55"/>
+  <circle cx="71"  cy="119" r="2.5" fill="white" opacity="0.55"/>
+  <circle cx="71"  cy="81"  r="2.5" fill="white" opacity="0.55"/>
+</svg>
