@@ -54,3 +54,46 @@ body.dark-mode textarea {
   border-color: var(--input-border) !important;
   color: var(--text) !important;
 }
+/* ══════════════════════════════════════════
+   SKELETON LOADER — global shimmer utility
+   ══════════════════════════════════════════ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--bg-secondary) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+
+@keyframes sk-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sk-line       { height: 13px; margin-bottom: 8px; }
+.sk-line.sm    { width: 35%; }
+.sk-line.md    { width: 60%; }
+.sk-line.lg    { width: 85%; }
+.sk-line.full  { width: 100%; }
+.sk-circle     { border-radius: 50%; }
+.sk-rounded    { border-radius: 12px; }
+
+.empty-state-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding: 56px 24px;
+}
+.empty-illustration {
+  font-size: 54px; margin-bottom: 16px; line-height: 1;
+  animation: empty-float 3s ease-in-out infinite;
+}
+@keyframes empty-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.empty-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 0 0 8px; }
+.empty-desc  { font-size: 0.88rem; color: var(--text-muted); max-width: 300px; line-height: 1.65; margin: 0; }

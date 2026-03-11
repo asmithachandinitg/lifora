@@ -38,9 +38,10 @@
     </div>
 
     <!-- Empty -->
-    <div *ngIf="trips.length === 0" class="empty">
-      <span class="material-icons empty-icon">travel_explore</span>
-      <p>No trips yet. Start planning your next adventure!</p>
+    <div *ngIf="trips.length === 0" class="empty-state-wrap">
+      <div class="empty-illustration">✈️</div>
+      <h3 class="empty-title">No trips planned yet</h3>
+      <p class="empty-desc">The world is waiting! Plan your next adventure.</p>
     </div>
 
     <!-- Ongoing -->
@@ -54,8 +55,10 @@
               <span class="material-icons">flight_takeoff</span> Ongoing
             </span>
             <div class="trip-card-actions" (click)="$event.stopPropagation()">
-              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span class="material-icons">edit</span></button>
-              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span class="material-icons">delete</span></button>
+              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span
+                  class="material-icons">edit</span></button>
+              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span
+                  class="material-icons">delete</span></button>
             </div>
           </div>
           <div class="trip-card-body">
@@ -75,16 +78,17 @@
     <div *ngIf="upcomingTrips.length > 0">
       <div class="section-title"><span class="material-icons">event</span> Upcoming</div>
       <div class="trips-grid">
-        <div class="trip-card" *ngFor="let trip of upcomingTrips; trackBy: trackById"
-          (click)="openTrip(trip)">
+        <div class="trip-card" *ngFor="let trip of upcomingTrips; trackBy: trackById" (click)="openTrip(trip)">
           <div class="trip-card-top" [style.background]="trip.coverColor">
             <span class="trip-countdown" *ngIf="getDaysUntil(trip.startDate) > 0">
               {{ getDaysUntil(trip.startDate) }} days away
             </span>
             <span class="trip-countdown" *ngIf="getDaysUntil(trip.startDate) <= 0">Today!</span>
             <div class="trip-card-actions" (click)="$event.stopPropagation()">
-              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span class="material-icons">edit</span></button>
-              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span class="material-icons">delete</span></button>
+              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span
+                  class="material-icons">edit</span></button>
+              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span
+                  class="material-icons">delete</span></button>
             </div>
           </div>
           <div class="trip-card-body">
@@ -117,8 +121,10 @@
               <span class="material-icons">check_circle</span> Completed
             </span>
             <div class="trip-card-actions" (click)="$event.stopPropagation()">
-              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span class="material-icons">edit</span></button>
-              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span class="material-icons">delete</span></button>
+              <button class="icon-btn-light" (click)="openEditTrip(trip)"><span
+                  class="material-icons">edit</span></button>
+              <button class="icon-btn-light" (click)="confirmDelete(trip._id!)"><span
+                  class="material-icons">delete</span></button>
             </div>
           </div>
           <div class="trip-card-body">
@@ -158,10 +164,8 @@
           <span class="material-icons">edit</span>
         </button>
         <span class="status-pill">{{ statusConfig[selectedTrip.status].label }}</span>
-        <button class="save-all-btn"
-                [class.has-changes]="hasUnsavedChanges"
-                [disabled]="!hasUnsavedChanges || isSaving"
-                (click)="saveAllChanges()">
+        <button class="save-all-btn" [class.has-changes]="hasUnsavedChanges" [disabled]="!hasUnsavedChanges || isSaving"
+          (click)="saveAllChanges()">
           <span class="material-icons">{{ isSaving ? 'hourglass_top' : 'save' }}</span>
           {{ isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved' }}
         </button>
@@ -170,12 +174,12 @@
 
     <!-- Detail Tabs -->
     <div class="tabs">
-      <button [class.active]="detailTab === 'overview'"   (click)="detailTab = 'overview'">Overview</button>
-      <button [class.active]="detailTab === 'packing'"    (click)="detailTab = 'packing'">
+      <button [class.active]="detailTab === 'overview'" (click)="detailTab = 'overview'">Overview</button>
+      <button [class.active]="detailTab === 'packing'" (click)="detailTab = 'packing'">
         Packing <span class="tab-badge" *ngIf="totalPacking > 0">{{ packedCount }}/{{ totalPacking }}</span>
       </button>
-      <button [class.active]="detailTab === 'itinerary'"  (click)="detailTab = 'itinerary'">Itinerary</button>
-      <button [class.active]="detailTab === 'budget'"     (click)="detailTab = 'budget'">Budget</button>
+      <button [class.active]="detailTab === 'itinerary'" (click)="detailTab = 'itinerary'">Itinerary</button>
+      <button [class.active]="detailTab === 'budget'" (click)="detailTab = 'budget'">Budget</button>
     </div>
 
     <!-- OVERVIEW TAB -->
@@ -208,8 +212,8 @@
       </div>
       <div class="notes-card" *ngIf="!selectedTrip.notes">
         <div class="notes-title"><span class="material-icons">notes</span> Notes & Memories</div>
-        <textarea [(ngModel)]="selectedTrip.notes" placeholder="Write your notes, memories, tips..."
-          rows="4" (change)="markDirty()"></textarea>
+        <textarea [(ngModel)]="selectedTrip.notes" placeholder="Write your notes, memories, tips..." rows="4"
+          (change)="markDirty()"></textarea>
       </div>
 
       <!-- Journal summary — full entries shown per-day in Itinerary tab -->
@@ -220,7 +224,8 @@
             <div class="js-title">Trip Journal</div>
             <div class="js-sub">
               <ng-container *ngIf="!loadingJournal">
-                {{ totalJournalCount > 0 ? (totalJournalCount + ' entr' + (totalJournalCount === 1 ? 'y' : 'ies') + ' written') : 'No journal entries yet' }}
+                {{ totalJournalCount > 0 ? (totalJournalCount + ' entr' + (totalJournalCount === 1 ? 'y' : 'ies') + '
+                written') : 'No journal entries yet' }}
               </ng-container>
               <ng-container *ngIf="loadingJournal">Loading...</ng-container>
             </div>
@@ -240,7 +245,8 @@
       <div class="pack-progress-card">
         <div class="pack-progress-info">
           <span class="pack-progress-label">{{ packedCount }} of {{ totalPacking }} items packed</span>
-          <span class="pack-progress-pct">{{ totalPacking > 0 ? (packedCount / totalPacking * 100 | number:'1.0-0') : 0 }}%</span>
+          <span class="pack-progress-pct">{{ totalPacking > 0 ? (packedCount / totalPacking * 100 | number:'1.0-0') : 0
+            }}%</span>
         </div>
         <div class="pack-bar-track">
           <div class="pack-bar-fill" [style.width.%]="totalPacking > 0 ? (packedCount / totalPacking * 100) : 0"></div>
@@ -267,7 +273,8 @@
             <div class="pack-item" *ngFor="let item of packingByCategory[cat]; trackBy: trackById"
               [class.packed-item]="item.packed">
               <div class="pack-item-left" (click)="togglePacked(item)">
-                <span class="material-icons pack-check">{{ item.packed ? 'check_box' : 'check_box_outline_blank' }}</span>
+                <span class="material-icons pack-check">{{ item.packed ? 'check_box' : 'check_box_outline_blank'
+                  }}</span>
                 <span class="pack-item-name" [class.packed-text]="item.packed">{{ item.name }}</span>
               </div>
               <button class="remove-pack-btn" (click)="removePackingItem(item)">
@@ -285,11 +292,8 @@
 
       <!-- Add day -->
       <div class="add-day-row">
-        <input type="date"
-               [(ngModel)]="newItineraryDay.date"
-               class="day-date-input"
-               [min]="tripMinDate"
-               [max]="tripMaxDate" />
+        <input type="date" [(ngModel)]="newItineraryDay.date" class="day-date-input" [min]="tripMinDate"
+          [max]="tripMaxDate" />
         <input placeholder="Day title (optional)" [(ngModel)]="newItineraryDay.title" class="day-title-input" />
         <button class="add-day-btn" (click)="addItineraryDay()">
           <span class="material-icons">add</span> Add Day
@@ -300,7 +304,8 @@
       </div>
 
       <div *ngIf="selectedTrip.itinerary.length === 0" class="empty-inline">
-        <span class="material-icons">map</span> No days planned yet. Add days between {{ formatDate(tripMinDate) }}{{ tripMaxDate ? ' and ' + formatDate(tripMaxDate) : '' }}.
+        <span class="material-icons">map</span> No days planned yet. Add days between {{ formatDate(tripMinDate) }}{{
+        tripMaxDate ? ' and ' + formatDate(tripMaxDate) : '' }}.
       </div>
 
       <div class="itinerary-list">
@@ -326,8 +331,8 @@
           </div>
 
           <div class="add-activity-row">
-            <input placeholder="Add activity..." [(ngModel)]="newActivity[day._id]"
-              (keyup.enter)="addActivity(day)" class="act-input" />
+            <input placeholder="Add activity..." [(ngModel)]="newActivity[day._id]" (keyup.enter)="addActivity(day)"
+              class="act-input" />
             <button class="add-act-btn" (click)="addActivity(day)">
               <span class="material-icons">add</span>
             </button>
@@ -349,8 +354,7 @@
               No entries for this day yet.
             </div>
             <div class="day-journal-cards" *ngIf="getEntriesForDate(day.date).length > 0">
-              <div class="day-journal-card" *ngFor="let entry of getEntriesForDate(day.date)"
-                   [ngClass]="entry.mood">
+              <div class="day-journal-card" *ngFor="let entry of getEntriesForDate(day.date)" [ngClass]="entry.mood">
                 <span class="material-icons djc-mood">{{ getMoodIcon(entry.mood) }}</span>
                 <div class="djc-body">
                   <span class="djc-title">{{ entry.title }}</span>
@@ -389,9 +393,7 @@
           </div>
         </div>
         <div class="budget-bar-track">
-          <div class="budget-bar-fill"
-            [style.width.%]="budgetPercent"
-            [class.over-bar]="budgetLeft < 0">
+          <div class="budget-bar-fill" [style.width.%]="budgetPercent" [class.over-bar]="budgetLeft < 0">
           </div>
         </div>
         <span class="budget-pct-label">{{ budgetPercent }}% used</span>
@@ -404,8 +406,7 @@
           <span class="material-icons cat-exp-icon">{{ c.icon }}</span>
           <span class="cat-exp-name">{{ c.cat | titlecase }}</span>
           <div class="cat-exp-bar-track">
-            <div class="cat-exp-bar-fill"
-              [style.width.%]="totalSpent > 0 ? (c.total / totalSpent * 100) : 0">
+            <div class="cat-exp-bar-fill" [style.width.%]="totalSpent > 0 ? (c.total / totalSpent * 100) : 0">
             </div>
           </div>
           <span class="cat-exp-amt">₹{{ c.total | number }}</span>
@@ -492,10 +493,8 @@
     <div class="form-group">
       <label>Cover Color</label>
       <div class="color-picker">
-        <div *ngFor="let c of coverColors" class="color-swatch"
-          [style.background]="c"
-          [class.selected-color]="tripForm.coverColor === c"
-          (click)="tripForm.coverColor = c">
+        <div *ngFor="let c of coverColors" class="color-swatch" [style.background]="c"
+          [class.selected-color]="tripForm.coverColor === c" (click)="tripForm.coverColor = c">
         </div>
       </div>
     </div>
@@ -560,7 +559,7 @@
     <h3>Delete this trip?</h3>
     <p>All packing, itinerary and expenses will be lost.</p>
     <div class="confirm-actions">
-      <button class="no-btn"  (click)="showDeleteConfirm = false">Cancel</button>
+      <button class="no-btn" (click)="showDeleteConfirm = false">Cancel</button>
       <button class="yes-btn" (click)="doDelete()">
         <span class="material-icons">delete</span> Delete
       </button>

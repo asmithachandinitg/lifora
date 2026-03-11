@@ -156,3 +156,30 @@
 .dropdown-item.danger { color: #ef4444; }
 .dropdown-item.danger .item-icon { color: #ef4444; }
 .dropdown-item.danger:hover { background: #fef2f2; color: #ef4444; }
+
+.logout-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.logout-modal {
+  background: var(--card-bg); border-radius: 20px;
+  padding: 32px 28px; text-align: center;
+  width: 300px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.logout-icon  { font-size: 40px; margin-bottom: 12px; }
+.logout-modal h3 { font-size: 1.2rem; font-weight: 700; color: var(--text); margin: 0 0 8px; }
+.logout-modal p  { font-size: 0.9rem; color: var(--text-muted); margin: 0 0 24px; }
+.logout-actions  { display: flex; gap: 12px; }
+.btn-cancel  {
+  flex: 1; padding: 10px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--text); font-weight: 600; cursor: pointer;
+}
+.btn-confirm {
+  flex: 1; padding: 10px; border-radius: 12px;
+  border: none; background: #ef4444;
+  color: white; font-weight: 600; cursor: pointer;
+}
+.btn-cancel:hover  { background: var(--bg); }
+.btn-confirm:hover { background: #dc2626; }

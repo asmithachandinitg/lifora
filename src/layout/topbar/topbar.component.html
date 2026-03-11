@@ -20,9 +20,18 @@
     <!-- Avatar + Dropdown -->
     <div class="avatar-wrapper" (click)="toggleMenu()">
 
-      <div class="avatar">
-        <span class="material-icons">account_circle</span>
-      </div>
+     <div class="avatar">
+    <img *ngIf="user?.profilePhoto" 
+         [src]="user.profilePhoto" 
+         alt="avatar"
+         style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+    <span *ngIf="!user?.profilePhoto && avatarInitials" 
+          style="font-size:15px; font-weight:700; color:white">
+      {{ avatarInitials }}
+    </span>
+    <span *ngIf="!user?.profilePhoto && !avatarInitials" 
+          class="material-icons">account_circle</span>
+  </div>
 
       <span class="status-dot"></span>
 
@@ -41,7 +50,7 @@
 
         <div class="dropdown-divider"></div>
 
-        <div class="dropdown-item danger" (click)="logout()">
+        <div class="dropdown-item danger" (click)="confirmLogout()">
           <span class="material-icons item-icon">logout</span>
           Logout
         </div>
@@ -52,4 +61,17 @@
 
   </div>
 
+</div>
+
+<!-- Logout Modal -->
+<div class="logout-overlay" *ngIf="showLogoutModal" (click)="cancelLogout()">
+  <div class="logout-modal" (click)="$event.stopPropagation()">
+    <div class="logout-icon">👋</div>
+    <h3>Leaving so soon?</h3>
+    <p>Are you sure you want to logout?</p>
+    <div class="logout-actions">
+      <button class="btn-cancel" (click)="cancelLogout()">Stay</button>
+      <button class="btn-confirm" (click)="logout()">Logout</button>
+    </div>
+  </div>
 </div>

@@ -13,12 +13,13 @@ export interface DailyInsight {
   priority: number;
 }
 
-export interface DailyInsight {
-  icon: string; color: string; bg: string; message: string; priority: number;
-}
-
 export interface WeeklyInsight {
-  label: string; value: string; icon: string; color: string; bg: string; sub?: string;
+  label: string;
+  value: string;
+  icon: string;
+  color: string;
+  bg: string;
+  sub?: string;
 }
 
 @Component({
@@ -40,6 +41,10 @@ export class DashboardComponent implements OnInit {
   moodToday: string | null = null;
   workoutsThisWeek = 0;
   foodLoggedToday = 0;
+
+  habitStreak = 0;
+  diaryStreak = 0;
+  moodStreak  = 0;
 
   private rawHabits: any[] = [];
   private rawWorkouts: any[] = [];
@@ -72,14 +77,14 @@ export class DashboardComponent implements OnInit {
   ];
 
   moodConfig: Record<string, { icon: string; color: string; label: string }> = {
-    great: { icon: '😄', color: '#10b981', label: 'Great' },
-    good: { icon: '🙂', color: '#8B5CF6', label: 'Good' },
-    okay: { icon: '😐', color: '#f59e0b', label: 'Okay' },
-    bad: { icon: '😔', color: '#ef4444', label: 'Bad' },
-    awful: { icon: '😞', color: '#6b7280', label: 'Awful' },
-    sad: { icon: '😢', color: '#3b82f6', label: 'Sad' },
-    angry: { icon: '😡', color: '#ef4444', label: 'Angry' },
-    happy: { icon: '😄', color: '#10b981', label: 'Happy' },
+    great:   { icon: '😄', color: '#10b981', label: 'Great' },
+    good:    { icon: '🙂', color: '#8B5CF6', label: 'Good' },
+    okay:    { icon: '😐', color: '#f59e0b', label: 'Okay' },
+    bad:     { icon: '😔', color: '#ef4444', label: 'Bad' },
+    awful:   { icon: '😞', color: '#6b7280', label: 'Awful' },
+    sad:     { icon: '😢', color: '#3b82f6', label: 'Sad' },
+    angry:   { icon: '😡', color: '#ef4444', label: 'Angry' },
+    happy:   { icon: '😄', color: '#10b981', label: 'Happy' },
     excited: { icon: '🤩', color: '#f59e0b', label: 'Excited' },
     neutral: { icon: '😐', color: '#6b7280', label: 'Neutral' },
   };
@@ -100,21 +105,21 @@ export class DashboardComponent implements OnInit {
   loadAllData() {
     this.loading = true;
     forkJoin({
-      habits: this.dashboardService.getHabitSummary(),
+      habits:   this.dashboardService.getHabitSummary(),
       workouts: this.dashboardService.getFitnessSummary(),
-      food: this.dashboardService.getFoodSummary(),
-      mood: this.dashboardService.getMoodSummary(),
-      tasks: this.dashboardService.getTasksSummary(),
-      goals: this.dashboardService.getGoalsSummary(),
-      diary: this.dashboardService.getDiarySummary(),
+      food:     this.dashboardService.getFoodSummary(),
+      mood:     this.dashboardService.getMoodSummary(),
+      tasks:    this.dashboardService.getTasksSummary(),
+      goals:    this.dashboardService.getGoalsSummary(),
+      diary:    this.dashboardService.getDiarySummary(),
     }).subscribe({
       next: ({ habits, workouts, food, mood, tasks, goals, diary }) => {
-        this.rawHabits = habits || [];
+        this.rawHabits   = habits   || [];
         this.rawWorkouts = workouts || [];
-        this.rawMoods = mood || [];
-        this.rawTasks = tasks || [];
-        this.rawGoals = goals || [];
-        this.rawDiary = diary || [];
+        this.rawMoods    = mood     || [];
+        this.rawTasks    = tasks    || [];
+        this.rawGoals    = goals    || [];
+        this.rawDiary    = diary    || [];
         this.processHabits(habits);
         this.processWorkouts(workouts);
         this.processFood(food);
@@ -123,6 +128,7 @@ export class DashboardComponent implements OnInit {
         this.buildRecentActivity(habits, workouts, food, mood);
         this.generateInsights();
         this.generateWeeklyInsights();
+        this.computeStreaks();
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -132,22 +138,21 @@ export class DashboardComponent implements OnInit {
   setWeekLabel() {
     const now = new Date();
     const start = new Date(now); start.setDate(now.getDate() - now.getDay());
-    const end = new Date(now); end.setDate(now.getDate() + (6 - now.getDay()));
+    const end   = new Date(now); end.setDate(now.getDate() + (6 - now.getDay()));
     const fmt = (d: Date) => d.toLocaleDateString('en', { day: 'numeric', month: 'short' });
     this.weekLabel = `${fmt(start)} – ${fmt(end)}`;
   }
 
   processHabits(habits: any[]) {
     if (!habits?.length) return;
-    this.habitsTotal = habits.length;
+    this.habitsTotal     = habits.length;
     this.habitsCompleted = habits.filter(h =>
       h.completions?.some((c: any) => c.date === this.todayStr && c.completed)
     ).length;
-
     this.todayHabits = habits.map(h => ({
-      name: h.name,
-      icon: h.icon || 'repeat',
-      color: h.color || '#8B5CF6',
+      name:      h.name,
+      icon:      h.icon  || 'repeat',
+      color:     h.color || '#8B5CF6',
       completed: h.completions?.some((c: any) => c.date === this.todayStr && c.completed) ?? false
     }));
   }
@@ -156,32 +161,32 @@ export class DashboardComponent implements OnInit {
     if (!workouts?.length) return;
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const weekAgoStr = weekAgo.toISOString().split('T')[0];
+    const weekAgoStr      = weekAgo.toISOString().split('T')[0];
     this.workoutsThisWeek = workouts.filter(w => w.date?.slice(0, 10) >= weekAgoStr).length;
-    const todayWorkouts = workouts.filter(w => w.date?.slice(0, 10) === this.todayStr);
-    this.caloriesToday = todayWorkouts.reduce((s: number, w: any) => s + (w.caloriesBurned || 0), 0);
+    const todayWorkouts   = workouts.filter(w => w.date?.slice(0, 10) === this.todayStr);
+    this.caloriesToday    = todayWorkouts.reduce((s: number, w: any) => s + (w.caloriesBurned || 0), 0);
   }
 
   processFood(food: any[]) {
     if (!food?.length) return;
-    const todayFood = food.filter(f => f.date?.slice(0, 10) === this.todayStr);
+    const todayFood      = food.filter(f => f.date?.slice(0, 10) === this.todayStr);
     this.foodLoggedToday = todayFood.reduce((s: number, f: any) => s + (f.items?.length || 0), 0);
   }
 
   processMood(moods: any[]) {
     if (!moods?.length) { this.moodToday = null; return; }
     const todayMood = moods.find(m => m.datetime?.slice(0, 10) === this.todayStr);
-    this.moodToday = todayMood?.mood || null;
+    this.moodToday  = todayMood?.mood || null;
   }
 
   processTasks(tasks: any[]) {
     if (!tasks?.length) return;
-    const dueTasks = tasks.filter(t => !t.completed && t.dueDate?.slice(0, 10) <= this.todayStr);
+    const dueTasks     = tasks.filter(t => !t.completed && t.dueDate?.slice(0, 10) <= this.todayStr);
     this.tasksDueToday = dueTasks.length;
     this.upcomingTasks = dueTasks.slice(0, 5).map(t => ({
-      _id: t._id,
-      title: t.title,
-      dueDate: t.dueDate,
+      _id:      t._id,
+      title:    t.title,
+      dueDate:  t.dueDate,
       priority: t.priority || 'medium'
     }));
   }
@@ -194,45 +199,45 @@ export class DashboardComponent implements OnInit {
     );
     if (completedHabits.length) {
       activity.push({
-        type: 'habit',
-        title: `${completedHabits.length} habit${completedHabits.length > 1 ? 's' : ''} completed`,
+        type:     'habit',
+        title:    `${completedHabits.length} habit${completedHabits.length > 1 ? 's' : ''} completed`,
         subtitle: completedHabits.slice(0, 2).map((h: any) => h.name).join(', '),
-        icon: 'repeat',
-        color: '#8B5CF6'
+        icon:     'repeat',
+        color:    '#8B5CF6'
       });
     }
 
     (workouts || []).filter(w => w.date?.slice(0, 10) === this.todayStr)
       .slice(0, 2).forEach(w => {
         activity.push({
-          type: 'workout',
-          title: w.title || 'Workout logged',
+          type:     'workout',
+          title:    w.title || 'Workout logged',
           subtitle: `${w.duration}min · ${w.caloriesBurned} kcal`,
-          time: w.workoutTime,
-          icon: 'fitness_center',
-          color: '#ef4444'
+          time:     w.workoutTime,
+          icon:     'fitness_center',
+          color:    '#ef4444'
         });
       });
 
     const todayFood = (food || []).filter(f => f.date?.slice(0, 10) === this.todayStr);
     if (todayFood.length) {
       activity.push({
-        type: 'food',
-        title: `${todayFood.length} meal${todayFood.length > 1 ? 's' : ''} logged`,
+        type:     'food',
+        title:    `${todayFood.length} meal${todayFood.length > 1 ? 's' : ''} logged`,
         subtitle: todayFood[0]?.items?.slice(0, 2).map((i: any) => i.name).join(', '),
-        icon: 'restaurant',
-        color: '#f59e0b'
+        icon:     'restaurant',
+        color:    '#f59e0b'
       });
     }
 
     const todayMood = (mood || []).find(m => m.datetime?.slice(0, 10) === this.todayStr);
     if (todayMood) {
       activity.push({
-        type: 'mood',
-        title: `Mood: ${todayMood.mood}`,
+        type:     'mood',
+        title:    `Mood: ${todayMood.mood}`,
         subtitle: todayMood.note || '',
-        icon: 'mood',
-        color: '#10b981'
+        icon:     'mood',
+        color:    '#10b981'
       });
     }
 
@@ -275,11 +280,13 @@ export class DashboardComponent implements OnInit {
     const inProgress = this.rawGoals.filter(g => g.status === 'in-progress')
       .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
     if (inProgress.length > 0) {
-      const s = inProgress[0];
+      const s     = inProgress[0];
       const dLeft = Math.ceil((new Date(s.deadline).getTime() - Date.now()) / 86400000);
       list.push({
         icon: 'track_changes', color: '#6366f1', bg: '#eef2ff',
-        message: dLeft <= 30 ? `🎯 "${s.title}" is at ${s.progress}% — ${dLeft} days left!` : `🎯 "${s.title}" is ${s.progress}% complete — keep pushing!`,
+        message:  dLeft <= 30
+          ? `🎯 "${s.title}" is at ${s.progress}% — ${dLeft} days left!`
+          : `🎯 "${s.title}" is ${s.progress}% complete — keep pushing!`,
         priority: dLeft <= 30 ? 2 : 6
       });
     }
@@ -291,39 +298,6 @@ export class DashboardComponent implements OnInit {
     this.insights = list.sort((a, b) => a.priority - b.priority).slice(0, 5);
   }
 
-  get habitsPercent(): number {
-    if (!this.habitsTotal) return 0;
-    return Math.round((this.habitsCompleted / this.habitsTotal) * 100);
-  }
-
-  get todayLabel(): string {
-    return this.today.toLocaleDateString('en', {
-      weekday: 'long', day: 'numeric', month: 'long'
-    });
-  }
-
-  get moodEmoji(): string {
-    if (!this.moodToday) return '—';
-    return this.moodConfig[this.moodToday]?.icon || '—';
-  }
-
-  get moodColor(): string {
-    if (!this.moodToday) return '#9ca3af';
-    return this.moodConfig[this.moodToday]?.color || '#9ca3af';
-  }
-
-  priorityColor(priority: string): string {
-    return priority === 'high' ? '#ef4444'
-      : priority === 'medium' ? '#f59e0b'
-        : '#10b981';
-  }
-
-  priorityIcon(priority: string): string {
-    return priority === 'high' ? 'keyboard_double_arrow_up'
-      : priority === 'medium' ? 'drag_handle'
-        : 'keyboard_double_arrow_down';
-  }
-
   generateWeeklyInsights() {
     const now = new Date();
     const weekDates: string[] = [];
@@ -333,17 +307,18 @@ export class DashboardComponent implements OnInit {
     }
 
     const items: WeeklyInsight[] = [];
+
     if (this.rawHabits.length > 0) {
       let possible = 0, done = 0;
       weekDates.forEach(date => {
         possible += this.rawHabits.length;
-        done += this.rawHabits.filter(h => h.completions?.some((c: any) => c.date === date && c.completed)).length;
+        done     += this.rawHabits.filter(h => h.completions?.some((c: any) => c.date === date && c.completed)).length;
       });
       const pct = possible > 0 ? Math.round((done / possible) * 100) : 0;
       items.push({ label: 'Habit Rate', value: `${pct}%`, icon: 'repeat', color: '#564d79', bg: '#f5f3ff', sub: `${done}/${possible} check-ins` });
     }
 
-    const weekW = this.rawWorkouts.filter(w => weekDates.includes(w.date?.slice(0, 10)));
+    const weekW   = this.rawWorkouts.filter(w => weekDates.includes(w.date?.slice(0, 10)));
     const weekCal = weekW.reduce((s: number, w: any) => s + (w.caloriesBurned || 0), 0);
     items.push({ label: 'Workouts', value: `${weekW.length}`, icon: 'fitness_center', color: '#ef4444', bg: '#fef2f2', sub: weekCal > 0 ? `${weekCal} kcal burned` : 'this week' });
 
@@ -352,7 +327,7 @@ export class DashboardComponent implements OnInit {
       const counts: Record<string, number> = {};
       weekMoods.forEach(m => { counts[m.mood] = (counts[m.mood] || 0) + 1; });
       const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
-      const cfg = this.moodConfig[dominant] || { icon: '😐', color: '#6b7280', label: dominant };
+      const cfg      = this.moodConfig[dominant] || { icon: '😐', color: '#6b7280', label: dominant };
       items.push({ label: 'Mood Trend', value: cfg.icon, icon: 'mood', color: cfg.color, bg: cfg.color + '18', sub: `${cfg.label} (${weekMoods.length} logs)` });
     }
 
@@ -372,5 +347,61 @@ export class DashboardComponent implements OnInit {
     }
 
     this.weeklyInsights = items;
+  }
+
+  computeStreaks(): void {
+    this.habitStreak = this.rawHabits.length
+      ? Math.max(...this.rawHabits.map((h: any) => h.currentStreak || 0))
+      : 0;
+    this.diaryStreak = this.calcConsecutiveStreak(
+      this.rawDiary.map((e: any) => e.entryDate?.slice(0, 10))
+    );
+    this.moodStreak = this.calcConsecutiveStreak(
+      this.rawMoods.map((m: any) => m.datetime?.slice(0, 10))
+    );
+  }
+
+  calcConsecutiveStreak(inputDates: (string | undefined)[]): number {
+    const dates = inputDates.filter((d): d is string => !!d);
+    if (!dates.length) return 0;
+    const unique = [...new Set(dates)].sort().reverse();
+    const today  = new Date().toISOString().split('T')[0];
+    if (unique[0] !== today) return 0;
+    let streak = 1;
+    for (let i = 1; i < unique.length; i++) {
+      const prev = new Date(unique[i - 1]);
+      const curr = new Date(unique[i]);
+      const diff = (prev.getTime() - curr.getTime()) / 86400000;
+      if (diff === 1) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  get habitsPercent(): number {
+    if (!this.habitsTotal) return 0;
+    return Math.round((this.habitsCompleted / this.habitsTotal) * 100);
+  }
+
+  get todayLabel(): string {
+    return this.today.toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  get moodEmoji(): string {
+    if (!this.moodToday) return '—';
+    return this.moodConfig[this.moodToday]?.icon || '—';
+  }
+
+  get moodColor(): string {
+    if (!this.moodToday) return '#9ca3af';
+    return this.moodConfig[this.moodToday]?.color || '#9ca3af';
+  }
+
+  priorityColor(priority: string): string {
+    return priority === 'high' ? '#ef4444' : priority === 'medium' ? '#f59e0b' : '#10b981';
+  }
+
+  priorityIcon(priority: string): string {
+    return priority === 'high' ? 'keyboard_double_arrow_up' : priority === 'medium' ? 'drag_handle' : 'keyboard_double_arrow_down';
   }
 }

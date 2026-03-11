@@ -72,10 +72,11 @@
   </div>
 
   <!-- EMPTY -->
-  <div *ngIf="!loading && books.length === 0" class="empty">
-    <span class="material-icons empty-icon">auto_stories</span>
-    <p>No books yet. Add your first book!</p>
-  </div>
+<div *ngIf="!loading && books.length === 0" class="empty-state-wrap">
+  <div class="empty-illustration">📚</div>
+  <h3 class="empty-title">Your reading list is empty</h3>
+  <p class="empty-desc">A reader lives a thousand lives. Add your first book!</p>
+</div>
 
   <!-- ===================== GRID VIEW ===================== -->
   <ng-container *ngIf="!loading && viewMode === 'grid'">

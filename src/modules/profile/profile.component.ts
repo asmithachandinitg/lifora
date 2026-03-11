@@ -37,24 +37,25 @@ export class ProfileComponent implements OnInit {
 
   // Math reference for template
   Math = Math;
+  uploadingPhoto = false;
 
   allModules: ModuleToggle[] = [
-    { key: 'dashboard', label: 'Dashboard', icon: 'dashboard',      enabled: true },
-    { key: 'diary',     label: 'Diary',      icon: 'menu_book',      enabled: true },
-    { key: 'tasks',     label: 'Tasks',      icon: 'check_circle',   enabled: true },
-    { key: 'habits',    label: 'Habits',     icon: 'repeat',         enabled: true },
-    { key: 'goals',     label: 'Goals',      icon: 'flag',           enabled: true },
-    { key: 'food',      label: 'Food',       icon: 'restaurant',     enabled: true },
-    { key: 'fitness',   label: 'Fitness',    icon: 'fitness_center', enabled: true },
-    { key: 'sleep',     label: 'Sleep',      icon: 'bedtime',        enabled: true },
-    { key: 'mood',      label: 'Mood',       icon: 'mood',           enabled: true },
-    { key: 'period',    label: 'Period',     icon: 'favorite',       enabled: true },
-    { key: 'medicine',  label: 'Medicine',   icon: 'medication',     enabled: true },
-    { key: 'expenses',  label: 'Expenses',   icon: 'payments',       enabled: true },
-    { key: 'travel',    label: 'Travel',     icon: 'flight_takeoff', enabled: true },
-    { key: 'reading',   label: 'Reading',    icon: 'auto_stories',   enabled: true },
-    { key: 'pregnancy', label: 'Pregnancy',  icon: 'child_care',     enabled: true },
-    { key: 'knowledge',  label: 'Knowledge', icon: 'lightbulb', enabled: true },
+    { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', enabled: true },
+    { key: 'diary', label: 'Diary', icon: 'menu_book', enabled: true },
+    { key: 'tasks', label: 'Tasks', icon: 'check_circle', enabled: true },
+    { key: 'habits', label: 'Habits', icon: 'repeat', enabled: true },
+    { key: 'goals', label: 'Goals', icon: 'flag', enabled: true },
+    { key: 'food', label: 'Food', icon: 'restaurant', enabled: true },
+    { key: 'fitness', label: 'Fitness', icon: 'fitness_center', enabled: true },
+    { key: 'sleep', label: 'Sleep', icon: 'bedtime', enabled: true },
+    { key: 'mood', label: 'Mood', icon: 'mood', enabled: true },
+    { key: 'period', label: 'Period', icon: 'favorite', enabled: true },
+    { key: 'medicine', label: 'Medicine', icon: 'medication', enabled: true },
+    { key: 'expenses', label: 'Expenses', icon: 'payments', enabled: true },
+    { key: 'travel', label: 'Travel', icon: 'flight_takeoff', enabled: true },
+    { key: 'reading', label: 'Reading', icon: 'auto_stories', enabled: true },
+    { key: 'pregnancy', label: 'Pregnancy', icon: 'child_care', enabled: true },
+    { key: 'knowledge', label: 'Knowledge', icon: 'lightbulb', enabled: true },
 
   ];
 
@@ -72,21 +73,20 @@ export class ProfileComponent implements OnInit {
   selectedState: any;
   selectedCity: any;
 
-   countryCodes = allCountries.map(c => ({
+  countryCodes = allCountries.map(c => ({
     name: c.name,
     code: '+' + c.dialCode,
     iso2: c.iso2
   }));
 
-selectedCode: any = null;
+  selectedCode: any = null;
   constructor(
     private profileService: ProfileService,
     private authService: AuthService
   ) { }
 
-  ngOnInit() 
-  { 
-    this.loadProfile(); 
+  ngOnInit() {
+    this.loadProfile();
     this.countries = Country.getAllCountries();
   }
 
@@ -95,11 +95,11 @@ selectedCode: any = null;
     this.profileService.getProfile().subscribe({
       next: (data) => {
         this.profile = { ...this.emptyProfile(), ...data };
-           if (this.profile.phoneCode) {
-        this.selectedCode = this.countryCodes.find(
-          c => c.code.replace('+', '') === this.profile.phoneCode.replace('+', '').trim()
-        );
-      }
+        if (this.profile.phoneCode) {
+          this.selectedCode = this.countryCodes.find(
+            c => c.code.replace('+', '') === this.profile.phoneCode.replace('+', '').trim()
+          );
+        }
         if (data.modules?.length) {
           this.allModules = this.allModules.map(m => {
             const saved = data.modules!.find(s => s.key === m.key);
@@ -147,11 +147,11 @@ selectedCode: any = null;
 
   get bmiCategory(): { label: string; color: string } {
     const bmi = this.calculatedBMI;
-    if (!bmi)        return { label: '—',           color: '#9ca3af' };
-    if (bmi < 18.5)  return { label: 'Underweight', color: '#3b82f6' };
-    if (bmi < 25)    return { label: 'Normal',      color: '#22c55e' };
-    if (bmi < 30)    return { label: 'Overweight',  color: '#f59e0b' };
-    return             { label: 'Obese',          color: '#ef4444' };
+    if (!bmi) return { label: '—', color: '#9ca3af' };
+    if (bmi < 18.5) return { label: 'Underweight', color: '#3b82f6' };
+    if (bmi < 25) return { label: 'Normal', color: '#22c55e' };
+    if (bmi < 30) return { label: 'Overweight', color: '#f59e0b' };
+    return { label: 'Obese', color: '#ef4444' };
   }
 
   get avatarInitials(): string {
@@ -219,39 +219,69 @@ selectedCode: any = null;
   }
 
   toggleModule(mod: ModuleToggle) { mod.enabled = !mod.enabled; }
-  enableAll()  { this.visibleModules.forEach(m => m.enabled = true); }
+  enableAll() { this.visibleModules.forEach(m => m.enabled = true); }
   disableAll() { this.visibleModules.forEach(m => m.enabled = false); }
   clearMessages() { this.successMsg = ''; this.errorMsg = ''; this.passwordError = ''; this.passwordSuccess = ''; }
 
   onCountryChange(country: any) {
-  this.selectedCountry = country;
+    this.selectedCountry = country;
 
-  this.states = State.getStatesOfCountry(country.isoCode);
-  this.cities = [];
+    this.states = State.getStatesOfCountry(country.isoCode);
+    this.cities = [];
 
-  this.profile.country = country.name;
-}
+    this.profile.country = country.name;
+  }
 
-onStateChange(state: any) {
-  this.selectedState = state;
+  onStateChange(state: any) {
+    this.selectedState = state;
 
-  this.cities = City.getCitiesOfState(
-    this.selectedCountry.isoCode,
-    state.isoCode
-  );
+    this.cities = City.getCitiesOfState(
+      this.selectedCountry.isoCode,
+      state.isoCode
+    );
 
-  this.profile.state = state.name;
-}
+    this.profile.state = state.name;
+  }
 
-onCityChange(city: any) {
-  this.selectedCity = city;
+  onCityChange(city: any) {
+    this.selectedCity = city;
 
-  this.profile.city = city.name;
-}
+    this.profile.city = city.name;
+  }
 
   allowOnlyNumbers(event: any) {
-  const input = event.target;
-  input.value = input.value.replace(/[^0-9]/g, '');
-  this.profile.phone = input.value;
-}
+    const input = event.target;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    this.profile.phone = input.value;
+  }
+
+  onPhotoSelect(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    if (file.size > 1.5 * 1024 * 1024) {
+      this.errorMsg = 'Image too large. Please choose under 1.5MB.';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      this.uploadingPhoto = true;
+      this.profileService.uploadPhoto(base64).subscribe({
+        next: (updated) => {
+          this.profile.profilePhoto = updated.profilePhoto;
+          this.authService.setUser(updated);
+          this.uploadingPhoto = false;
+          this.successMsg = 'Photo updated!';
+          setTimeout(() => this.successMsg = '', 3000);
+        },
+        error: () => {
+          this.errorMsg = 'Failed to upload photo.';
+          this.uploadingPhoto = false;
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+  }
 }

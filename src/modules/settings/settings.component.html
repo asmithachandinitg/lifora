@@ -149,7 +149,7 @@
               <p class="label-sub">Log out of your Lifora account</p>
             </div>
           </div>
-          <button class="danger-btn" (click)="logout()">
+          <button class="danger-btn" (click)="confirmLogout()">
             <span class="material-icons">logout</span> Logout
           </button>
         </div>
@@ -247,6 +247,18 @@
 
       </div>
 
+    </div>
+  </div>
+</div>
+
+<div class="logout-overlay" *ngIf="showLogoutModal" (click)="cancelLogout()">
+  <div class="logout-modal" (click)="$event.stopPropagation()">
+    <div class="logout-icon">👋</div>
+    <h3>Leaving so soon?</h3>
+    <p>Are you sure you want to logout?</p>
+    <div class="logout-actions">
+      <button class="btn-cancel" (click)="cancelLogout()">Stay</button>
+      <button class="btn-confirm" (click)="logout()">Logout</button>
     </div>
   </div>
 </div>

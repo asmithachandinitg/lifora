@@ -59,10 +59,11 @@
       <span class="material-icons">today</span> Today's Schedule
     </div>
 
-    <div *ngIf="todayMedicines.length === 0" class="empty">
-      <span class="material-icons empty-icon">medication</span>
-      <p>No medicines scheduled for today.</p>
-    </div>
+<div *ngIf="medicines.length === 0" class="empty-state-wrap">
+  <div class="empty-illustration">💊</div>
+  <h3 class="empty-title">No medicines added</h3>
+  <p class="empty-desc">Stay on top of your health. Never miss a dose again!</p>
+</div>
 
     <div class="today-list">
       <div class="today-card" *ngFor="let med of todayMedicines; trackBy: trackById"

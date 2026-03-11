@@ -26,4 +26,8 @@ export class ProfileService {
   updateModules(modules: { key: string; enabled: boolean }[]): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.baseUrl}/modules`, { modules });
   }
+
+  uploadPhoto(base64: string): Observable<UserProfile> {
+  return this.http.put<UserProfile>(`${this.baseUrl}/photo`, { photo: base64 });
+}
 }

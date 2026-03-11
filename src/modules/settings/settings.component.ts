@@ -20,6 +20,7 @@ export class SettingsComponent implements OnInit {
   activeSection: 'appearance' | 'account' | 'data' | 'about' = 'appearance';
 
   user: any = {};
+  showLogoutModal = false;
 
   showDeleteConfirm = false;
   deleteInput       = '';
@@ -54,13 +55,6 @@ export class SettingsComponent implements OnInit {
     this.router.navigate(['/profile']);
   }
 
-  logout() {
-    if (confirm('Are you sure you want to logout?')) {
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
-  }
-
   downloadBackup() {
     this.exportingBackup = true;
     this.exportService.exportFullBackup();
@@ -79,4 +73,19 @@ export class SettingsComponent implements OnInit {
     if (!this.user) return '';
     return `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim();
   }
+
+  confirmLogout() {
+ // this.menuOpen = false;
+  this.showLogoutModal = true;
+}
+
+cancelLogout() {
+  this.showLogoutModal = false;
+}
+
+logout() {
+  this.showLogoutModal = false;
+  this.authService.logout();
+  this.router.navigate(['/login']);
+}
 }

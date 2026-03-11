@@ -1,8 +1,26 @@
 <div class="dashboard-wrapper">
 
-  <div *ngIf="loading" class="empty">
-    <span class="material-icons empty-icon">hourglass_empty</span>
-    <p>Loading your dashboard...</p>
+  <!-- ── SKELETON LOADER ── -->
+  <div *ngIf="loading" class="sk-dashboard">
+
+    <!-- Hero skeleton -->
+    <div class="sk-hero sk-rounded skeleton"></div>
+
+    <!-- Stats row skeleton -->
+    <div class="sk-stats-row">
+      <div class="sk-stat-card sk-rounded skeleton" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+
+    <!-- Streaks skeleton -->
+    <div class="sk-streaks-row">
+      <div class="sk-streak-card sk-rounded skeleton" *ngFor="let i of [1,2,3]"></div>
+    </div>
+
+    <!-- Content grid skeleton -->
+    <div class="sk-content-grid">
+      <div class="sk-card-block sk-rounded skeleton"></div>
+      <div class="sk-card-block sk-rounded skeleton"></div>
+    </div>
   </div>
 
   <div *ngIf="!loading">
@@ -106,6 +124,32 @@
       </div>
 
     </div>
+
+    <!-- ── STREAK ROW ── -->
+    <div class="streaks-row" *ngIf="diaryStreak > 0 || habitStreak > 0 || moodStreak > 0">
+      <div class="streak-card" *ngIf="habitStreak > 0">
+        <span class="streak-fire">🔥</span>
+        <div class="streak-info">
+          <span class="streak-num">{{ habitStreak }}</span>
+          <span class="streak-label">day habit streak</span>
+        </div>
+      </div>
+      <div class="streak-card" *ngIf="diaryStreak > 0">
+        <span class="streak-fire">📔</span>
+        <div class="streak-info">
+          <span class="streak-num">{{ diaryStreak }}</span>
+          <span class="streak-label">day journal streak</span>
+        </div>
+      </div>
+      <div class="streak-card" *ngIf="moodStreak > 0">
+        <span class="streak-fire">😊</span>
+        <div class="streak-info">
+          <span class="streak-num">{{ moodStreak }}</span>
+          <span class="streak-label">day mood streak</span>
+        </div>
+      </div>
+    </div>
+
 
     <div class="insights-section" *ngIf="insights.length > 0">
       <div class="insights-header">

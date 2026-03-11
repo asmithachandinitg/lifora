@@ -17,29 +17,30 @@ export class TopbarComponent {
   today = new Date();
   user: any;
   menuOpen = false;
+  showLogoutModal = false;
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
-ngOnInit() {
-  if (this.authService.isLoggedIn()) {
-    this.authService.loadUser()
-      .subscribe({
-        next: (user) => {
-          console.log('User loaded:', user);
-          this.user = user;  
-        },
-        error: (err) => {
-          console.error('Error loading user:', err);
-          this.user = this.authService.getUser();
-        }
-      });
-  } else {
-    this.user = this.authService.getUser();
+  ngOnInit() {
+    if (this.authService.isLoggedIn()) {
+      this.authService.loadUser()
+        .subscribe({
+          next: (user) => {
+            console.log('User loaded:', user);
+            this.user = user;
+          },
+          error: (err) => {
+            console.error('Error loading user:', err);
+            this.user = this.authService.getUser();
+          }
+        });
+    } else {
+      this.user = this.authService.getUser();
+    }
   }
-}
 
   getGreeting() {
     const hour = this.today.getHours();
@@ -47,13 +48,6 @@ ngOnInit() {
     if (hour < 12) return 'Good Morning';
     if (hour < 18) return 'Good Afternoon';
     return 'Good Evening';
-  }
-
-  logout() {
-    if (confirm('Are you sure you want to logout?')) {
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
   }
 
   toggleMenu() {
@@ -65,8 +59,31 @@ ngOnInit() {
     this.menuOpen = false;
   }
 
-    goSettings() {
+  goSettings() {
     this.router.navigate(['/settings']);
     this.menuOpen = false;
   }
+
+  get avatarInitials(): string {
+    const f = this.user?.firstName?.charAt(0) || '';
+    const l = this.user?.lastName?.charAt(0) || '';
+    return (f + l).toUpperCase();
+  }
+
+
+confirmLogout() {
+  this.menuOpen = false;
+  this.showLogoutModal = true;
 }
+
+cancelLogout() {
+  this.showLogoutModal = false;
+}
+
+logout() {
+  this.showLogoutModal = false;
+  this.authService.logout();
+  this.router.navigate(['/login']);
+}
+}
+

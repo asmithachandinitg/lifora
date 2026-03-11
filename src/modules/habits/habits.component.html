@@ -21,10 +21,13 @@
     <button [class.active]="activeTab === 'stats'" (click)="onStatsTabClick()">Stats</button>
   </div>
 
-  <!-- LOADING -->
-  <div *ngIf="loading" class="empty">
-    <span class="material-icons empty-icon">hourglass_empty</span>
-    <p>Loading habits...</p>
+  <!-- SKELETON LOADER -->
+  <div *ngIf="loading" class="sk-habits">
+    <div class="sk-summary-bar sk-rounded skeleton"></div>
+    <div class="sk-habit-group" *ngFor="let i of [1,2]">
+      <div class="sk-line md skeleton" style="margin-bottom:14px"></div>
+      <div class="sk-habit-row sk-rounded skeleton" *ngFor="let j of [1,2,3]"></div>
+    </div>
   </div>
 
   <!-- ERROR -->
@@ -51,9 +54,11 @@
     </div>
 
     <!-- Empty state -->
-    <div *ngIf="!habits.length" class="empty">
-      <span class="material-icons empty-icon">repeat</span>
-      <p>No habits yet. Add your first habit!</p>
+    <div *ngIf="!habits.length" class="empty-state-wrap">
+      <div class="empty-illustration">🔁</div>
+      <h3 class="empty-title">No habits yet</h3>
+      <p class="empty-desc">Build consistency one day at a time. Add your first habit to start your streak!</p>
+      <button class="empty-action" (click)="openModal()">+ Add first habit</button>
     </div>
 
     <!-- Grouped habits -->

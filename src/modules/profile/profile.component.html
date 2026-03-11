@@ -20,16 +20,18 @@
     <div class="profile-sidebar-card">
 
       <div class="avatar-section">
-        <div class="avatar-circle">
+        <div class="avatar-circle" (click)="photoInput.click()" style="cursor:pointer; position:relative">
           <img *ngIf="profile.profilePhoto" [src]="profile.profilePhoto" alt="avatar" />
           <span *ngIf="!profile.profilePhoto" class="avatar-initials">{{ avatarInitials }}</span>
+          <!-- hover overlay -->
+          <div class="avatar-overlay">
+            <span class="material-icons" style="font-size:20px; color:white">photo_camera</span>
+          </div>
         </div>
+        <input #photoInput type="file" accept="image/*" style="display:none" (change)="onPhotoSelect($event)">
+        <div *ngIf="uploadingPhoto" style="font-size:12px; color:var(--primary); margin-top:6px">Uploading...</div>
         <div class="avatar-name">{{ profile.firstName }} {{ profile.lastName }}</div>
         <div class="avatar-email">{{ profile.email }}</div>
-        <div class="gender-badge" *ngIf="profile.gender">
-          {{ profile.gender === 'male' ? '♂' : profile.gender === 'female' ? '♀' : '⚧' }}
-          {{ profile.gender | titlecase }}
-        </div>
       </div>
 
       <div class="quick-stats">
@@ -127,7 +129,7 @@
             <label>Email</label>
             <input type="email" [(ngModel)]="profile.email" placeholder="Email address" />
           </div>
-        <!-- <div class="form-group">
+          <!-- <div class="form-group">
   <label>Mobile Number</label>
 
   <div class="phone-input-wrapper">
@@ -155,37 +157,25 @@
   </div>
 </div> -->
 
-<div class="form-group">
-  <label>Mobile Number</label>
-  <div class="phone-container">
-<ng-select
-  class="country-code"
-  [items]="countryCodes"
-  bindLabel="name"
-  [(ngModel)]="selectedCode"
-  [searchable]="true"
-  [clearable]="false"
-  appendTo="body"
->
-  <ng-template ng-option-tmp let-item="item">
-    {{ item.name }} (+{{ item.code }})
-  </ng-template>
+          <div class="form-group">
+            <label>Mobile Number</label>
+            <div class="phone-container">
+              <ng-select class="country-code" [items]="countryCodes" bindLabel="name" [(ngModel)]="selectedCode"
+                [searchable]="true" [clearable]="false" appendTo="body">
+                <ng-template ng-option-tmp let-item="item">
+                  {{ item.name }} (+{{ item.code }})
+                </ng-template>
 
-  <ng-template ng-label-tmp let-item="item">
-    {{ item?.code }}
-  </ng-template>
-</ng-select>
+                <ng-template ng-label-tmp let-item="item">
+                  {{ item?.code }}
+                </ng-template>
+              </ng-select>
 
-    <input
-      type="text"
-      class="phone-input"
-      placeholder="Enter phone number"
-      [(ngModel)]="profile.phone"
-      (input)="allowOnlyNumbers($event)"
-    />
+              <input type="text" class="phone-input" placeholder="Enter phone number" [(ngModel)]="profile.phone"
+                (input)="allowOnlyNumbers($event)" />
 
-  </div>
-</div>
+            </div>
+          </div>
         </div>
 
         <div class="form-row">

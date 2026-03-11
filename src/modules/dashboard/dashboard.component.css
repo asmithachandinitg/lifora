@@ -787,3 +787,31 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* ── SKELETON ── */
+.sk-dashboard { padding: 0; }
+.sk-hero       { height: 140px; margin-bottom: 24px; }
+.sk-stats-row  { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 14px; margin-bottom: 20px; }
+.sk-stat-card  { height: 90px; }
+.sk-streaks-row{ display: flex; gap: 14px; margin-bottom: 20px; }
+.sk-streak-card{ flex: 1; height: 72px; }
+.sk-content-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.sk-card-block { height: 260px; }
+
+/* ── STREAK ROW ── */
+.streaks-row {
+  display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.streak-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card-bg); border-radius: 16px;
+  padding: 14px 20px; box-shadow: var(--card-shadow);
+  border: 1.5px solid var(--border);
+  flex: 1; min-width: 140px;
+}
+.streak-fire { font-size: 28px; line-height: 1; }
+.streak-info { display: flex; flex-direction: column; }
+.streak-num  {
+  font-size: 1.5rem; font-weight: 800; color: var(--text);
+  line-height: 1;
+}
+.streak-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }

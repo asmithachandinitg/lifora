@@ -867,3 +867,32 @@ input:focus, select:focus { border-color: var(--primary); background: #fff; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* ── SKELETON ── */
+.sk-habits        { padding-top: 8px; }
+.sk-summary-bar   { height: 64px; margin-bottom: 24px; }
+.sk-habit-group   { margin-bottom: 28px; }
+.sk-habit-row     { height: 70px; margin-bottom: 12px; }
+
+/* ── EMPTY STATE ── */
+.empty-state-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding: 56px 24px;
+}
+.empty-illustration {
+  font-size: 56px; margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-8px); }
+}
+.empty-title  { font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 0 0 8px; }
+.empty-desc   { font-size: 0.9rem; color: var(--text-muted); max-width: 280px; line-height: 1.6; margin: 0 0 24px; }
+.empty-action {
+  padding: 10px 24px; border-radius: 12px; border: none;
+  background: var(--primary); color: white;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.empty-action:hover { opacity: 0.85; }

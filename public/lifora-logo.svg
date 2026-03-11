@@ -1,9 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1a1a2e"/>
-      <stop offset="100%" stop-color="#2d1b4e"/>
-    </linearGradient>
     <linearGradient id="p1" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ff6b6b"/>
       <stop offset="100%" stop-color="#ff8e53"/>
@@ -28,56 +24,61 @@
       <stop offset="0%" stop-color="#ff6fd8"/>
       <stop offset="100%" stop-color="#ff6b6b"/>
     </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <radialGradient id="centerglow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="60%" stop-color="#ffd93d" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#ffd93d" stop-opacity="0.6"/>
       <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/>
     </radialGradient>
-    <filter id="softglow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.10)"/>
+    </filter>
+    <filter id="petalshadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.12)"/>
     </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="200" height="200" rx="46" fill="url(#bg)"/>
+  <!-- White background circle -->
+  <circle cx="100" cy="100" r="100" fill="white"/>
 
-  <!-- Subtle rings -->
-  <circle cx="100" cy="100" r="72" fill="none" stroke="white" stroke-width="0.5" opacity="0.08"/>
-  <circle cx="100" cy="100" r="52" fill="none" stroke="white" stroke-width="0.5" opacity="0.06"/>
+  <!-- Outer subtle ring -->
+  <circle cx="100" cy="100" r="88" fill="none" stroke="#f0f0f0" stroke-width="1"/>
 
-  <!-- 6 petals representing 6 life dimensions -->
-  <g transform="translate(100,100) rotate(0)">
-    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p1)" opacity="0.93" filter="url(#softglow)"/>
-  </g>
-  <g transform="translate(100,100) rotate(60)">
-    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p2)" opacity="0.93" filter="url(#softglow)"/>
-  </g>
-  <g transform="translate(100,100) rotate(120)">
-    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p3)" opacity="0.93" filter="url(#softglow)"/>
-  </g>
-  <g transform="translate(100,100) rotate(180)">
-    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p4)" opacity="0.93" filter="url(#softglow)"/>
-  </g>
-  <g transform="translate(100,100) rotate(240)">
-    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p5)" opacity="0.93" filter="url(#softglow)"/>
-  </g>
-  <g transform="translate(100,100) rotate(300)">
-    <ellipse cx="0" cy="-38" rx="11" ry="22" fill="url(#p6)" opacity="0.93" filter="url(#softglow)"/>
+  <!-- 6 petals -->
+  <g filter="url(#petalshadow)">
+    <g transform="translate(100,100) rotate(0)">
+      <ellipse cx="0" cy="-44" rx="13" ry="26" fill="url(#p1)" opacity="0.95"/>
+    </g>
+    <g transform="translate(100,100) rotate(60)">
+      <ellipse cx="0" cy="-44" rx="13" ry="26" fill="url(#p2)" opacity="0.95"/>
+    </g>
+    <g transform="translate(100,100) rotate(120)">
+      <ellipse cx="0" cy="-44" rx="13" ry="26" fill="url(#p3)" opacity="0.95"/>
+    </g>
+    <g transform="translate(100,100) rotate(180)">
+      <ellipse cx="0" cy="-44" rx="13" ry="26" fill="url(#p4)" opacity="0.95"/>
+    </g>
+    <g transform="translate(100,100) rotate(240)">
+      <ellipse cx="0" cy="-44" rx="13" ry="26" fill="url(#p5)" opacity="0.95"/>
+    </g>
+    <g transform="translate(100,100) rotate(300)">
+      <ellipse cx="0" cy="-44" rx="13" ry="26" fill="url(#p6)" opacity="0.95"/>
+    </g>
   </g>
 
-  <!-- Center glow -->
-  <circle cx="100" cy="100" r="18" fill="url(#glow)" opacity="0.85"/>
-  <circle cx="100" cy="100" r="7" fill="white"/>
+  <!-- Inner glow ring -->
+  <circle cx="100" cy="100" r="22" fill="url(#centerglow)" opacity="0.9"/>
+
+  <!-- Center white circle -->
+  <circle cx="100" cy="100" r="10" fill="white" filter="url(#shadow)"/>
+
+  <!-- Center dot -->
+  <circle cx="100" cy="100" r="5" fill="url(#p1)"/>
 
   <!-- Sparkle dots between petals -->
-  <circle cx="100" cy="63"  r="2.5" fill="white" opacity="0.55"/>
-  <circle cx="129" cy="81"  r="2.5" fill="white" opacity="0.55"/>
-  <circle cx="129" cy="119" r="2.5" fill="white" opacity="0.55"/>
-  <circle cx="100" cy="137" r="2.5" fill="white" opacity="0.55"/>
-  <circle cx="71"  cy="119" r="2.5" fill="white" opacity="0.55"/>
-  <circle cx="71"  cy="81"  r="2.5" fill="white" opacity="0.55"/>
+  <circle cx="100" cy="67"  r="3" fill="white" stroke="#ff6b6b" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="128" cy="83"  r="3" fill="white" stroke="#ffd93d" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="128" cy="117" r="3" fill="white" stroke="#6bcb77" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="100" cy="133" r="3" fill="white" stroke="#4d96ff" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="72"  cy="117" r="3" fill="white" stroke="#c77dff" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="72"  cy="83"  r="3" fill="white" stroke="#ff6fd8" stroke-width="1.5" opacity="0.9"/>
 </svg>

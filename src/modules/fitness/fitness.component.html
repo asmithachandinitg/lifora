@@ -1,26 +1,26 @@
 <div class="fitness-wrapper">
 
   <!-- HEADER -->
-<div class="fitness-header">
-  <div class="header-left">
-    <h2><span class="material-icons header-icon">fitness_center</span> Fitness Tracker</h2>
-    <span class="fitness-subtitle">Stay consistent, stay strong</span>
-  </div>
-  <div class="header-actions">
-        <button class="add-btn" (click)="openModal()">
-      <span class="material-icons">add</span> Log Workout
-    </button>
-    <button class="add-btn" (click)="toggleExportMenu()">
-      <span class="material-icons">download</span> Export
-    </button>
-    <div class="export-dropdown" *ngIf="showExportMenu">
-      <button (click)="exportFitnessCSV()">
-        <span class="material-icons">table_chart</span>
-        Download Workout CSV
+  <div class="fitness-header">
+    <div class="header-left">
+      <h2><span class="material-icons header-icon">fitness_center</span> Fitness Tracker</h2>
+      <span class="fitness-subtitle">Stay consistent, stay strong</span>
+    </div>
+    <div class="header-actions">
+      <button class="add-btn" (click)="openModal()">
+        <span class="material-icons">add</span> Log Workout
       </button>
+      <button class="add-btn" (click)="toggleExportMenu()">
+        <span class="material-icons">download</span> Export
+      </button>
+      <div class="export-dropdown" *ngIf="showExportMenu">
+        <button (click)="exportFitnessCSV()">
+          <span class="material-icons">table_chart</span>
+          Download Workout CSV
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
   <!-- TABS -->
   <div class="tabs">
@@ -32,9 +32,10 @@
   <!-- ===================== DASHBOARD ===================== -->
   <div *ngIf="activeTab === 'dashboard'">
 
-    <div *ngIf="entries.length === 0" class="empty">
-      <span class="material-icons empty-icon">fitness_center</span>
-      <p>No workouts yet. Log your first session!</p>
+    <div *ngIf="entries.length === 0" class="empty-state-wrap">
+      <div class="empty-illustration">💪</div>
+      <h3 class="empty-title">No workouts yet</h3>
+      <p class="empty-desc">Every journey starts with a single rep. Log your first session!</p>
     </div>
 
     <div *ngIf="entries.length > 0">
@@ -141,8 +142,7 @@
       <!-- LATEST WORKOUT -->
       <div class="latest-card" *ngIf="sortedEntries[0] as latest">
         <div class="latest-top">
-          <div class="latest-cat-badge"
-            [style.background]="getCatColor(latest.category) + '18'"
+          <div class="latest-cat-badge" [style.background]="getCatColor(latest.category) + '18'"
             [style.color]="getCatColor(latest.category)">
             <span class="material-icons">{{ getCatIcon(latest.category) }}</span>
             {{ getCatLabel(latest.category) }}
@@ -197,7 +197,8 @@
         <div class="hc-right">
           <div class="hc-stats">
             <span class="hc-stat"><span class="material-icons">schedule</span>{{ entry.duration }}m</span>
-            <span class="hc-stat"><span class="material-icons">local_fire_department</span>{{ entry.caloriesBurned }}</span>
+            <span class="hc-stat"><span class="material-icons">local_fire_department</span>{{ entry.caloriesBurned
+              }}</span>
           </div>
           <div class="hc-actions">
             <button class="edit-btn" (click)="openEditModal(entry)">
@@ -265,14 +266,11 @@
     <!-- Category -->
     <label class="form-label">Category</label>
     <div class="cat-selector">
-      <div *ngFor="let cat of categories"
-        class="cat-option"
-        [class.selected-cat]="form.category === cat"
+      <div *ngFor="let cat of categories" class="cat-option" [class.selected-cat]="form.category === cat"
         [style.border-color]="form.category === cat ? getCatColor(cat) : 'transparent'"
         [style.background]="form.category === cat ? getCatColor(cat) + '15' : ''"
         (click)="form.category = cat; onFormChange()">
-        <span class="material-icons"
-          [style.color]="form.category === cat ? getCatColor(cat) : '#9ca3af'">
+        <span class="material-icons" [style.color]="form.category === cat ? getCatColor(cat) : '#9ca3af'">
           {{ getCatIcon(cat) }}
         </span>
         <span class="cat-opt-label">{{ getCatLabel(cat) }}</span>
@@ -295,8 +293,7 @@
     <div class="form-row">
       <div class="form-group">
         <label>Duration (min)</label>
-        <input type="number" [(ngModel)]="form.duration"
-          min="1" (ngModelChange)="onFormChange()" />
+        <input type="number" [(ngModel)]="form.duration" min="1" (ngModelChange)="onFormChange()" />
       </div>
       <div class="form-group">
         <label>
@@ -319,8 +316,7 @@
       <div class="exercise-item" *ngFor="let ex of form.exercises; let ei = index">
         <div class="ex-header">
           <input class="ex-name-input" placeholder="Exercise name" [(ngModel)]="ex.name" />
-          <button class="remove-ex-btn" (click)="removeExercise(ei)"
-            *ngIf="form.exercises.length > 1">
+          <button class="remove-ex-btn" (click)="removeExercise(ei)" *ngIf="form.exercises.length > 1">
             <span class="material-icons">close</span>
           </button>
         </div>
@@ -328,12 +324,9 @@
         <div class="sets-list">
           <div class="set-row" *ngFor="let set of ex.sets; let si = index">
             <span class="set-num">{{ si + 1 }}</span>
-            <input type="number" placeholder="Reps" [(ngModel)]="set.reps"
-              min="0" class="set-input" />
-            <input type="number" placeholder="kg (opt)" [(ngModel)]="set.weight"
-              min="0" class="set-input" />
-            <button class="remove-set-btn" (click)="removeSet(ex, si)"
-              *ngIf="ex.sets.length > 1">
+            <input type="number" placeholder="Reps" [(ngModel)]="set.reps" min="0" class="set-input" />
+            <input type="number" placeholder="kg (opt)" [(ngModel)]="set.weight" min="0" class="set-input" />
+            <button class="remove-set-btn" (click)="removeSet(ex, si)" *ngIf="ex.sets.length > 1">
               <span class="material-icons">close</span>
             </button>
           </div>
@@ -346,8 +339,7 @@
 
     <!-- Notes -->
     <label class="form-label">Notes</label>
-    <textarea [(ngModel)]="form.notes"
-      placeholder="How was the workout?" rows="2"></textarea>
+    <textarea [(ngModel)]="form.notes" placeholder="How was the workout?" rows="2"></textarea>
 
     <p class="error" *ngIf="formError">{{ formError }}</p>
 
@@ -390,33 +382,24 @@
 
     <!-- Mood selector -->
     <div class="mpm-moods">
-      <div *ngFor="let m of moodOptions"
-           class="mpm-option"
-           [class.selected]="postWorkoutMood === m.value"
-           [style.border-color]="postWorkoutMood === m.value ? m.color : '#e5e7eb'"
-           [style.background]="postWorkoutMood === m.value ? m.color + '20' : ''"
-           (click)="selectPostWorkoutMood(m.value)">
+      <div *ngFor="let m of moodOptions" class="mpm-option" [class.selected]="postWorkoutMood === m.value"
+        [style.border-color]="postWorkoutMood === m.value ? m.color : '#e5e7eb'"
+        [style.background]="postWorkoutMood === m.value ? m.color + '20' : ''" (click)="selectPostWorkoutMood(m.value)">
         <span class="mpm-emoji">{{ m.emoji }}</span>
         <span class="mpm-label">{{ m.label }}</span>
       </div>
     </div>
 
     <!-- Optional note -->
-    <input class="mpm-note"
-           [(ngModel)]="postWorkoutNote"
-           placeholder="Any notes? (optional)"
-           *ngIf="postWorkoutMood" />
+    <input class="mpm-note" [(ngModel)]="postWorkoutNote" placeholder="Any notes? (optional)" *ngIf="postWorkoutMood" />
 
     <div class="mpm-actions">
       <button class="mpm-skip" (click)="skipMoodPrompt()">Skip</button>
-      <button class="mpm-save"
-              [style.background]="getPostWorkoutMoodColor()"
-              [disabled]="!postWorkoutMood"
-              (click)="savePostWorkoutMood()">
+      <button class="mpm-save" [style.background]="getPostWorkoutMoodColor()" [disabled]="!postWorkoutMood"
+        (click)="savePostWorkoutMood()">
         <span class="material-icons">save</span> Save Mood
       </button>
     </div>
 
   </div>
 </div>
-
