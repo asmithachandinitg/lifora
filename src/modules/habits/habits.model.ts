@@ -22,6 +22,8 @@ export interface Habit {
   notes?: string;
   createdAt?: string;
 
+  deadline?: string | null;
+
   // ── Goal link ──────────────────────────────────────────────
   linkedGoalId?:    string;
   linkedGoalTitle?: string;

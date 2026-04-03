@@ -1,12 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DiaryService {
 
-  private baseUrl = 'http://localhost:5000/api/diary';
+private baseUrl = `${environment.apiUrl}/diary`;
 
   constructor(private http: HttpClient) {}
 

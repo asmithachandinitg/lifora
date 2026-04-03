@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  private base = 'http://localhost:5000/api';
-
+private base = `${environment.apiUrl}`;
   constructor(private http: HttpClient) { }
 
   getHabitSummary(): Observable<any> {

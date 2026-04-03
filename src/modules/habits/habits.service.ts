@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Habit, HabitCompletion } from './habits.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class HabitService {
-  private base = 'http://localhost:5000/api/habits';
+private base = `${environment.apiUrl}/habits`;
 
   constructor(private http: HttpClient) {}
 

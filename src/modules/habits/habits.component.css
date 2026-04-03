@@ -896,3 +896,117 @@ input:focus, select:focus { border-color: var(--primary); background: #fff; }
   transition: opacity 0.2s;
 }
 .empty-action:hover { opacity: 0.85; }
+
+/* ── Clickable calendar cells ────────────────────────────── */
+.cal-cell.clickable {
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.cal-cell.clickable:hover:not(.completed) {
+  background: #f3f4f6 !important;
+  transform: scale(1.05);
+}
+.cal-cell.clickable.completed:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+/* ── Deadline badge ──────────────────────────────────────── */
+.deadline-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #6b7280;
+  white-space: nowrap;
+}
+.deadline-badge .material-icons {
+  font-size: 13px;
+}
+.deadline-badge.deadline-near {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+/* ── Optional field label ────────────────────────────────── */
+.field-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-left: 4px;
+}
+
+/* ── Deadline date input ─────────────────────────────────── */
+.deadline-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13.5px;
+  color: #374151;
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.deadline-input:hover {
+  border-color: #c4b5fd;
+  background: #fff;
+}
+.deadline-input:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+.deadline-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.deadline-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* ── Deadline badge on habit card ───────────────────────── */
+.deadline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.deadline-badge .material-icons {
+  font-size: 13px;
+}
+/* Overdue — deadline passed */
+.deadline-badge.deadline-near {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+/* Approaching — within 3 days, add this class from TS if you want */
+.deadline-badge.deadline-soon {
+  background: #fffbeb;
+  color: #f59e0b;
+  border-color: #fde68a;
+}
+
+/* ── Optional label hint ─────────────────────────────────── */
+.field-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-left: 4px;
+}

@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ExportService {
 
-  private base = 'http://localhost:5000/api';
+private base = `${environment.apiUrl}`;
 
   constructor(private http: HttpClient) {}
 

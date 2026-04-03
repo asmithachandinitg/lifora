@@ -96,6 +96,12 @@
               <span class="material-icons">track_changes</span>
               <span class="goal-badge-text">{{ habit.linkedGoalTitle }}</span>
             </div>
+            <div class="deadline-badge" *ngIf="habit.deadline"
+              [class.deadline-near]="habit.deadline <= today"
+              [title]="'Deadline: ' + habit.deadline">
+              <span class="material-icons">event</span>
+              <span class="deadline-text">{{ habit.deadline | date:'MMM d' }}</span>
+            </div>
             <div class="streak-badge" [style.background]="habit.color + '18'" [style.color]="habit.color">
               <span class="material-icons">local_fire_department</span>
               {{ habit.currentStreak }}
@@ -180,8 +186,10 @@
           <!-- Day cells -->
           <div *ngFor="let day of getCalendarData(selectedHabitForCalendar)" class="cal-cell"
             [class.today]="day.isToday" [class.future]="day.isFuture" [class.completed]="day.completed === 1"
+            [class.clickable]="!day.isFuture"
             [style.background]="day.completed === 1 ? selectedHabitForCalendar.color : ''"
-            [style.border-color]="day.isToday ? selectedHabitForCalendar.color : ''">
+            [style.border-color]="day.isToday ? selectedHabitForCalendar.color : ''"
+            (click)="!day.isFuture && toggleHabitOnDate(selectedHabitForCalendar, day.date)">
             <span class="cal-day-num">{{ day.day }}</span>
             <span class="material-icons cal-check" *ngIf="day.completed === 1">check</span>
           </div>
@@ -300,6 +308,23 @@
         </div>
       </div>
 
+      <!-- Deadline + Notes side by side -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="field-label">
+            <span class="material-icons">event</span> Deadline
+            <span class="field-optional">(optional)</span>
+          </label>
+          <input class="deadline-input" type="date" [(ngModel)]="form.deadline" [min]="today" />
+        </div>
+        <div class="form-group">
+          <label class="field-label">
+            <span class="material-icons">sticky_note_2</span> Notes
+          </label>
+          <input type="text" [(ngModel)]="form.notes" placeholder="Any extra notes" />
+        </div>
+      </div>
+
       <!-- Color -->
       <div class="form-group">
         <label class="field-label">
@@ -324,14 +349,6 @@
             <span class="material-icons">{{ ico }}</span>
           </span>
         </div>
-      </div>
-
-      <!-- Notes -->
-      <div class="form-group">
-        <label class="field-label">
-          <span class="material-icons">sticky_note_2</span> Notes
-        </label>
-        <input type="text" [(ngModel)]="form.notes" placeholder="Any extra notes" />
       </div>
 
       <p class="form-error" *ngIf="formError">{{ formError }}</p>

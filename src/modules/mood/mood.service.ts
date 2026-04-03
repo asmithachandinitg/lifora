@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MoodService {
 
-  private base = 'http://localhost:5000/api/mood';
+private base = `${environment.apiUrl}/mood`;
 
   constructor(private http: HttpClient) {}
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewChecked, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   Habit, HabitWithStats, HabitCategory, HabitFrequency,
@@ -13,7 +13,7 @@ declare var d3: any;
 @Component({
   selector: 'app-habit',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './habits.component.html',
   styleUrls: ['./habits.component.css']
 })
@@ -181,6 +181,24 @@ ngAfterViewChecked() {
       next: (updated) => {
         const idx = this.habits.findIndex(h => h._id === habit._id);
         if (idx > -1) this.habits[idx] = this.enrichHabit(updated);
+      },
+      error: () => {}
+    });
+  }
+
+  // Toggle completion for any past or current date (used in calendar)
+  toggleHabitOnDate(habit: HabitWithStats, dateStr: string) {
+    if (dateStr > this.today) return;
+    const currentlyCompleted = habit.completions?.some(c => c.date === dateStr && c.completed) ?? false;
+    this.habitService.toggleLog(habit._id!, dateStr, !currentlyCompleted).subscribe({
+      next: (updated) => {
+        const idx = this.habits.findIndex(h => h._id === habit._id);
+        if (idx > -1) {
+          this.habits[idx] = this.enrichHabit(updated);
+          if (this.selectedHabitForCalendar?._id === habit._id) {
+            this.selectedHabitForCalendar = this.habits[idx];
+          }
+        }
       },
       error: () => {}
     });
@@ -413,7 +431,8 @@ ngAfterViewChecked() {
       icon: 'favorite',
       frequency: 'daily' as HabitFrequency,
       color: '#8B5CF6',
-      notes: ''
+      notes: '',
+      deadline: ''
     };
   }
 
@@ -433,7 +452,8 @@ ngAfterViewChecked() {
       icon: habit.icon,
       frequency: habit.frequency,
       color: habit.color,
-      notes: habit.notes || ''
+      notes: habit.notes || '',
+      deadline: habit.deadline || ''
     };
     this.editingId = habit._id!;
     this.editMode = true;
@@ -458,6 +478,7 @@ closeModal() {
       frequency: this.form.frequency,
       color: this.form.color,
       notes: this.form.notes,
+      deadline: this.form.deadline || null,
         linkedGoalId:    this.linkedGoalId    || undefined,
   linkedGoalTitle: this.linkedGoalTitle || undefined,
     };

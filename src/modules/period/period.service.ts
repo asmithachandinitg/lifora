@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PeriodEntry, DailySymptomLog } from './period.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class PeriodService {
-  private base     = 'http://localhost:5000/api/period';
-  private dailyBase = 'http://localhost:5000/api/daily-symptoms';
 
+  private base = `${environment.apiUrl}/period`;
+  private dailyBase = `${environment.apiUrl}/daily-symptoms`;
   constructor(private http: HttpClient) {}
 
   private headers(): HttpHeaders {
     return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token')}` });
   }
 
-  // Period entries
   getPeriodEntries(): Observable<PeriodEntry[]> {
     return this.http.get<PeriodEntry[]>(this.base, { headers: this.headers() });
   }

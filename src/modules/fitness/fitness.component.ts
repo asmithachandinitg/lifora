@@ -685,11 +685,16 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
     const scale = this.moodScaleDefaults[this.postWorkoutMood] || 5;
     const note = this.postWorkoutNote || `After workout: ${this.postWorkoutTitle}`;
 
+    const workoutEntry = this.entries.find(e => e.title === this.postWorkoutTitle);
+    const workoutDate = workoutEntry?.date
+      ? new Date(`${workoutEntry.date.slice(0, 10)}T${workoutEntry.workoutTime || '09:00'}`)
+      : new Date();
+
     this.moodService.createMood({
       mood: this.postWorkoutMood,
       scale,
       note,
-      datetime: new Date()
+      datetime: workoutDate
     }).subscribe({
       next: () => { this.showMoodPrompt = false; },
       error: () => { this.showMoodPrompt = false; }
@@ -700,7 +705,7 @@ export class FitnessComponent implements OnInit, AfterViewChecked {
     this.showMoodPrompt = false;
   }
 
-    toggleExportMenu() {
+  toggleExportMenu() {
     this.showExportMenu = !this.showExportMenu;
   }
 
